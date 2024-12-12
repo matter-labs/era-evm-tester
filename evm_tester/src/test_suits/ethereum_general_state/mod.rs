@@ -4,16 +4,12 @@
 
 use std::path::Path;
 use std::path::PathBuf;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 pub mod index;
 
-use index::FSEntity;
 
 use crate::test_suits::Collection;
 use crate::filters::Filters;
-use crate::summary::Summary;
 use crate::test::Test;
 
 ///
@@ -61,7 +57,7 @@ impl Collection for EthereumGeneralStateTestsDirectory {
                     return None;
                 }
 
-                let file = std::fs::read_to_string(test.path.clone()).expect(&format!("Test not found: {:?}", test.path));
+                let file = std::fs::read_to_string(test.path.clone()).unwrap_or_else(|_| panic!("Test not found: {:?}", test.path));
 
                 let file_name = test.path.file_name().unwrap().to_str().unwrap().to_string();
 
@@ -83,13 +79,13 @@ impl Collection for EthereumGeneralStateTestsDirectory {
 
                 let mut  is_json = false;
                 if std::fs::exists(filler_path_yml.clone()).unwrap() {
-                    filler_file = std::fs::read_to_string(filler_path_yml.clone()).expect(&format!("Filler not found: {:?}", filler_path_yml));
+                    filler_file = std::fs::read_to_string(filler_path_yml.clone()).unwrap_or_else(|_| panic!("Filler not found: {:?}", filler_path_yml));
                 } else {
                     let filler_path_json = filler_path.join(test_name + "Filler.json");
 
                     if std::fs::exists(filler_path_json.clone()).unwrap() {
                         is_json = true;
-                        filler_file = std::fs::read_to_string(filler_path_json.clone()).expect(&format!("Filler not found: {:?}", filler_path_json));
+                        filler_file = std::fs::read_to_string(filler_path_json.clone()).unwrap_or_else(|_| panic!("Filler not found: {:?}", filler_path_json));
                     } else {
                         return None // skip
                     }

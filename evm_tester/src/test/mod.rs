@@ -7,7 +7,6 @@ pub mod case;
 pub mod filler_structure;
 
 use std::collections::HashMap;
-use std::fs;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -30,7 +29,7 @@ fn wrap_numbers_in_quotes(input: &str) -> String {
     //let res2 = re2.replace_all(&res1, "\"$1\":").to_string();
 
     let re3 = Regex::new(r#"\s((0x)?[0-9a-fA-F]{2,}):"#).unwrap();
-    let res3 = re3.replace_all(&input, " \"$1\":").to_string();
+    let res3 = re3.replace_all(input, " \"$1\":").to_string();
 
     let re4 = Regex::new(r#": ((0x)?[0-9a-fA-F]{2,})\b"#).unwrap();
     re4.replace_all(&res3, ": \"$1\"").to_string()

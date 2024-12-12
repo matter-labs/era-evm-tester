@@ -4,8 +4,6 @@
 
 pub(crate) mod arguments;
 
-use std::path::PathBuf;
-use std::str::FromStr;
 use std::time::Instant;
 
 use colored::Colorize;
@@ -52,7 +50,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
         arguments.workflow,
     )?;
 
-    let environment = match (arguments.environment) {
+    let environment = match arguments.environment {
         Some(environment @ evm_tester::Environment::EVMEmulator) => environment,
         None => evm_tester::Environment::EVMEmulator
     };
@@ -95,7 +93,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
+    
 
     use crate::arguments::Arguments;
 

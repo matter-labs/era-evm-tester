@@ -2,7 +2,6 @@
 //! The evm tester arguments.
 //!
 
-use std::path::PathBuf;
 
 use structopt::StructOpt;
 

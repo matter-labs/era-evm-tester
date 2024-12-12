@@ -1,13 +1,10 @@
-use std::{borrow::Borrow, collections::HashMap, sync::{Arc, Mutex}};
+use std::{collections::HashMap, sync::{Arc, Mutex}};
 
 pub mod transaction;
 pub mod post_state_for_case;
 
 use post_state_for_case::PostStateForCase;
-use revm::{db::{states::plain_account, PlainAccount}, primitives::AccountInfo};
-use revme::cmd::statetest::merkle_trie::state_merkle_trie_root;
 use transaction::Transaction;
-use zksync_types::system_context;
 
 use crate::{test::filler_structure::{AccountFillerStruct, Labels}, utils, vm::eravm::system_context::SystemContext, EraVM, EraVMDeployer, Summary};
 
@@ -24,7 +21,7 @@ pub struct Case {
     pub env: EnvSection
 }
 
-const EVM_VERSION: &'static str = "Cancun";
+const EVM_VERSION: &str = "Cancun";
 
 fn parse_label(val: &LabelValue) -> Vec<String> {
     match val {
@@ -89,13 +86,13 @@ impl Case {
                 fill_indexes_for_expected_states(&indexes.data, &mut indexes_for_struct.0);
 
                 if let Some(gas_indexes) = &indexes.gas {
-                    fill_indexes_for_expected_states(&gas_indexes, &mut indexes_for_struct.1);
+                    fill_indexes_for_expected_states(gas_indexes, &mut indexes_for_struct.1);
                 } else {
                     indexes_for_struct.1.push("-1".to_string());
                 }
 
                 if let Some(value_indexes) = &indexes.value {
-                    fill_indexes_for_expected_states(&value_indexes, &mut indexes_for_struct.2);
+                    fill_indexes_for_expected_states(value_indexes, &mut indexes_for_struct.2);
                 } else {
                     indexes_for_struct.2.push("-1".to_string());
                 }
@@ -173,7 +170,7 @@ impl Case {
                         env: test_definition.env.clone()
                     });
 
-                    case_counter = case_counter + 1;
+                    case_counter += 1;
                 }
             }
         }
@@ -219,16 +216,14 @@ impl Case {
 
         if let Some(gas_price) = self.transaction.gas_price {
             system_context.gas_price = gas_price;
-        } else {
-            if let Some(base_fee) = self.env.current_base_fee {
-                let mut gas_price = base_fee;
+        } else if let Some(base_fee) = self.env.current_base_fee {
+            let mut gas_price = base_fee;
 
-                if let Some(max_priority_fee) = self.transaction.max_priority_fee_per_gas {
-                    gas_price = gas_price + max_priority_fee;
-                }
-
-                system_context.gas_price = gas_price;
+            if let Some(max_priority_fee) = self.transaction.max_priority_fee_per_gas {
+                gas_price += max_priority_fee;
             }
+
+            system_context.gas_price = gas_price;
         }
 
         if let Some(base_fee) = self.env.current_base_fee {
@@ -295,11 +290,7 @@ impl Case {
             }
 
             if filler_struct.code.is_some() {
-                let actual_code = if let Some(code) = vm.get_code(address) {
-                    code
-                } else {
-                    Default::default()
-                };
+                let actual_code = vm.get_code(address).unwrap_or_default();
 
                 if actual_code != filler_struct.code.unwrap().0.0 {
                     expected = Some(format!("Code of {address:?} is invalid"));
@@ -333,7 +324,7 @@ impl Case {
                         U256Parsed::Any => {
                             if actual_value.is_none() {
                                 expected = Some(format!("Storage of {address:?}, {:?}: {:?}", key.as_value().unwrap(), "Any value"));
-                                actual = Some(format!("None"));
+                                actual = Some("None".to_string());
         
                                 has_storage_divergence = true;
                                 break;

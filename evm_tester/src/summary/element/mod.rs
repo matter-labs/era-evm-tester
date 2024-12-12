@@ -102,7 +102,7 @@ impl Element {
                     )
                 }
             }
-            Outcome::Invalid { ref error, ref calldata } => format!("{} (calldata {})", error.to_string(), calldata),
+            Outcome::Invalid { ref error, ref calldata } => format!("{} (calldata {})", error, calldata),
             _ => String::new(),
         };
 

@@ -117,20 +117,18 @@ impl From<zkevm_tester::compiler_tests::VmSnapshot> for ExecutionOutput {
                     .collect();
 
                 let mut system_error = None;
-                if return_data.len() != 0 {
+                if !return_data.is_empty() {
                     let first_result_slot = return_data[0];
-                    if first_result_slot > (web3::types::U256::from(1) << web3::types::U256::from(128)) {
-                        if first_result_slot < (web3::types::U256::from(1) << web3::types::U256::from(220)) {
-                            let first_result_slot = first_result_slot >> web3::types::U256::from(8);
-                            let panic = first_result_slot.low_u32();
-                
-                            if first_result_slot >= (web3::types::U256::from(1) << web3::types::U256::from(200)) {
-                                system_error = Some((1, panic as usize));
-                            } else {
-                                system_error = Some((2, panic as usize));
+                    if first_result_slot > (web3::types::U256::from(1) << web3::types::U256::from(128)) && first_result_slot < (web3::types::U256::from(1) << web3::types::U256::from(220)) {
+                                let first_result_slot = first_result_slot >> web3::types::U256::from(8);
+                                let panic = first_result_slot.low_u32();
+                    
+                                if first_result_slot >= (web3::types::U256::from(1) << web3::types::U256::from(200)) {
+                                    system_error = Some((1, panic as usize));
+                                } else {
+                                    system_error = Some((2, panic as usize));
+                                }
                             }
-                        }
-                    }
                 }
 
                 Self {

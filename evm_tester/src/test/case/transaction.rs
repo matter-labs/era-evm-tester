@@ -15,7 +15,7 @@ impl<'de> Deserialize<'de> for FieldTo {
                 f.write_str("An empty string or correct address")
             }
             fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
-                let res = if value == "" {
+                let res = if value.is_empty() {
                     None
                 } else {
                     Some(value.parse::<web3::types::Address>().unwrap())

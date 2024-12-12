@@ -13,7 +13,6 @@ pub mod constants;
 mod vm2_adapter;
 
 use address_iterator::EraVMAddressIterator;
-use address_iterator_evm::EVMAddressIterator;
 use era_compiler_common::EVMVersion;
 use system_context::EVMContext;
 use system_contracts::SYSTEM_CONTRACT_LIST;
@@ -21,7 +20,6 @@ use web3::signing::keccak256;
 use zkevm_tester::compiler_tests::StorageKey;
 use zksync_types::bytecode::BytecodeHash;
 use zksync_types::Address;
-use zksync_types::H160;
 use zksync_types::H256;
 use zksync_types::U256;
 use std::collections::HashMap;
@@ -412,7 +410,7 @@ impl EraVM {
     }
 
     pub fn deploy_evm<const M: bool>(
-        self: &mut Self,
+        &mut self,
         test_name: String,
         caller: web3::types::Address,
         constructor_input: Vec<u8>,
@@ -513,26 +511,23 @@ impl EraVM {
             let mut r3 = None;
             let mut r4 = None;
             let mut r5 = None;
-            match value {
-                Some(value) => {
-                    if value != 0 {
-                        let value = web3::types::U256::from(value);
+            if let Some(value) = value {
+                        if value != 0 {
+                            let value = web3::types::U256::from(value);
 
-                        r3 = Some(value);
-                        r4 = Some(web3::types::U256::from(
-                            zkevm_opcode_defs::ADDRESS_CONTRACT_DEPLOYER,
-                        ));
-                        r5 = Some(web3::types::U256::from(u8::from(
-                            SYSTEM_CALL_BIT,
-                        )));
-        
-                        entry_address = web3::types::Address::from_low_u64_be(
-                            zkevm_opcode_defs::ADDRESS_MSG_VALUE.into(),
-                        );
+                            r3 = Some(value);
+                            r4 = Some(web3::types::U256::from(
+                                zkevm_opcode_defs::ADDRESS_CONTRACT_DEPLOYER,
+                            ));
+                            r5 = Some(web3::types::U256::from(u8::from(
+                                SYSTEM_CALL_BIT,
+                            )));
+            
+                            entry_address = web3::types::Address::from_low_u64_be(
+                                zkevm_opcode_defs::ADDRESS_MSG_VALUE.into(),
+                            );
+                        }
                     }
-                },
-                None => {},
-            }
 
             vm_launch_option = zkevm_tester::compiler_tests::VmLaunchOption::ManualCallABI(
                 zkevm_tester::compiler_tests::FullABIParams {
@@ -567,7 +562,7 @@ impl EraVM {
                 + constructor_input.len()
         );
 
-        const EVM_CREATE_METHOD_SIGNATURE: &'static str = "createEVM(bytes)";
+        const EVM_CREATE_METHOD_SIGNATURE: &str = "createEVM(bytes)";
         calldata.extend(crate::utils::selector(EVM_CREATE_METHOD_SIGNATURE));
         calldata.extend(
             web3::types::H256::from_low_u64_be(era_compiler_common::BYTE_LENGTH_FIELD as u64)
@@ -732,26 +727,24 @@ impl EraVM {
             if self.get_code(entry_address).is_some() {
                 anyhow::bail!("Return data is empty");
             } else {
-                let refund_amount = gas_limit * U256::from(gas_price);
+                let refund_amount = gas_limit * gas_price;
     
                 self.refund_gas(caller, coinbase, refund_amount);
             }
-        } else {
-            if result.output.system_error.is_none() {
-                let gas_left = result
-                .output
-                .return_data
-                .remove(0);
-    
-                let gas_left: u64 = gas_left.try_into().unwrap();
-    
-                result.gas = gas_limit - gas_left;
-    
-                let refund_amount = U256::from(gas_left) * U256::from(gas_price);
-    
-                self.refund_gas(caller, coinbase, refund_amount);
-            }
-        }
+        } else if result.output.system_error.is_none() {
+                    let gas_left = result
+                    .output
+                    .return_data
+                    .remove(0);
+        
+                    let gas_left: u64 = gas_left.try_into().unwrap();
+        
+                    result.gas = gas_limit - gas_left;
+        
+                    let refund_amount = U256::from(gas_left) * gas_price;
+        
+                    self.refund_gas(caller, coinbase, refund_amount);
+                }
 
         Ok(result)
     }
@@ -764,7 +757,7 @@ impl EraVM {
         });
 
         if gas >= intristic_cost {
-            gas = gas - intristic_cost;
+            gas -= intristic_cost;
         } else {
             return None;
         }
@@ -781,7 +774,7 @@ impl EraVM {
                 return None            
             }
 
-            gas = gas - calldata_byte_price;
+            gas -= calldata_byte_price;
         }
 
         Some(gas)
@@ -825,7 +818,7 @@ impl EraVM {
 
             user_space
         }).map(|(key, value)| {
-            (key.clone(), value.clone())
+            (*key, *value)
         }).collect();
 
         let accounts_storages: HashMap<Address, HashMap<U256, U256>> = self.active_addresses.iter().map(|address| {
@@ -834,7 +827,7 @@ impl EraVM {
             user_space_storage.iter().filter(|(key, _)| {
                 key.address == *address
             }).for_each(|(key, value)| {
-                storage.insert(key.key.clone(), utils::h256_to_u256(value));
+                storage.insert(key.key, utils::h256_to_u256(value));
             });
 
             (*address, storage)
@@ -930,7 +923,7 @@ impl EraVM {
     }
 
     pub fn pay_for_gas(&mut self, address: web3::types::Address, coinbase: web3::types::Address, gas_limit: U256, gas_price: U256) -> Result<U256, String> {
-        let amount = U256::from(gas_limit).checked_mul(U256::from(gas_price));
+        let amount = gas_limit.checked_mul(gas_price);
 
         if amount.is_none() {
             return Err("Amount calculation overflow".to_string());
@@ -948,7 +941,7 @@ impl EraVM {
             return Err("Insufficient balance".to_string());
         }
 
-        caller_balance = caller_balance - amount;
+        caller_balance -= amount;
         // coinbase_balance = coinbase_balance + amount;
 
         self.storage.insert(caller_key, utils::u256_to_h256(&caller_balance));
@@ -968,7 +961,7 @@ impl EraVM {
         let mut caller_balance = utils::h256_to_u256(&self.storage.get(&caller_key).copied().unwrap_or_default());
         //let mut coinbase_balance = utils::h256_to_u256(&self.storage.get(&coinbase_key).copied().unwrap_or_default());
 
-        caller_balance = caller_balance + amount;
+        caller_balance += amount;
         //coinbase_balance = coinbase_balance - amount;
 
         self.storage.insert(caller_key, utils::u256_to_h256(&caller_balance));
@@ -1036,7 +1029,7 @@ impl EraVM {
         self.save_evm_bytecode(address, bytecode.clone());
         self.active_addresses.push(address);
 
-        if bytecode.len() == 0 {
+        if bytecode.is_empty() {
             return;
         }
 
@@ -1292,13 +1285,13 @@ impl EraVM {
         ]
         .concat();
         let key = web3::signing::keccak256(&bytes).into();
-        let storage_key = zkevm_tester::compiler_tests::StorageKey {
+        
+
+        zkevm_tester::compiler_tests::StorageKey {
             address: web3::types::Address::from_low_u64_be(
                 zkevm_opcode_defs::ADDRESS_NONCE_HOLDER.into(),
             ),
             key,
-        };
-
-        storage_key
+        }
     }
 }

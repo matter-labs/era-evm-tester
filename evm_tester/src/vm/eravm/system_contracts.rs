@@ -7,7 +7,7 @@ use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use zksync_types::{block::DeployedContract, AccountTreeId, Address, ACCOUNT_CODE_STORAGE_ADDRESS, BOOTLOADER_ADDRESS, BOOTLOADER_UTILITIES_ADDRESS, CODE_ORACLE_ADDRESS, COMPLEX_UPGRADER_ADDRESS, COMPRESSOR_ADDRESS, CONTRACT_DEPLOYER_ADDRESS, CREATE2_FACTORY_ADDRESS, ECRECOVER_PRECOMPILE_ADDRESS, EC_ADD_PRECOMPILE_ADDRESS, EC_MUL_PRECOMPILE_ADDRESS, EC_PAIRING_PRECOMPILE_ADDRESS, EVENT_WRITER_ADDRESS, EVM_GAS_MANAGER_ADDRESS, IMMUTABLE_SIMULATOR_STORAGE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS, L1_MESSENGER_ADDRESS, L2_BASE_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS, P256VERIFY_PRECOMPILE_ADDRESS, PUBDATA_CHUNK_PUBLISHER_ADDRESS, SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS, IDENTITY_ADDRESS};
+use zksync_types::{block::DeployedContract, AccountTreeId, Address, ACCOUNT_CODE_STORAGE_ADDRESS, BOOTLOADER_ADDRESS, BOOTLOADER_UTILITIES_ADDRESS, CODE_ORACLE_ADDRESS, COMPLEX_UPGRADER_ADDRESS, COMPRESSOR_ADDRESS, CONTRACT_DEPLOYER_ADDRESS, ECRECOVER_PRECOMPILE_ADDRESS, EC_ADD_PRECOMPILE_ADDRESS, EC_MUL_PRECOMPILE_ADDRESS, EC_PAIRING_PRECOMPILE_ADDRESS, EVENT_WRITER_ADDRESS, EVM_GAS_MANAGER_ADDRESS, IMMUTABLE_SIMULATOR_STORAGE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS, L1_MESSENGER_ADDRESS, L2_BASE_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS, P256VERIFY_PRECOMPILE_ADDRESS, PUBDATA_CHUNK_PUBLISHER_ADDRESS, SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS, IDENTITY_ADDRESS};
 use zksync_contracts::ContractLanguage;
 use zksync_types::bytecode::BytecodeHash;
 
@@ -210,7 +210,7 @@ impl SystemContracts {
         
 
         let deployed_contracts:Vec<_> = system_contracts.into_iter().map(|contract| {
-            (contract.account_id.address().clone(), contract.bytecode)
+            (*contract.account_id.address(), contract.bytecode)
         }).collect();
 
         let evm_emulator_bytecode = read_sys_contract_bytecode(system_contracts_path.clone(), "", "EvmEmulator", ContractLanguage::Yul);
@@ -281,7 +281,7 @@ pub fn read_sys_contract_bytecode(
                     "artifacts-zk/contracts-preprocessed/{0}{1}.sol/{1}.json",
                     directory, name
                 )))
-                .expect(&format!("One of the outputs should exists: {:?} {}", root, name))
+                .unwrap_or_else(|| panic!("One of the outputs should exists: {:?} {}", root, name))
             }
         }
         ContractLanguage::Yul => {

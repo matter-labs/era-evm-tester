@@ -115,9 +115,9 @@ impl SystemContext {
     pub fn create_storage(
         target: era_compiler_common::Target,
     ) -> HashMap<zkevm_tester::compiler_tests::StorageKey, web3::types::H256> {
-        let mut storage = HashMap::new();
+        
 
-        storage
+        HashMap::new()
     }
 
     pub fn default_context(target: era_compiler_common::Target) -> EVMContext {
@@ -153,7 +153,7 @@ impl SystemContext {
 
         EVMContext {
             chain_id,
-            coinbase: web3::types::H256::from_str(&coinbase).expect("Always valid").into(),
+            coinbase: web3::types::H256::from_str(coinbase).expect("Always valid").into(),
             block_number,
             block_timestamp,
             block_gas_limit: web3::types::U256::from(block_gas_limit),

@@ -120,12 +120,11 @@ impl EvmTester {
     where
         T: Collection,
     {
-        Ok(T::read_all(
+        T::read_all(
             Path::new(path),
             Path::new(filler_path),
             &self.filters,
         )
-        .map_err(|error| anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}"))?
-        )
+        .map_err(|error| anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}"))
     }
 }

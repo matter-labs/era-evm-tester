@@ -1,8 +1,6 @@
 use std::{collections::HashMap, str::FromStr};
-use num_bigint::BigInt;
 use serde::{Deserialize, Deserializer};
 
-use crate::utils;
 
 #[derive(Debug, Clone, Hash, PartialEq)]
 pub enum U256Parsed {
@@ -18,7 +16,7 @@ impl U256Parsed {
         Self::from_str(&value.as_string())
     }
 
-    pub fn as_value(self: &Self) -> Option<web3::types::U256> {
+    pub fn as_value(&self) -> Option<web3::types::U256> {
         match self {
             U256Parsed::Value(u256) => Some(*u256),
             U256Parsed::Any => None,
@@ -35,7 +33,9 @@ impl FromStr for U256Parsed {
             return Ok(U256Parsed::Any);
         }
 
-        let result = if let Some(_) = value.strip_prefix("0x") {
+        
+
+        if value.strip_prefix("0x").is_some() {
             Ok(U256Parsed::Value(web3::types::U256::from_str_radix(value, 16).unwrap()))
         } else {
             let res_10 = web3::types::U256::from_str_radix(value, 10);
@@ -49,9 +49,7 @@ impl FromStr for U256Parsed {
                     Err(ParseU256Error(format!("Invalid input: {}", value)))
                 }
             }
-        };
-
-        result
+        }
     }
 }
 
@@ -119,12 +117,12 @@ impl<'de> Deserialize<'de> for AccountCode {
                 f.write_str("A smart contract bytecode")
             }
             fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
-                let res = if value == ""  {
+                let res = if value.is_empty()  {
                     web3::types::Bytes::default()
                 } else {
                     let stripped = value.strip_prefix("0x").unwrap_or(value);
 
-                    web3::types::Bytes(hex::decode(&stripped).unwrap())
+                    web3::types::Bytes(hex::decode(stripped).unwrap())
                 };
 
                 Ok(AccountCode(res))
@@ -183,7 +181,7 @@ pub enum LabelValue {
 }
 
 impl LabelValue {
-    pub fn as_isize(self: &Self) -> isize {
+    pub fn as_isize(&self) -> isize {
         match self {
             LabelValue::String(str) => panic!("Invalid label: {str}"),
             LabelValue::Number(val) => *val,
@@ -288,7 +286,7 @@ impl<'de> Deserialize<'de> for GenericSerializedSimpleValue {
 }
 
 impl GenericSerializedSimpleValue {
-    pub fn is_string(self: &Self) -> bool {
+    pub fn is_string(&self) -> bool {
         if let GenericSerializedSimpleValue::String(_) = self {
             true
         } else {
@@ -296,7 +294,7 @@ impl GenericSerializedSimpleValue {
         }
     }
 
-    pub fn as_string(self: &Self) -> String {
+    pub fn as_string(&self) -> String {
         match self {
             GenericSerializedSimpleValue::String(str) => str.clone(),
             GenericSerializedSimpleValue::U64(val) => val.to_string(),
