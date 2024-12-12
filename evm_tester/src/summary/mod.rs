@@ -102,7 +102,7 @@ impl Summary {
             size,
             cycles,
             ergs,
-            gas,
+            _gas: gas,
         };
         Self::passed(summary, name, group, passed_variant);
     }

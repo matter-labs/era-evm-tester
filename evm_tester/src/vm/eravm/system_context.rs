@@ -113,7 +113,7 @@ impl SystemContext {
     /// Returns the storage values for the system context.
     ///
     pub fn create_storage(
-        target: era_compiler_common::Target,
+        _target: era_compiler_common::Target,
     ) -> HashMap<zkevm_tester::compiler_tests::StorageKey, web3::types::H256> {
         HashMap::new()
     }

@@ -38,10 +38,7 @@ use self::system_context::SystemContext;
 use self::system_contracts::SystemContracts;
 use self::system_contracts::ADDRESS_EVM_GAS_MANAGER;
 
-use super::address_iterator::AddressIterator;
 use super::output::ExecutionOutput;
-
-pub type AccountsStorages = HashMap<Address, HashMap<U256, U256>>;
 
 #[derive(Debug)]
 pub struct EvmAccount {
@@ -73,10 +70,10 @@ pub struct EraVM {
     /// The current EVM block number.
     current_evm_block_number: u128,
     /// The target instruction set.
-    target: era_compiler_common::Target,
+    _target: era_compiler_common::Target,
     active_addresses: Vec<Address>,
     evm_bytecodes: HashMap<Address, (Vec<u8>, H256)>,
-    address_iterator: EraVMAddressIterator,
+    _address_iterator: EraVMAddressIterator,
     system_context: EVMContext,
 }
 
@@ -145,10 +142,10 @@ impl EraVM {
             storage_transient,
             published_evm_bytecodes: HashMap::new(),
             current_evm_block_number: SystemContext::INITIAL_BLOCK_NUMBER,
-            target,
+            _target: target,
             active_addresses: vec![],
             evm_bytecodes: Default::default(),
-            address_iterator: EraVMAddressIterator::new(),
+            _address_iterator: EraVMAddressIterator::new(),
             system_context: default_system_context,
         };
 
@@ -195,7 +192,7 @@ impl EraVM {
     pub fn clone_with_contracts(
         vm: Arc<Self>,
         known_contracts: HashMap<web3::types::U256, Vec<u8>>,
-        evm_version: Option<EVMVersion>,
+        _evm_version: Option<EVMVersion>,
     ) -> Self {
         let mut vm_clone = (*vm).clone();
         for (bytecode_hash, bytecode) in known_contracts.into_iter() {
@@ -935,22 +932,18 @@ impl EraVM {
         let amount = amount.unwrap();
 
         let caller_key = Self::balance_storage_key(address);
-        let coinbase_key = Self::balance_storage_key(coinbase);
 
         let mut caller_balance =
             utils::h256_to_u256(&self.storage.get(&caller_key).copied().unwrap_or_default());
-        //let mut coinbase_balance = utils::h256_to_u256(&self.storage.get(&coinbase_key).copied().unwrap_or_default());
 
         if caller_balance < amount {
             return Err("Insufficient balance".to_string());
         }
 
         caller_balance -= amount;
-        // coinbase_balance = coinbase_balance + amount;
 
         self.storage
             .insert(caller_key, utils::u256_to_h256(&caller_balance));
-        //self.storage.insert(coinbase_key, utils::u256_to_h256(&coinbase_balance));
 
         if !self.active_addresses.contains(&coinbase) {
             self.active_addresses.push(coinbase);
@@ -966,18 +959,14 @@ impl EraVM {
         amount: U256,
     ) {
         let caller_key = Self::balance_storage_key(address);
-        let coinbase_key = Self::balance_storage_key(coinbase);
 
         let mut caller_balance =
             utils::h256_to_u256(&self.storage.get(&caller_key).copied().unwrap_or_default());
-        //let mut coinbase_balance = utils::h256_to_u256(&self.storage.get(&coinbase_key).copied().unwrap_or_default());
 
         caller_balance += amount;
-        //coinbase_balance = coinbase_balance - amount;
 
         self.storage
             .insert(caller_key, utils::u256_to_h256(&caller_balance));
-        //self.storage.insert(coinbase_key, utils::u256_to_h256(&coinbase_balance));
 
         if !self.active_addresses.contains(&coinbase) {
             self.active_addresses.push(coinbase);
@@ -1111,7 +1100,7 @@ impl EraVM {
         self.known_contracts.insert(bytecode_hash, bytecode);
     }
 
-    fn add_known_evm_contract(&mut self, bytecode: Vec<u8>, bytecode_hash: web3::types::U256) {
+    fn add_known_evm_contract(&mut self, _bytecode: Vec<u8>, bytecode_hash: web3::types::U256) {
         self.storage.insert(
             zkevm_tester::compiler_tests::StorageKey {
                 address: web3::types::Address::from_low_u64_be(

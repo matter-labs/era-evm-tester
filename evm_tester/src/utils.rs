@@ -13,22 +13,6 @@ pub fn selector(signature: &str) -> [u8; 4] {
 }
 
 ///
-/// Overrides the default formatting for `Address`, which replaces the middle with an ellipsis.
-///
-pub fn address_as_string(value: &web3::types::Address) -> String {
-    hex::encode(value.as_bytes())
-}
-
-///
-/// Overrides the default formatting for `U256`, which replaces the middle with an ellipsis.
-///
-pub fn u256_as_string(value: &web3::types::U256) -> String {
-    let mut bytes = vec![0; era_compiler_common::BYTE_LENGTH_FIELD];
-    value.to_big_endian(&mut bytes);
-    hex::encode(bytes)
-}
-
-///
 /// Converts `[u8; 32]` into `Address`.
 ///
 pub fn bytes32_to_address(

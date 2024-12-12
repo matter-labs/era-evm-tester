@@ -32,8 +32,6 @@ pub struct Case {
     pub env: EnvSection,
 }
 
-const EVM_VERSION: &str = "Cancun";
-
 fn parse_label(val: &LabelValue) -> Vec<String> {
     match val {
         LabelValue::Number(index) => {

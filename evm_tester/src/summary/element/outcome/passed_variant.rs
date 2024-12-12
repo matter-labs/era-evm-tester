@@ -16,7 +16,7 @@ pub enum PassedVariant {
         /// The number of used ergs.
         ergs: u64,
         /// The number of used gas.
-        gas: u64,
+        _gas: u64,
     },
     /// The contract call.
     Runtime {
