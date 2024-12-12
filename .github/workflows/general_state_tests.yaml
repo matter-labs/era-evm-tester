@@ -1,0 +1,50 @@
+name: General State Tests CI
+
+on:
+  pull_request:
+
+jobs:
+  test:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout the repository
+          uses: actions/checkout@v4
+          with:
+            submodules: recursive
+
+        - name: Install rust
+          uses: actions-rust-lang/setup-rust-toolchain@v1
+          with:
+            toolchain: nightly-2024-08-01
+
+        - name: Install foundry-zksync
+          run: |
+            mkdir ./foundry-zksync
+            curl -LO https://github.com/matter-labs/foundry-zksync/releases/download/nightly/foundry_nightly_linux_amd64.tar.gz
+            tar zxf foundry_nightly_linux_amd64.tar.gz -C ./foundry-zksync
+            chmod +x ./foundry-zksync/forge ./foundry-zksync/cast
+            echo "$PWD/foundry-zksync" >> $GITHUB_PATH
+
+        - name: Use Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18.18.0
+            cache: yarn
+
+        - name: Build artifacts
+          working-directory: era-contracts/system-contracts
+          run: |
+            yarn install
+            yarn preprocess:system-contracts
+            forge build --zksync --zk-enable-eravm-extensions
+            yarn preprocess:bootloader
+            forge build --zksync --zk-enable-eravm-extensions
+            yarn build
+
+        - name: Build evm-tester
+          run: cargo build --release --bin 'evm-tester'
+
+        - name: Run general state transition tests
+          run: |
+            ./target/release/evm-tester
