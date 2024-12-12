@@ -61,8 +61,6 @@ impl Collection for EthereumGeneralStateTestsDirectory {
 
                 let file_name = test.path.file_name().unwrap().to_str().unwrap().to_string();
 
-                println!("Test: {file_name}");
-
                 let dir_name = directory_path.file_name().unwrap();
                 let relative_path: PathBuf = test
                     .path
