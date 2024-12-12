@@ -23,7 +23,7 @@ pub struct EVMContext {
     pub block_difficulty: web3::types::H256,
     pub base_fee: web3::types::U256,
     pub gas_price: web3::types::U256,
-    pub tx_origin: web3::types::Address
+    pub tx_origin: web3::types::Address,
 }
 
 impl SystemContext {
@@ -115,8 +115,6 @@ impl SystemContext {
     pub fn create_storage(
         target: era_compiler_common::Target,
     ) -> HashMap<zkevm_tester::compiler_tests::StorageKey, web3::types::H256> {
-        
-
         HashMap::new()
     }
 
@@ -153,18 +151,25 @@ impl SystemContext {
 
         EVMContext {
             chain_id,
-            coinbase: web3::types::H256::from_str(coinbase).expect("Always valid").into(),
+            coinbase: web3::types::H256::from_str(coinbase)
+                .expect("Always valid")
+                .into(),
             block_number,
             block_timestamp,
             block_gas_limit: web3::types::U256::from(block_gas_limit),
             block_difficulty,
             base_fee: web3::types::U256::from(Self::BASE_FEE),
             gas_price: web3::types::U256::from(Self::GAS_PRICE),
-            tx_origin: web3::types::H256::from_str(Self::TX_ORIGIN).expect("Always valid").into(),
+            tx_origin: web3::types::H256::from_str(Self::TX_ORIGIN)
+                .expect("Always valid")
+                .into(),
         }
     }
 
-    pub fn set_system_context(storage: &mut HashMap<zkevm_tester::compiler_tests::StorageKey, web3::types::H256>, context: &EVMContext) {
+    pub fn set_system_context(
+        storage: &mut HashMap<zkevm_tester::compiler_tests::StorageKey, web3::types::H256>,
+        context: &EVMContext,
+    ) {
         let mut system_context_values = vec![
             (
                 web3::types::H256::from_low_u64_be(Self::SYSTEM_CONTEXT_CHAIN_ID_POSITION),
@@ -188,7 +193,7 @@ impl SystemContext {
             ),
             (
                 web3::types::H256::from_low_u64_be(Self::SYSTEM_CONTEXT_DIFFICULTY_POSITION),
-                context.block_difficulty
+                context.block_difficulty,
             ),
             (
                 web3::types::H256::from_low_u64_be(Self::SYSTEM_CONTEXT_BASE_FEE_POSITION),
@@ -208,7 +213,11 @@ impl SystemContext {
             ),
         ];
 
-        let block_info_bytes = [context.block_number.to_be_bytes(), context.block_timestamp.to_be_bytes()].concat();
+        let block_info_bytes = [
+            context.block_number.to_be_bytes(),
+            context.block_timestamp.to_be_bytes(),
+        ]
+        .concat();
 
         system_context_values.push((
             web3::types::H256::from_low_u64_be(Self::SYSTEM_CONTEXT_VIRTUAL_L2_BLOCK_INFO_POSITION),

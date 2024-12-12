@@ -15,14 +15,19 @@ pub struct ExecutionOutput {
     pub exception: bool,
     /// The emitted events.
     pub events: Vec<Event>,
-    pub system_error: Option<(usize, usize)>
+    pub system_error: Option<(usize, usize)>,
 }
 
 impl ExecutionOutput {
     ///
     /// A shortcut constructor.
     ///
-    pub fn new(return_data: Vec<Value>, exception: bool, events: Vec<Event>, system_error: Option<(usize, usize)>) -> Self {
+    pub fn new(
+        return_data: Vec<Value>,
+        exception: bool,
+        events: Vec<Event>,
+        system_error: Option<(usize, usize)>,
+    ) -> Self {
         Self {
             return_data,
             exception,
@@ -119,37 +124,43 @@ impl From<zkevm_tester::compiler_tests::VmSnapshot> for ExecutionOutput {
                 let mut system_error = None;
                 if !return_data.is_empty() {
                     let first_result_slot = return_data[0];
-                    if first_result_slot > (web3::types::U256::from(1) << web3::types::U256::from(128)) && first_result_slot < (web3::types::U256::from(1) << web3::types::U256::from(220)) {
-                                let first_result_slot = first_result_slot >> web3::types::U256::from(8);
-                                let panic = first_result_slot.low_u32();
-                    
-                                if first_result_slot >= (web3::types::U256::from(1) << web3::types::U256::from(200)) {
-                                    system_error = Some((1, panic as usize));
-                                } else {
-                                    system_error = Some((2, panic as usize));
-                                }
-                            }
+                    if first_result_slot
+                        > (web3::types::U256::from(1) << web3::types::U256::from(128))
+                        && first_result_slot
+                            < (web3::types::U256::from(1) << web3::types::U256::from(220))
+                    {
+                        let first_result_slot = first_result_slot >> web3::types::U256::from(8);
+                        let panic = first_result_slot.low_u32();
+
+                        if first_result_slot
+                            >= (web3::types::U256::from(1) << web3::types::U256::from(200))
+                        {
+                            system_error = Some((1, panic as usize));
+                        } else {
+                            system_error = Some((2, panic as usize));
+                        }
+                    }
                 }
 
                 Self {
                     return_data,
                     exception: true,
                     events,
-                    system_error
+                    system_error,
                 }
             }
             zkevm_tester::compiler_tests::VmExecutionResult::Panic => Self {
                 return_data: vec![],
                 exception: true,
                 events,
-                system_error: None
+                system_error: None,
             },
             zkevm_tester::compiler_tests::VmExecutionResult::MostLikelyDidNotFinish { .. } => {
                 Self {
                     return_data: vec![],
                     exception: true,
                     events,
-                    system_error: None
+                    system_error: None,
                 }
             }
         }

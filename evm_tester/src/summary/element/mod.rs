@@ -25,10 +25,7 @@ impl Element {
     /// A shortcut constructor.
     ///
     pub fn new(name: String, outcome: Outcome) -> Self {
-        Self {
-            name,
-            outcome,
-        }
+        Self { name, outcome }
     }
 
     ///
@@ -82,7 +79,7 @@ impl Element {
                 ref calldata,
                 ref exception,
                 ref expected,
-                ref actual
+                ref actual,
             } => {
                 let actual_line = if let Some(actual_value) = actual {
                     format!("\n actual: {actual_value}")
@@ -96,21 +93,16 @@ impl Element {
                         calldata,
                     )
                 } else {
-                    format!(
-                        "(calldata {})",
-                        calldata,
-                    )
+                    format!("(calldata {})", calldata,)
                 }
             }
-            Outcome::Invalid { ref error, ref calldata } => format!("{} (calldata {})", error, calldata),
+            Outcome::Invalid {
+                ref error,
+                ref calldata,
+            } => format!("{} (calldata {})", error, calldata),
             _ => String::new(),
         };
 
-        Some(format!(
-            "{:>7} {} {}",
-            outcome,
-            self.name,
-            details
-        ))
+        Some(format!("{:>7} {} {}", outcome, self.name, details))
     }
 }

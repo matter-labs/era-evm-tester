@@ -7,10 +7,9 @@ use std::path::PathBuf;
 
 pub mod index;
 
-
-use crate::test_suits::Collection;
 use crate::filters::Filters;
 use crate::test::Test;
+use crate::test_suits::Collection;
 
 ///
 /// The Ethereum tests directory.
@@ -52,24 +51,27 @@ impl Collection for EthereumGeneralStateTestsDirectory {
                 if !filters.check_case_path(&identifier) {
                     return None;
                 }
-        
+
                 if !filters.check_group(&test.group) {
                     return None;
                 }
 
-                let file = std::fs::read_to_string(test.path.clone()).unwrap_or_else(|_| panic!("Test not found: {:?}", test.path));
+                let file = std::fs::read_to_string(test.path.clone())
+                    .unwrap_or_else(|_| panic!("Test not found: {:?}", test.path));
 
                 let file_name = test.path.file_name().unwrap().to_str().unwrap().to_string();
 
                 println!("Test: {file_name}");
 
                 let dir_name = directory_path.file_name().unwrap();
-                let relative_path: PathBuf = test.path.iter()   // iterate over path components
-                .skip_while(|s| *s != dir_name)
-                .skip(1)
-                .collect();
+                let relative_path: PathBuf = test
+                    .path
+                    .iter() // iterate over path components
+                    .skip_while(|s| *s != dir_name)
+                    .skip(1)
+                    .collect();
 
-                let test_name = remove_suffix(&file_name,".json").to_string();
+                let test_name = remove_suffix(&file_name, ".json").to_string();
                 let filler_name_yml = test_name.clone() + "Filler.yml";
 
                 let filler_path = filler_path.join(relative_path.parent().unwrap());
@@ -77,31 +79,37 @@ impl Collection for EthereumGeneralStateTestsDirectory {
 
                 let filler_file;
 
-                let mut  is_json = false;
+                let mut is_json = false;
                 if std::fs::exists(filler_path_yml.clone()).unwrap() {
-                    filler_file = std::fs::read_to_string(filler_path_yml.clone()).unwrap_or_else(|_| panic!("Filler not found: {:?}", filler_path_yml));
+                    filler_file = std::fs::read_to_string(filler_path_yml.clone())
+                        .unwrap_or_else(|_| panic!("Filler not found: {:?}", filler_path_yml));
                 } else {
                     let filler_path_json = filler_path.join(test_name + "Filler.json");
 
                     if std::fs::exists(filler_path_json.clone()).unwrap() {
                         is_json = true;
-                        filler_file = std::fs::read_to_string(filler_path_json.clone()).unwrap_or_else(|_| panic!("Filler not found: {:?}", filler_path_json));
+                        filler_file = std::fs::read_to_string(filler_path_json.clone())
+                            .unwrap_or_else(|_| panic!("Filler not found: {:?}", filler_path_json));
                     } else {
-                        return None // skip
+                        return None; // skip
                     }
                 }
 
-
-                Some(Test::from_ethereum_test(&file, &filler_file, is_json, test.skip_calldatas, test.skip_cases))
+                Some(Test::from_ethereum_test(
+                    &file,
+                    &filler_file,
+                    is_json,
+                    test.skip_calldatas,
+                    test.skip_cases,
+                ))
             })
             .collect())
     }
 }
 
 fn remove_suffix<'a>(s: &'a str, suffix: &str) -> &'a str {
-
     match s.strip_suffix(suffix) {
         Some(s) => s,
-        None => s
+        None => s,
     }
 }

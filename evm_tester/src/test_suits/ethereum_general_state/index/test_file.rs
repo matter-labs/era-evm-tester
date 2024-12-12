@@ -33,7 +33,7 @@ pub struct TestFile {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skip_calldatas: Option<Vec<web3::types::Bytes>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skip_cases: Option<Vec<String>>
+    pub skip_cases: Option<Vec<String>>,
 }
 
 impl TryFrom<&Path> for TestFile {
@@ -56,7 +56,7 @@ impl TryFrom<&Path> for TestFile {
             group: None,
             comment: None,
             skip_calldatas: None,
-            skip_cases: None
+            skip_cases: None,
         })
     }
 }

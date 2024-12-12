@@ -4,9 +4,9 @@
 
 pub mod ethereum_general_state;
 
-use std::path::Path;
 use crate::filters::Filters;
 use crate::test::Test;
+use std::path::Path;
 
 ///
 /// The compiler tests directory trait.

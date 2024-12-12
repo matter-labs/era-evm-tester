@@ -14,7 +14,7 @@ pub struct EnabledTest {
     /// The test group.
     pub group: Option<String>,
     pub skip_calldatas: Option<Vec<web3::types::Bytes>>,
-    pub skip_cases: Option<Vec<String>>
+    pub skip_cases: Option<Vec<String>>,
 }
 
 impl EnabledTest {
@@ -25,13 +25,13 @@ impl EnabledTest {
         path: PathBuf,
         group: Option<String>,
         skip_calldatas: Option<Vec<web3::types::Bytes>>,
-        skip_cases: Option<Vec<String>>
+        skip_cases: Option<Vec<String>>,
     ) -> Self {
         Self {
             path,
             group,
             skip_calldatas,
-            skip_cases
+            skip_cases,
         }
     }
 }

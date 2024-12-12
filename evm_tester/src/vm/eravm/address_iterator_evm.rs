@@ -26,7 +26,6 @@ impl EVMAddressIterator {
         stream.append(nonce);
 
         let hash = era_compiler_common::Hash::keccak256(&stream.out());
-        
 
         web3::types::Address::from_str(
             &hash.to_string()[2 + 2

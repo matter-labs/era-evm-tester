@@ -1,18 +1,19 @@
-use std::{collections::HashMap, str::FromStr};
 use serde::{Deserialize, Deserializer};
-
+use std::{collections::HashMap, str::FromStr};
 
 #[derive(Debug, Clone, Hash, PartialEq)]
 pub enum U256Parsed {
     Value(web3::types::U256),
-    Any
+    Any,
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseU256Error(String);
 
 impl U256Parsed {
-    pub fn from_generic_deserialized_value(value: GenericSerializedSimpleValue) -> Result<Self, ParseU256Error> {
+    pub fn from_generic_deserialized_value(
+        value: GenericSerializedSimpleValue,
+    ) -> Result<Self, ParseU256Error> {
         Self::from_str(&value.as_string())
     }
 
@@ -33,10 +34,10 @@ impl FromStr for U256Parsed {
             return Ok(U256Parsed::Any);
         }
 
-        
-
         if value.strip_prefix("0x").is_some() {
-            Ok(U256Parsed::Value(web3::types::U256::from_str_radix(value, 16).unwrap()))
+            Ok(U256Parsed::Value(
+                web3::types::U256::from_str_radix(value, 16).unwrap(),
+            ))
         } else {
             let res_10 = web3::types::U256::from_str_radix(value, 10);
             if res_10.is_ok() {
@@ -59,7 +60,7 @@ impl<'de> Deserialize<'de> for U256Parsed {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
-    {   
+    {
         struct U256ParsedVisitor;
 
         impl<'de> serde::de::Visitor<'de> for U256ParsedVisitor {
@@ -74,20 +75,23 @@ impl<'de> Deserialize<'de> for U256Parsed {
             }
 
             fn visit_u128<E>(self, value: u128) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error, {
+            where
+                E: serde::de::Error,
+            {
                 Ok(U256Parsed::from_str(&value.to_string()).unwrap())
             }
 
             fn visit_string<E>(self, value: String) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error, {
+            where
+                E: serde::de::Error,
+            {
                 Ok(U256Parsed::from_str(&value).unwrap())
             }
 
             fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error, {
+            where
+                E: serde::de::Error,
+            {
                 Ok(U256Parsed::from_str(value).unwrap())
             }
         }
@@ -117,7 +121,7 @@ impl<'de> Deserialize<'de> for AccountCode {
                 f.write_str("A smart contract bytecode")
             }
             fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
-                let res = if value.is_empty()  {
+                let res = if value.is_empty() {
                     web3::types::Bytes::default()
                 } else {
                     let stripped = value.strip_prefix("0x").unwrap_or(value);
@@ -137,47 +141,50 @@ pub struct AccountFillerStruct {
     pub balance: Option<U256Parsed>,
     pub code: Option<AccountCode>,
     pub nonce: Option<U256Parsed>,
-    pub storage: Option<HashMap<GenericSerializedSimpleValue, GenericSerializedSimpleValue>>
+    pub storage: Option<HashMap<GenericSerializedSimpleValue, GenericSerializedSimpleValue>>,
 }
 
-
 impl AccountFillerStruct {
-    pub fn get_storage_value(storage: &HashMap<U256Parsed, U256Parsed>, key: &U256Parsed) -> Option<U256Parsed> {
+    pub fn get_storage_value(
+        storage: &HashMap<U256Parsed, U256Parsed>,
+        key: &U256Parsed,
+    ) -> Option<U256Parsed> {
         storage.get(key).cloned()
     }
 
-    pub fn parse_storage(map: &HashMap<GenericSerializedSimpleValue, GenericSerializedSimpleValue>) -> HashMap<U256Parsed, U256Parsed> {
+    pub fn parse_storage(
+        map: &HashMap<GenericSerializedSimpleValue, GenericSerializedSimpleValue>,
+    ) -> HashMap<U256Parsed, U256Parsed> {
         let mut storage = HashMap::new();
-    
+
         for (key, value) in map {
             if key.is_string() && key.as_string().starts_with("//") {
                 continue;
             }
-    
+
             let key_v = U256Parsed::from_generic_deserialized_value(key.clone()).unwrap();
-    
+
             let val_v = U256Parsed::from_generic_deserialized_value(value.clone()).unwrap();
-    
+
             storage.insert(key_v, val_v);
         }
-    
+
         storage
     }
 }
-
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum Labels {
     Single(LabelValue),
-    Multiple(Vec<LabelValue>)
+    Multiple(Vec<LabelValue>),
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum LabelValue {
     String(String),
-    Number(isize)
+    Number(isize),
 }
 
 impl LabelValue {
@@ -193,48 +200,50 @@ impl LabelValue {
 pub struct ExpectedIndexesStructure {
     pub data: Labels,
     pub value: Option<Labels>,
-    pub gas: Option<Labels>
+    pub gas: Option<Labels>,
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq, Hash)]
 #[serde(untagged)]
 pub enum AddressMaybe {
     Val(web3::types::Address),
-    Comment(String)
+    Comment(String),
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum AccountFillerStructMaybe {
     Val(AccountFillerStruct),
-    Comment(String)
+    Comment(String),
 }
 
 #[derive(Debug, Deserialize, Clone, Default)]
 pub struct ExpectStructure {
     pub indexes: Option<ExpectedIndexesStructure>,
-    pub result: HashMap<AddressMaybe, AccountFillerStructMaybe>
+    pub result: HashMap<AddressMaybe, AccountFillerStructMaybe>,
 }
 
 impl ExpectStructure {
-    pub fn get_expected_result(map: &HashMap<AddressMaybe, AccountFillerStructMaybe>) -> HashMap<web3::types::Address, AccountFillerStruct> {
+    pub fn get_expected_result(
+        map: &HashMap<AddressMaybe, AccountFillerStructMaybe>,
+    ) -> HashMap<web3::types::Address, AccountFillerStruct> {
         let mut storage = HashMap::new();
-    
+
         for (key, value) in map {
             if let AddressMaybe::Val(addr) = key {
                 match value {
                     AccountFillerStructMaybe::Val(account_struct) => {
                         storage.insert(*addr, account_struct.clone());
-                    },
+                    }
                     AccountFillerStructMaybe::Comment(comment) => {
                         panic!("Unexpected value instead of account struct: {comment}");
-                    },
+                    }
                 };
             } else {
                 println!("Incorrect key: {:?}", key);
             }
         }
-    
+
         storage
     }
 }
@@ -249,7 +258,7 @@ impl<'de> Deserialize<'de> for GenericSerializedSimpleValue {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
-    {   
+    {
         struct U256ParsedVisitor;
 
         impl<'de> serde::de::Visitor<'de> for U256ParsedVisitor {
@@ -263,14 +272,16 @@ impl<'de> Deserialize<'de> for GenericSerializedSimpleValue {
                 Ok(GenericSerializedSimpleValue::U64(value))
             }
             fn visit_string<E>(self, value: String) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error, {
+            where
+                E: serde::de::Error,
+            {
                 Ok(GenericSerializedSimpleValue::String(value))
             }
 
             fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-                where
-                    E: serde::de::Error, {
+            where
+                E: serde::de::Error,
+            {
                 Ok(GenericSerializedSimpleValue::String(value.to_string()))
             }
         }
@@ -304,5 +315,5 @@ impl GenericSerializedSimpleValue {
 
 #[derive(Debug, Deserialize, Default)]
 pub struct FillerStructure {
-    pub expect: Vec<ExpectStructure>
+    pub expect: Vec<ExpectStructure>,
 }

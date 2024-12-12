@@ -85,9 +85,7 @@ impl EraVMDeployer for DummyDeployer {
 
         Self::set_immutables(address, &result.output.return_data, vm)?;
 
-        let return_data = vec![web3::types::U256::from_big_endian(
-            address.as_bytes(),
-        )];
+        let return_data = vec![web3::types::U256::from_big_endian(address.as_bytes())];
 
         Ok(ExecutionResult::new(
             ExecutionOutput::new(return_data, false, result.output.events, None),

@@ -72,7 +72,6 @@ impl AddressIterator for EraVMAddressIterator {
 
         address
     }
-    
 
     fn increment_nonce(&mut self, caller: &web3::types::Address) {
         let nonce = self.nonces.entry(*caller).or_insert(0);

@@ -25,7 +25,7 @@ pub struct Directory {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skip_calldatas: Option<Vec<web3::types::Bytes>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skip_cases: Option<Vec<String>>
+    pub skip_cases: Option<Vec<String>>,
 }
 
 impl Directory {
@@ -38,7 +38,7 @@ impl Directory {
             entries,
             comment: None,
             skip_calldatas: None,
-            skip_cases: None
+            skip_cases: None,
         }
     }
 }

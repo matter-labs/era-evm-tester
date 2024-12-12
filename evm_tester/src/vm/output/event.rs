@@ -13,7 +13,6 @@ pub struct Event {
     values: Vec<Value>,
 }
 
-
 impl Event {
     ///
     /// A shortcut constructor.
@@ -84,8 +83,7 @@ impl PartialEq<Self> for Event {
         }
 
         for index in 0..self.topics.len() {
-            let (value1, value2) =
-                (&self.topics[index], &other.topics[index]);
+            let (value1, value2) = (&self.topics[index], &other.topics[index]);
 
             if value1 != value2 {
                 return false;
@@ -93,9 +91,8 @@ impl PartialEq<Self> for Event {
         }
 
         for index in 0..self.values.len() {
-            let (value1, value2) =
-                (&self.values[index], &other.values[index]);
-            
+            let (value1, value2) = (&self.values[index], &other.values[index]);
+
             if value1 != value2 {
                 return false;
             }

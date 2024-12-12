@@ -4,7 +4,7 @@ use serde::Deserialize;
 pub struct PostStateIndexes {
     pub data: usize,
     pub gas: usize,
-    pub value: usize
+    pub value: usize,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -14,5 +14,5 @@ pub struct PostState {
     pub hash: web3::types::H256,
     pub logs: web3::types::H256,
     pub txbytes: web3::types::Bytes,
-    pub expect_exception: Option<String>
+    pub expect_exception: Option<String>,
 }

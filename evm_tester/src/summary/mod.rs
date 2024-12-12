@@ -125,11 +125,7 @@ impl Summary {
     ///
     /// Adds a passed outcome of a special call, like `storageEmpty` or `balance`.
     ///
-    pub fn passed_special(
-        summary: Arc<Mutex<Self>>,
-        name: String,
-        group: Option<String>,
-    ) {
+    pub fn passed_special(summary: Arc<Mutex<Self>>, name: String, group: Option<String>) {
         let passed_variant = PassedVariant::Special;
         Self::passed(summary, name, group, passed_variant);
     }
@@ -145,7 +141,7 @@ impl Summary {
         actual: Option<String>,
         calldata: Vec<u8>,
     ) {
-        let element = Element::new( name, Outcome::failed(calldata, exception, expected, actual));
+        let element = Element::new(name, Outcome::failed(calldata, exception, expected, actual));
         summary.lock().expect("Sync").push_element(element);
     }
 

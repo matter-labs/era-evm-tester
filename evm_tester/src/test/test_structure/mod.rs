@@ -8,10 +8,10 @@ use transaction_section::TransactionSection;
 
 use serde::Deserialize;
 
-pub mod info_section;
 pub mod env_section;
-pub mod pre_state;
+pub mod info_section;
 pub mod post_state;
+pub mod pre_state;
 pub mod transaction_section;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -20,5 +20,5 @@ pub struct TestStructure {
     pub env: EnvSection,
     pub post: HashMap<String, Vec<PostState>>,
     pub pre: PreState,
-    pub transaction: TransactionSection
+    pub transaction: TransactionSection,
 }

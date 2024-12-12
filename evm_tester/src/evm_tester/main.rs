@@ -44,15 +44,11 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     let filters = evm_tester::Filters::new(arguments.paths, arguments.groups);
 
-    let evm_tester = evm_tester::EvmTester::new(
-        summary.clone(),
-        filters,
-        arguments.workflow,
-    )?;
+    let evm_tester = evm_tester::EvmTester::new(summary.clone(), filters, arguments.workflow)?;
 
     let environment = match arguments.environment {
         Some(environment @ evm_tester::Environment::EVMEmulator) => environment,
-        None => evm_tester::Environment::EVMEmulator
+        None => evm_tester::Environment::EVMEmulator,
     };
 
     let run_time_start = Instant::now();
@@ -64,14 +60,9 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     match environment {
         evm_tester::Environment::EVMEmulator => {
-            let vm = evm_tester::EraVM::new(
-                era_compiler_common::Target::EVM,
-            )?;
+            let vm = evm_tester::EraVM::new(era_compiler_common::Target::EVM)?;
 
-            evm_tester
-                .run_evm_interpreter::<evm_tester::EraVMSystemContractDeployer, true>(
-                    vm
-                )
+            evm_tester.run_evm_interpreter::<evm_tester::EraVMSystemContractDeployer, true>(vm)
         }
     }?;
 
@@ -93,7 +84,6 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    
 
     use crate::arguments::Arguments;
 

@@ -51,9 +51,7 @@ impl EraVMDeployer for SystemContractDeployer {
                 r4 = Some(web3::types::U256::from(
                     zkevm_opcode_defs::ADDRESS_CONTRACT_DEPLOYER,
                 ));
-                r5 = Some(web3::types::U256::from(u8::from(
-                    SYSTEM_CALL_BIT,
-                )));
+                r5 = Some(web3::types::U256::from(u8::from(SYSTEM_CALL_BIT)));
 
                 entry_address = web3::types::Address::from_low_u64_be(
                     zkevm_opcode_defs::ADDRESS_MSG_VALUE.into(),
@@ -149,9 +147,7 @@ impl EraVMDeployer for SystemContractDeployer {
                 r4 = Some(web3::types::U256::from(
                     zkevm_opcode_defs::ADDRESS_CONTRACT_DEPLOYER,
                 ));
-                r5 = Some(web3::types::U256::from(u8::from(
-                    SYSTEM_CALL_BIT,
-                )));
+                r5 = Some(web3::types::U256::from(u8::from(SYSTEM_CALL_BIT)));
 
                 entry_address = web3::types::Address::from_low_u64_be(
                     zkevm_opcode_defs::ADDRESS_MSG_VALUE.into(),

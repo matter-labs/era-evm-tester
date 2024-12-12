@@ -2,17 +2,13 @@
 //! The evm tester arguments.
 //!
 
-
 use structopt::StructOpt;
 
 ///
 /// The evm tester arguments.
 ///
 #[derive(Debug, StructOpt)]
-#[structopt(
-    name = "evm-tester",
-    about = "EVM Implementations Testing Framework"
-)]
+#[structopt(name = "evm-tester", about = "EVM Implementations Testing Framework")]
 pub struct Arguments {
     /// The logging level.
     #[structopt(short = "v", long = "verbose")]
@@ -33,7 +29,7 @@ pub struct Arguments {
     /// Sets the number of threads, which execute the tests concurrently.
     #[structopt(short = "t", long = "threads")]
     pub threads: Option<usize>,
-    
+
     /// Specify the environment to run tests on.
     /// Available arguments: `EVMEmulator`.
     /// The default value is EVMEmulator

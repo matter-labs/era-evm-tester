@@ -8,7 +8,7 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Deserialize)]
 pub enum Environment {
     /// The EraVM-based EVM emulator.
-    EVMEmulator
+    EVMEmulator,
 }
 
 impl std::str::FromStr for Environment {

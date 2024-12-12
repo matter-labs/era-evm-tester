@@ -7,9 +7,19 @@ use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use zksync_types::{block::DeployedContract, AccountTreeId, Address, ACCOUNT_CODE_STORAGE_ADDRESS, BOOTLOADER_ADDRESS, BOOTLOADER_UTILITIES_ADDRESS, CODE_ORACLE_ADDRESS, COMPLEX_UPGRADER_ADDRESS, COMPRESSOR_ADDRESS, CONTRACT_DEPLOYER_ADDRESS, ECRECOVER_PRECOMPILE_ADDRESS, EC_ADD_PRECOMPILE_ADDRESS, EC_MUL_PRECOMPILE_ADDRESS, EC_PAIRING_PRECOMPILE_ADDRESS, EVENT_WRITER_ADDRESS, EVM_GAS_MANAGER_ADDRESS, IMMUTABLE_SIMULATOR_STORAGE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS, L1_MESSENGER_ADDRESS, L2_BASE_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS, P256VERIFY_PRECOMPILE_ADDRESS, PUBDATA_CHUNK_PUBLISHER_ADDRESS, SHA256_PRECOMPILE_ADDRESS, SYSTEM_CONTEXT_ADDRESS, IDENTITY_ADDRESS};
 use zksync_contracts::ContractLanguage;
 use zksync_types::bytecode::BytecodeHash;
+use zksync_types::{
+    block::DeployedContract, AccountTreeId, Address, ACCOUNT_CODE_STORAGE_ADDRESS,
+    BOOTLOADER_ADDRESS, BOOTLOADER_UTILITIES_ADDRESS, CODE_ORACLE_ADDRESS,
+    COMPLEX_UPGRADER_ADDRESS, COMPRESSOR_ADDRESS, CONTRACT_DEPLOYER_ADDRESS,
+    ECRECOVER_PRECOMPILE_ADDRESS, EC_ADD_PRECOMPILE_ADDRESS, EC_MUL_PRECOMPILE_ADDRESS,
+    EC_PAIRING_PRECOMPILE_ADDRESS, EVENT_WRITER_ADDRESS, EVM_GAS_MANAGER_ADDRESS, IDENTITY_ADDRESS,
+    IMMUTABLE_SIMULATOR_STORAGE_ADDRESS, KECCAK256_PRECOMPILE_ADDRESS, KNOWN_CODES_STORAGE_ADDRESS,
+    L1_MESSENGER_ADDRESS, L2_BASE_TOKEN_ADDRESS, MSG_VALUE_SIMULATOR_ADDRESS, NONCE_HOLDER_ADDRESS,
+    P256VERIFY_PRECOMPILE_ADDRESS, PUBDATA_CHUNK_PUBLISHER_ADDRESS, SHA256_PRECOMPILE_ADDRESS,
+    SYSTEM_CONTEXT_ADDRESS,
+};
 
 use colored::Colorize;
 
@@ -192,14 +202,14 @@ impl SystemContracts {
     ///
     /// Builds the system contracts.
     ///
-    pub fn build(
-    ) -> anyhow::Result<Self> {
+    pub fn build() -> anyhow::Result<Self> {
         let build_time_start = Instant::now();
         println!("    {} system contracts", "Building".bright_green().bold());
 
         let system_contracts_path = PathBuf::from("era-contracts/system-contracts");
 
-        let system_contracts = get_system_smart_contracts_from_dir(system_contracts_path.clone(), true);
+        let system_contracts =
+            get_system_smart_contracts_from_dir(system_contracts_path.clone(), true);
 
         println!(
             "    {} building system contracts in {}.{:03}s",
@@ -207,33 +217,57 @@ impl SystemContracts {
             build_time_start.elapsed().as_secs(),
             build_time_start.elapsed().subsec_millis(),
         );
-        
 
-        let deployed_contracts:Vec<_> = system_contracts.into_iter().map(|contract| {
-            (*contract.account_id.address(), contract.bytecode)
-        }).collect();
+        let deployed_contracts: Vec<_> = system_contracts
+            .into_iter()
+            .map(|contract| (*contract.account_id.address(), contract.bytecode))
+            .collect();
 
-        let evm_emulator_bytecode = read_sys_contract_bytecode(system_contracts_path.clone(), "", "EvmEmulator", ContractLanguage::Yul);
+        let evm_emulator_bytecode = read_sys_contract_bytecode(
+            system_contracts_path.clone(),
+            "",
+            "EvmEmulator",
+            ContractLanguage::Yul,
+        );
         let evm_emulator = Build {
             bytecode: evm_emulator_bytecode.clone(),
-            bytecode_hash: Some(BytecodeHash::for_bytecode(&evm_emulator_bytecode).value().to_fixed_bytes())
+            bytecode_hash: Some(
+                BytecodeHash::for_bytecode(&evm_emulator_bytecode)
+                    .value()
+                    .to_fixed_bytes(),
+            ),
         };
 
-        let default_aa_bytecode = read_sys_contract_bytecode(system_contracts_path.clone(), "", "DefaultAccount", ContractLanguage::Sol);
+        let default_aa_bytecode = read_sys_contract_bytecode(
+            system_contracts_path.clone(),
+            "",
+            "DefaultAccount",
+            ContractLanguage::Sol,
+        );
         let default_aa = Build {
             bytecode: default_aa_bytecode.clone(),
-            bytecode_hash: Some(BytecodeHash::for_bytecode(&default_aa_bytecode).value().to_fixed_bytes())
+            bytecode_hash: Some(
+                BytecodeHash::for_bytecode(&default_aa_bytecode)
+                    .value()
+                    .to_fixed_bytes(),
+            ),
         };
 
-        let deployed_contracts = deployed_contracts.into_iter().map(|(address, bytecode)| {
+        let deployed_contracts = deployed_contracts
+            .into_iter()
+            .map(|(address, bytecode)| {
+                let build = Build {
+                    bytecode: bytecode.clone(),
+                    bytecode_hash: Some(
+                        BytecodeHash::for_bytecode(&bytecode)
+                            .value()
+                            .to_fixed_bytes(),
+                    ),
+                };
 
-            let build = Build{
-                bytecode : bytecode.clone(),
-                bytecode_hash: Some(BytecodeHash::for_bytecode(&bytecode).value().to_fixed_bytes())
-            };
-
-            (address, build)
-        }).collect();
+                (address, build)
+            })
+            .collect();
 
         Ok(Self {
             deployed_contracts,
@@ -242,7 +276,6 @@ impl SystemContracts {
         })
     }
 }
-
 
 pub fn get_system_smart_contracts_from_dir(
     root: PathBuf,
@@ -256,7 +289,12 @@ pub fn get_system_smart_contracts_from_dir(
             } else {
                 Some(DeployedContract {
                     account_id: AccountTreeId::new(*address),
-                    bytecode: read_sys_contract_bytecode(root.clone(), path, name, contract_lang.clone()),
+                    bytecode: read_sys_contract_bytecode(
+                        root.clone(),
+                        path,
+                        name,
+                        contract_lang.clone(),
+                    ),
                 })
             }
         })
@@ -272,8 +310,7 @@ pub fn read_sys_contract_bytecode(
     match lang {
         ContractLanguage::Sol => {
             if let Some(contracts) = read_bytecode_from_path(
-                root
-                    .join(format!("zkout/{0}{1}.sol/{1}.json", directory, name)),
+                root.join(format!("zkout/{0}{1}.sol/{1}.json", directory, name)),
             ) {
                 contracts
             } else {
@@ -291,8 +328,7 @@ pub fn read_sys_contract_bytecode(
                 contract
             } else {
                 read_yul_bytecode_by_path(
-                    root
-                        .join(format!("contracts-preprocessed/{directory}artifacts")),
+                    root.join(format!("contracts-preprocessed/{directory}artifacts")),
                     name,
                 )
             }

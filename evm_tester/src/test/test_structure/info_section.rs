@@ -13,5 +13,5 @@ pub struct InfoSection {
     pub lllcversion: String,
     pub source: String,
     pub source_hash: String,
-    pub labels: Option<HashMap<usize, String>>
+    pub labels: Option<HashMap<usize, String>>,
 }

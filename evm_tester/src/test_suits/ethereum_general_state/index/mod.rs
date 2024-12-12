@@ -105,7 +105,6 @@ impl FSEntity {
     /// Returns the enabled test by the path with the `initial` directory prefix (None if not found or test disabled).
     ///
     pub fn into_enabled_test(self, initial: &Path, path: &Path) -> Option<EnabledTest> {
-
         let mut skipped_calldatas: Vec<web3::types::Bytes> = vec![];
         let mut skipped_cases: Vec<String> = vec![];
 
@@ -113,16 +112,14 @@ impl FSEntity {
         for path_part in path.iter() {
             match current_entity {
                 FSEntity::Directory(mut directory) => {
-
                     if let Some(additional_skipped_calldatas) = directory.skip_calldatas {
                         skipped_calldatas.extend(additional_skipped_calldatas);
                     }
-    
+
                     if let Some(additional_skipped_cases) = directory.skip_cases {
                         skipped_cases.extend(additional_skipped_cases);
                     }
 
-                    
                     current_entity = match directory
                         .entries
                         .remove(path_part.to_string_lossy().as_ref())
@@ -146,7 +143,7 @@ impl FSEntity {
                     file_path,
                     file.group,
                     Some(skipped_calldatas),
-                    Some(skipped_cases)
+                    Some(skipped_cases),
                 ))
             }
         }
@@ -203,14 +200,14 @@ impl FSEntity {
                     entries: old_entities,
                     comment: old_comment,
                     skip_calldatas: old_skip_calldatas,
-                    skip_cases: old_skip_cases
+                    skip_cases: old_skip_cases,
                 }),
                 Self::Directory(Directory {
                     enabled: new_enabled,
                     entries: new_entities,
                     comment: new_comment,
                     skip_calldatas: new_skip_calldatas,
-                    skip_cases: new_skip_cases
+                    skip_cases: new_skip_cases,
                 }),
             ) => {
                 *new_enabled = *old_enabled;
@@ -260,7 +257,13 @@ impl FSEntity {
     ///
     /// Inner enabled accumulator function.
     ///
-    fn into_enabled_list_recursive(self, current: &Path, accumulator: &mut Vec<EnabledTest>, skipped_calldatas: &Vec<web3::types::Bytes>, skipped_cases: &Vec<String>) {
+    fn into_enabled_list_recursive(
+        self,
+        current: &Path,
+        accumulator: &mut Vec<EnabledTest>,
+        skipped_calldatas: &Vec<web3::types::Bytes>,
+        skipped_cases: &Vec<String>,
+    ) {
         let mut skipped_calldatas_new = skipped_calldatas.clone();
         let mut skipped_cases_new = skipped_cases.clone();
 
@@ -282,7 +285,7 @@ impl FSEntity {
                     current.to_owned(),
                     file.group,
                     Some(skipped_calldatas_new),
-                    Some(skipped_cases_new)
+                    Some(skipped_cases_new),
                 ));
                 return;
             }
@@ -306,7 +309,12 @@ impl FSEntity {
         for (name, entity) in entries.into_iter() {
             let mut current = current.to_owned();
             current.push(name);
-            entity.into_enabled_list_recursive(&current, accumulator, &skipped_calldatas_new, &skipped_cases_new);
+            entity.into_enabled_list_recursive(
+                &current,
+                accumulator,
+                &skipped_calldatas_new,
+                &skipped_cases_new,
+            );
         }
     }
 

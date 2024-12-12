@@ -24,7 +24,7 @@ pub enum Outcome {
         calldata: String,
         exception: bool,
         expected: Option<String>,
-        actual: Option<String>
+        actual: Option<String>,
     },
     /// The `invalid` outcome. The test is incorrect.
     Invalid {
@@ -47,12 +47,17 @@ impl Outcome {
     ///
     /// A shortcut constructor.
     ///
-    pub fn failed(calldata: Vec<u8>, exception: bool, expected: Option<String>, actual: Option<String>) -> Self {
+    pub fn failed(
+        calldata: Vec<u8>,
+        exception: bool,
+        expected: Option<String>,
+        actual: Option<String>,
+    ) -> Self {
         Self::Failed {
             calldata: hex::encode(calldata.as_slice()),
             exception,
             expected,
-            actual
+            actual,
         }
     }
 
@@ -65,7 +70,7 @@ impl Outcome {
     {
         Self::Invalid {
             error: error.to_string(),
-            calldata: hex::encode(calldata.as_slice())
+            calldata: hex::encode(calldata.as_slice()),
         }
     }
 

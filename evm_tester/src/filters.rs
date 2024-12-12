@@ -19,10 +19,7 @@ impl Filters {
     ///
     /// A shortcut constructor.
     ///
-    pub fn new(
-        path_filters: Vec<String>,
-        group_filters: Vec<String>,
-    ) -> Self {
+    pub fn new(path_filters: Vec<String>, group_filters: Vec<String>) -> Self {
         Self {
             path_filters: path_filters.into_iter().collect(),
             group_filters: group_filters.into_iter().collect(),

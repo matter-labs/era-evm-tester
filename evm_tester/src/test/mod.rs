@@ -2,9 +2,9 @@
 //! The test.
 //!
 
-pub mod test_structure;
 pub mod case;
 pub mod filler_structure;
+pub mod test_structure;
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -62,7 +62,7 @@ impl Test {
         group: Option<String>,
         evm_version: Option<EVMVersion>,
         skipped_calldatas: Option<Vec<web3::types::Bytes>>,
-        skipped_cases: Option<Vec<String>>
+        skipped_cases: Option<Vec<String>>,
     ) -> Self {
         Self {
             name,
@@ -70,18 +70,24 @@ impl Test {
             group,
             evm_version,
             skipped_calldatas,
-            skipped_cases
+            skipped_cases,
         }
     }
 
-    pub fn from_ethereum_test(str: &str, filler_str: &str, is_json: bool, skipped_calldatas: Option<Vec<web3::types::Bytes>>, skipped_cases: Option<Vec<String>>) -> Self {
+    pub fn from_ethereum_test(
+        str: &str,
+        filler_str: &str,
+        is_json: bool,
+        skipped_calldatas: Option<Vec<web3::types::Bytes>>,
+        skipped_cases: Option<Vec<String>>,
+    ) -> Self {
         let cleaned_str = str.replace("0x:bigint ", "");
-        let test_structure: HashMap<String, TestStructure> = serde_json::from_str(&cleaned_str).unwrap();
+        let test_structure: HashMap<String, TestStructure> =
+            serde_json::from_str(&cleaned_str).unwrap();
 
         let keys: Vec<_> = test_structure.keys().collect();
         let test_name = keys[0];
-            
-        
+
         let test_filler_structure: HashMap<String, FillerStructure> = if is_json {
             serde_json::from_str(filler_str).unwrap()
         } else {
@@ -89,7 +95,6 @@ impl Test {
             //fs::write("out.yaml", wrapped_numbers.clone());
             serde_yaml::from_str(&wrapped_numbers).unwrap()
         };
-
 
         let test_definition = test_structure.get(keys[0]).expect("Always exists");
         let test_filler = test_filler_structure.get(keys[0]).expect("Always exists");
@@ -102,7 +107,7 @@ impl Test {
             group: None,
             evm_version: None,
             skipped_calldatas,
-            skipped_cases
+            skipped_cases,
         }
     }
 
@@ -128,11 +133,7 @@ impl Test {
                 }
             }
 
-            let vm = EraVM::clone_with_contracts(
-                vm.clone(),
-                Default::default(),
-                self.evm_version,
-            );
+            let vm = EraVM::clone_with_contracts(vm.clone(), Default::default(), self.evm_version);
             case.run_evm_interpreter::<D, M>(
                 summary.clone(),
                 vm,

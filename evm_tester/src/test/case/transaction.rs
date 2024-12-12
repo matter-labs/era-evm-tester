@@ -1,7 +1,7 @@
 use serde::{Deserialize, Deserializer};
 
 #[derive(Debug, Clone, Copy)]
-pub struct FieldTo (pub Option<web3::types::Address>);
+pub struct FieldTo(pub Option<web3::types::Address>);
 
 impl<'de> Deserialize<'de> for FieldTo {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
