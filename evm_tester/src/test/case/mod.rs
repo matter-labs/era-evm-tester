@@ -327,7 +327,7 @@ impl Case {
             if filler_struct.code.is_some() {
                 let actual_code = vm.get_code(address).unwrap_or_default();
 
-                if actual_code != filler_struct.code.unwrap().0 .0 {
+                if actual_code != filler_struct.code.as_ref().unwrap().0 .0 {
                     expected = Some(format!("Code of {address:?} is invalid"));
                     actual = None;
 
