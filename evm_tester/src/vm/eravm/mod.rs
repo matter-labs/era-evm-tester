@@ -86,8 +86,7 @@ impl EraVM {
     pub const EVM_INTERPRETER_GAS_OVERHEAD: u64 = 2500;
 
     /// The `allowedBytecodesToDeploy` variable storage slot in the `ContractDeployer` contract.
-    pub const CONTRACT_DEPLOYER_ALLOWED_BYTECODES_MODE_SLOT: &'static str =
-        "0xd70708d0b933e26eab552567ce3a8ad69e6fbec9a2a68f16d51bd417a47d9d3b";
+    pub const CONTRACT_DEPLOYER_ALLOWED_BYTECODES_MODE_SLOT: u64 = 1;
 
     pub const CONTRACT_DEPLOYER_EVM_HASH_PREFIX_SHIFT: u64 = 254;
 

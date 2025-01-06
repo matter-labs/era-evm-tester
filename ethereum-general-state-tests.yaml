@@ -604,6 +604,8 @@ entries:
           blockInfo.json:
             hash: '0x4a892e23b38bb1bdb380b9e4e3fadfc8'
             enabled: true
+            skipCalldatas: ["0x693c61390000000000000000000000000000000000000000000000000000000000000001"]
+            comment: "Difficulty check skipped"
           calldatacopy.json:
             hash: '0x9a1f4916a30c6318d7125cbde0d7039b'
             enabled: true
@@ -2645,7 +2647,8 @@ entries:
         enabled: true
       mergeTest.json:
         hash: '0x277bcea6ba08f7c0465e0e3b6e21542b'
-        enabled: true
+        enabled: false
+        comment: "Checks difficulty opcode (it is hardcoded now)"
       rangesExample.json:
         hash: '0x39ce8a937dc622d25a6dca52829a231a'
         enabled: true
@@ -3927,10 +3930,12 @@ entries:
         enabled: true
       randomStatetest138.json:
         hash: '0x48fab6eff845951ead238e57156130e4'
-        enabled: true
+        enabled: false
+        comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest139.json:
         hash: '0xc2a0effef3f2255c66b45ad27c7274b0'
-        enabled: true
+        enabled: false
+        comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest14.json:
         hash: '0x449242b98e1844544bbc3a4301c1ecf5'
         enabled: true
@@ -3970,7 +3975,8 @@ entries:
         enabled: true
       randomStatetest153.json:
         hash: '0x883eba1608f0b5b554e596c0afdd5444'
-        enabled: true
+        enabled: false
+        comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest154.json:
         hash: '0x9a47688d7a92026343cc0c24c909ae3c'
         enabled: false
@@ -4222,7 +4228,8 @@ entries:
         enabled: true
       randomStatetest246.json:
         hash: '0x1385edd53b570d02b5e3f5342c4dfbf8'
-        enabled: true
+        enabled: false
+        comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest247.json:
         hash: '0x2ccd9d2b77ace286a33fbf1685490ff6'
         enabled: true
@@ -4511,7 +4518,8 @@ entries:
         enabled: true
       randomStatetest350.json:
         hash: '0x76251328ac08a49445cddf6cd218454b'
-        enabled: true
+        enabled: false
+        comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest351.json:
         hash: '0x25a13eb3c79de9ffc9e76b85571aa75c'
         enabled: true
@@ -4565,7 +4573,8 @@ entries:
         enabled: true
       randomStatetest367.json:
         hash: '0x49e5ef4cf198ad3997a4a68c6812d2bb'
-        enabled: true
+        enabled: false
+        comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest368.json:
         hash: '0xdb7e71b622a8c2d5b988a24a96a26e67'
         enabled: true
@@ -4963,7 +4972,8 @@ entries:
         enabled: true
       randomStatetest466.json:
         hash: '0xd3e1dfc8910c2b51d1afd869e483b206'
-        enabled: true
+        enabled: false
+        comment: "Checks difficulty opcode (it is hardcoded now)"
       randomStatetest467.json:
         hash: '0x6cd348f51ca8d869dfe6e1067b9131aa'
         enabled: false
@@ -5244,7 +5254,8 @@ entries:
         enabled: true
       randomStatetest577.json:
         hash: '0x2a645ead782b3d480bca4a8353b2144f'
-        enabled: true
+        enabled: false
+        comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest578.json:
         hash: '0xcdcbaa31cc2a1add4dad5767fbe67970'
         enabled: true
