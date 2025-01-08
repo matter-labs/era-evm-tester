@@ -9,6 +9,7 @@
 pub enum Environment {
     /// The EraVM-based EVM emulator.
     EVMEmulator,
+    ZkOS
 }
 
 impl std::str::FromStr for Environment {
@@ -17,6 +18,7 @@ impl std::str::FromStr for Environment {
     fn from_str(string: &str) -> Result<Self, Self::Err> {
         match string {
             "EVMEmulator" => Ok(Self::EVMEmulator),
+            "ZKOS" => Ok(Self::ZkOS),
             string => anyhow::bail!(
                 "Unknown environment `{}`. Supported environments: {:?}",
                 string,
@@ -34,6 +36,7 @@ impl std::fmt::Display for Environment {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::EVMEmulator => write!(f, "EVMEmulator"),
+            Self::ZkOS => write!(f, "ZK OS"),
         }
     }
 }

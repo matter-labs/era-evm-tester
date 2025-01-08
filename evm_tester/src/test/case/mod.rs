@@ -12,7 +12,7 @@ use transaction::Transaction;
 use crate::{
     test::filler_structure::{AccountFillerStruct, Labels},
     utils,
-    vm::eravm::system_context::SystemContext,
+    vm::{eravm::system_context::SystemContext, zk_ee::{ZkOS, ZkOsEVMContext}},
     EraVM, EraVMDeployer, Summary,
 };
 
@@ -429,6 +429,213 @@ impl Case {
                     summary,
                     format!("{test_name}: {name}"),
                     res.output.exception,
+                    expected,
+                    actual,
+                    self.transaction.data.0,
+                );
+            }
+            //}
+        } else {
+            Summary::invalid(
+                summary,
+                format!("{test_name}: {name}"),
+                run_result.err().unwrap(),
+                self.transaction.data.0,
+            );
+        }
+    }
+
+    ///
+    /// Runs the case on ZK OS.
+    ///
+    pub fn run_zk_os(
+        self,
+        summary: Arc<Mutex<Summary>>,
+        mut vm: ZkOS,
+        test_name: String,
+        test_group: Option<String>,
+    )
+    {
+        let name = self.label;
+
+        // Populate prestate
+        for (address, state) in self.prestate {
+            vm.set_balance(address, state.balance);
+
+            vm.set_nonce(address, state.nonce);
+
+            if state.code.0.len() > 0 {
+                vm.set_predeployed_evm_contract(address, state.code.0);
+            }
+
+            state.storage.into_iter().for_each(|(storage_key, storage_value)| {
+                vm.set_storage_slot(address, storage_key, utils::u256_to_h256(&storage_value));
+            });
+        }
+
+        let mut system_context = ZkOsEVMContext::default();
+
+        system_context.block_number = self.env.current_number.try_into().unwrap();
+        system_context.block_timestamp = self.env.current_timestamp.try_into().unwrap();
+        system_context.coinbase = self.env.current_coinbase;
+        system_context.block_gas_limit = self.env.current_gas_limit;
+
+        if let Some(gas_price) = self.transaction.gas_price {
+            system_context.gas_price = gas_price;
+        } else if let Some(base_fee) = self.env.current_base_fee {
+            let mut gas_price = base_fee;
+
+            if let Some(max_priority_fee) = self.transaction.max_priority_fee_per_gas {
+                gas_price += max_priority_fee;
+            }
+
+            system_context.gas_price = gas_price;
+        }
+
+        if let Some(base_fee) = self.env.current_base_fee {
+            system_context.base_fee = base_fee;
+        }
+
+        if let Some(current_difficulty) = self.env.current_difficulty {
+            system_context.block_difficulty = utils::u256_to_h256(&current_difficulty);
+        }
+
+        if let Some(random) = self.env.current_random {
+            system_context.block_difficulty = utils::u256_to_h256(&random);
+        }
+        let run_result = if self.transaction.to.0.is_none() {
+            unimplemented!()
+        } else {
+            vm.execute_transaction(
+                self.transaction.secret_key,
+                self.transaction.to.0.unwrap(),
+                Some(self.transaction.value),
+                self.transaction.data.0.clone(),
+                self.transaction.gas_limit,
+                self.transaction.nonce.try_into().expect("Nonce overflow"),
+                system_context,
+            )
+        };
+
+        let mut check_successful = true;
+        let mut expected: Option<String> = None;
+        let mut actual: Option<String> = None;
+        // TODO merge with prestate!
+        for (address, filler_struct) in self.expected_state {
+            if filler_struct.balance.is_some() {
+                let expected_balance = filler_struct.balance.as_ref().unwrap();
+                if let Some(expected_balance_value) = expected_balance.as_value() {
+                    if vm.get_balance(address) != expected_balance_value {
+                        expected = Some(format!(
+                            "Balance of {address:?}: {:?}",
+                            expected_balance_value
+                        ));
+                        actual = Some(vm.get_balance(address).to_string());
+                        check_successful = false;
+                        break;
+                    }
+                }
+            }
+
+            if filler_struct.nonce.is_some() {
+                let expected_nonce = filler_struct.nonce.as_ref().unwrap();
+                if let Some(expected_nonce_value) = expected_nonce.as_value() {
+                    if vm.get_nonce(address) != expected_nonce_value {
+                        expected =
+                            Some(format!("Nonce of {address:?}: {:?}", expected_nonce_value));
+                        actual = Some(vm.get_nonce(address).to_string());
+                        check_successful = false;
+                        break;
+                    }
+                }
+            }
+
+            if filler_struct.code.is_some() {
+                let actual_code = vm.get_code(address).unwrap_or_default();
+
+                if actual_code != filler_struct.code.as_ref().unwrap().0 .0 {
+                    expected = Some(format!("Code of {address:?} is invalid"));
+                    actual = None;
+
+                    check_successful = false;
+                    break;
+                }
+            }
+
+            if filler_struct.storage.is_some() {
+                let mut has_storage_divergence = false;
+                let storage =
+                    AccountFillerStruct::parse_storage(filler_struct.storage.as_ref().unwrap());
+                for (key, _) in &storage {
+                    let key_u256 =
+                        web3::types::U256::from_str_radix(&key.as_value().unwrap().to_string(), 10)
+                            .unwrap();
+
+                    let expected_value =
+                        AccountFillerStruct::get_storage_value(&storage, key).unwrap();
+                    let actual_value = vm.get_storage_slot(address, key_u256);
+
+                    match expected_value {
+                        U256Parsed::Value(expected_u256) => {
+                            let unwrapped_actual_value = actual_value.unwrap_or_default();
+                            if unwrapped_actual_value != utils::u256_to_h256(&expected_u256) {
+                                expected = Some(format!(
+                                    "Storage of {address:?}, {:?}: {:?}",
+                                    key.as_value().unwrap(),
+                                    utils::u256_to_h256(&expected_u256)
+                                ));
+                                actual = Some(format!("{:?}", actual_value));
+
+                                has_storage_divergence = true;
+                                break;
+                            }
+                        }
+                        U256Parsed::Any => {
+                            if actual_value.is_none() {
+                                expected = Some(format!(
+                                    "Storage of {address:?}, {:?}: {:?}",
+                                    key.as_value().unwrap(),
+                                    "Any value"
+                                ));
+                                actual = Some("None".to_string());
+
+                                has_storage_divergence = true;
+                                break;
+                            }
+                        }
+                    };
+                }
+                if has_storage_divergence {
+                    check_successful = false;
+                    break;
+                }
+            }
+        }
+
+        if let Ok(res) = run_result {
+            /*if res.output.exception {
+                Summary::failed(
+                    summary,
+                    format!("{test_name}: {name}"),
+                    Some("Finish successfully".to_string()),
+                    Some("Failed with exception".to_string()),
+                    self.transaction.data.0
+                );
+            } else {*/
+            if check_successful {
+                Summary::passed_runtime(
+                    summary,
+                    format!("{test_name}: {name}"),
+                    test_group,
+                    0,
+                    0,
+                    res.gas,
+                );
+            } else {
+                Summary::failed(
+                    summary,
+                    format!("{test_name}: {name}"),
+                    res.exception,
                     expected,
                     actual,
                     self.transaction.data.0,

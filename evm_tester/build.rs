@@ -1,3 +1,4 @@
+#![feature(allocator_api)]
 //!
 //! The default build script for `evm-tester`.
 //!
