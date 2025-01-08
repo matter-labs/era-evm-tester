@@ -87,7 +87,7 @@ impl ZkOS {
     pub fn execute_transaction(
         &mut self,
         private_key: H256,
-        to: web3::types::Address,
+        to: Option<web3::types::Address>,
         value: Option<U256>,
         calldata: Vec<u8>,
         gas_limit: U256,
@@ -199,8 +199,9 @@ impl ZkOS {
                                 execution_result.return_data = data.clone();
                             },
                             zk_os_forward_system::run::ExecutionOutput::Create(data, address) => {
+                                let bytes = address.to_be_bytes();
                                 execution_result.return_data = data.clone();
-                                // execution_result.address_deployed
+                                execution_result.address_deployed = Some(Address::from(bytes));
                             },
                         }
                     },

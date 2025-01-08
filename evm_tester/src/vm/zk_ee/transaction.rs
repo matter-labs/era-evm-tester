@@ -7,7 +7,7 @@ use zksync_types::{ExecuteTransactionCommon, K256PrivateKey, Nonce, PackedEthSig
 
 pub fn gen_l2_tx(
     private_key: &zksync_types::K256PrivateKey, 
-    to: Address,
+    to: Option<Address>,
     data: Vec<u8>,
     value: U256,
     nonce: u32,
@@ -21,7 +21,7 @@ pub fn gen_l2_tx(
     let req = TransactionRequest {
         nonce: nonce.into(),
         from: Some(initiator_address),
-        to: Some(to),
+        to,
         value,
         gas_price: fee.max_fee_per_gas,
         gas: fee.gas_limit,
