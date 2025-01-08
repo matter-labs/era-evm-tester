@@ -503,19 +503,15 @@ impl Case {
         if let Some(random) = self.env.current_random {
             system_context.block_difficulty = utils::u256_to_h256(&random);
         }
-        let run_result = if self.transaction.to.0.is_none() {
-            unimplemented!()
-        } else {
-            vm.execute_transaction(
-                self.transaction.secret_key,
-                self.transaction.to.0.unwrap(),
-                Some(self.transaction.value),
-                self.transaction.data.0.clone(),
-                self.transaction.gas_limit,
-                self.transaction.nonce.try_into().expect("Nonce overflow"),
-                system_context,
-            )
-        };
+        let run_result = vm.execute_transaction(
+            self.transaction.secret_key,
+            self.transaction.to.0,
+            Some(self.transaction.value),
+            self.transaction.data.0.clone(),
+            self.transaction.gas_limit,
+            self.transaction.nonce.try_into().expect("Nonce overflow"),
+            system_context,
+        );
 
         let mut check_successful = true;
         let mut expected: Option<String> = None;
@@ -613,15 +609,6 @@ impl Case {
         }
 
         if let Ok(res) = run_result {
-            /*if res.output.exception {
-                Summary::failed(
-                    summary,
-                    format!("{test_name}: {name}"),
-                    Some("Finish successfully".to_string()),
-                    Some("Failed with exception".to_string()),
-                    self.transaction.data.0
-                );
-            } else {*/
             if check_successful {
                 Summary::passed_runtime(
                     summary,
