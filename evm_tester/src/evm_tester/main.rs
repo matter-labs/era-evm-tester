@@ -48,6 +48,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     let environment = match arguments.environment {
         Some(environment @ evm_tester::Environment::EVMEmulator) => environment,
+        Some(environment @ evm_tester::Environment::ZkOS) => environment,
         None => evm_tester::Environment::EVMEmulator,
     };
 
@@ -63,6 +64,11 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
             let vm = evm_tester::EraVM::new(era_compiler_common::Target::EVM)?;
 
             evm_tester.run_evm_interpreter::<evm_tester::EraVMSystemContractDeployer, true>(vm)
+        },
+
+        evm_tester::Environment::ZkOS => {
+            let vm = evm_tester::ZkOS::new();
+            evm_tester.run_zk_os(vm)
         }
     }?;
 

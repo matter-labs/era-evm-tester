@@ -2,6 +2,8 @@
 //! The evm tester library.
 //!
 
+#![feature(allocator_api)]
+
 #![allow(non_camel_case_types)]
 #![allow(clippy::upper_case_acronyms)]
 #![allow(clippy::too_many_arguments)]
@@ -33,6 +35,7 @@ pub use crate::vm::eravm::deployers::dummy_deployer::DummyDeployer as EraVMNativ
 pub use crate::vm::eravm::deployers::system_contract_deployer::SystemContractDeployer as EraVMSystemContractDeployer;
 pub use crate::vm::eravm::deployers::EraVMDeployer;
 pub use crate::vm::eravm::EraVM;
+pub use crate::vm::zk_ee::ZkOS;
 pub use crate::workflow::Workflow;
 
 ///
@@ -83,6 +86,25 @@ impl EvmTester {
             .into_par_iter()
             .map(|test| {
                 test.run_evm_interpreter::<D, M>(self.summary.clone(), vm.clone());
+            })
+            .collect();
+
+        Ok(())
+    }
+
+
+    ///
+    /// Runs all tests on ZK OS.
+    ///
+    pub fn run_zk_os(self, vm: ZkOS) -> anyhow::Result<()>
+    {
+        let tests = self.all_tests()?;
+        let vm = Arc::new(vm);
+
+        let _: Vec<()> = tests
+            .into_par_iter()
+            .map(|test| {
+                test.run_zk_os(self.summary.clone(), vm.clone());
             })
             .collect();
 
