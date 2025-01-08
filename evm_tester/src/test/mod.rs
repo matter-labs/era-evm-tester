@@ -19,6 +19,7 @@ use crate::summary::Summary;
 use crate::test::case::Case;
 use crate::vm::eravm::deployers::EraVMDeployer;
 use crate::vm::eravm::EraVM;
+use crate::ZkOS;
 
 fn wrap_numbers_in_quotes(input: &str) -> String {
     // Match numbers not already inside quotes
@@ -135,6 +136,36 @@ impl Test {
 
             let vm = EraVM::clone_with_contracts(vm.clone(), Default::default(), self.evm_version);
             case.run_evm_interpreter::<D, M>(
+                summary.clone(),
+                vm,
+                self.name.clone(),
+                self.group.clone(),
+            );
+        }
+    }
+
+    ///
+    /// Runs the test on ZK OS.
+    ///
+    pub fn run_zk_os(self, summary: Arc<Mutex<Summary>>, vm: Arc<ZkOS>)
+    {
+        for case in self.cases {
+            if let Some(filter_calldata) = self.skipped_calldatas.as_ref() {
+                if filter_calldata.contains(&case.transaction.data) {
+                    Summary::ignored(summary.clone(), case.label);
+                    continue;
+                }
+            }
+
+            if let Some(filter_cases) = self.skipped_cases.as_ref() {
+                if filter_cases.contains(&case.label) {
+                    Summary::ignored(summary.clone(), case.label);
+                    continue;
+                }
+            }
+
+            let vm = ZkOS::clone(vm.clone());
+            case.run_zk_os(
                 summary.clone(),
                 vm,
                 self.name.clone(),
