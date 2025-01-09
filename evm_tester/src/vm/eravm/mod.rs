@@ -8,6 +8,7 @@ pub mod constants;
 pub mod deployers;
 pub mod system_context;
 pub mod system_contracts;
+pub mod evm_bytecode_hash;
 
 #[cfg(feature = "vm2")]
 mod vm2_adapter;
@@ -23,7 +24,6 @@ use system_context::EVMContext;
 use system_contracts::SYSTEM_CONTRACT_LIST;
 use web3::signing::keccak256;
 use zkevm_tester::compiler_tests::StorageKey;
-use zksync_types::bytecode::BytecodeHash;
 use zksync_types::Address;
 use zksync_types::H256;
 use zksync_types::U256;
@@ -86,8 +86,7 @@ impl EraVM {
     pub const EVM_INTERPRETER_GAS_OVERHEAD: u64 = 2500;
 
     /// The `allowedBytecodesToDeploy` variable storage slot in the `ContractDeployer` contract.
-    pub const CONTRACT_DEPLOYER_ALLOWED_BYTECODES_MODE_SLOT: &'static str =
-        "0xd70708d0b933e26eab552567ce3a8ad69e6fbec9a2a68f16d51bd417a47d9d3b";
+    pub const CONTRACT_DEPLOYER_ALLOWED_BYTECODES_MODE_SLOT: u64 = 1;
 
     pub const CONTRACT_DEPLOYER_EVM_HASH_PREFIX_SHIFT: u64 = 254;
 
@@ -1041,11 +1040,7 @@ impl EraVM {
             return;
         }
 
-        let bytecode_prefix = &mut [0; 32];
-        web3::types::U256::from(bytecode.len()).to_big_endian(bytecode_prefix);
-
-        let mut padded_bytecode = Vec::from(bytecode_prefix);
-        padded_bytecode.extend(bytecode.iter());
+        let mut padded_bytecode = bytecode.clone();
 
         if padded_bytecode.len() % 32 != 0 {
             let padded_len = (padded_bytecode.len() / 32 + 1) * 32;
@@ -1056,13 +1051,13 @@ impl EraVM {
             padded_bytecode.extend(vec![0; 32]);
         }
 
-        let bytecode_hash = BytecodeHash::for_evm_bytecode(&padded_bytecode).value();
+        let bytecode_hash = evm_bytecode_hash::hash_evm_bytecode(bytecode.len() as u16, &padded_bytecode);
 
         self.add_known_evm_contract(padded_bytecode.clone(), utils::h256_to_u256(&bytecode_hash));
         self.add_deployed_contract(
             address,
             utils::h256_to_u256(&bytecode_hash),
-            Some(padded_bytecode),
+            Some(padded_bytecode.clone()),
         );
 
         let evm_hash = keccak256(&bytecode);
@@ -1130,21 +1125,19 @@ impl EraVM {
 
     pub fn get_code(&self, address: Address) -> Option<Vec<u8>> {
         if let Some(bytecode_hash) = self.get_contract_versioned_bytecode_hash(address) {
-            // TODO unpacking EVM code
+            let hash_as_bytes = bytecode_hash.as_bytes();
+            let bytecode_len = (hash_as_bytes[3] as usize) + 256 * (hash_as_bytes[2] as usize);
+
             if let Some(bytecode) = self
                 .published_evm_bytecodes
                 .get(&utils::h256_to_u256(bytecode_hash))
             {
                 let mut res_bytecode: Vec<u8> = vec![];
-                let bytecode_len = bytecode[0].as_u32();
-                for word in bytecode.iter().skip(1) {
+                for word in bytecode.iter() {
                     res_bytecode.extend(utils::u256_to_h256(word).as_bytes());
                 }
 
-                let res_bytecode = res_bytecode
-                    .into_iter()
-                    .take(bytecode_len as usize)
-                    .collect();
+                let res_bytecode = res_bytecode.into_iter().take(bytecode_len).collect();
                 Some(res_bytecode)
             } else {
                 None
