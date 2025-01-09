@@ -268,7 +268,7 @@ impl ZkOS {
 
         match partial_data {
             Some(partial_data) => {
-                let nonce = partial_data.as_u64_array_ref()[3];
+                let nonce = zk_ee::system::reference_implementations::storage_format::account_code::PackedPartialAccountData::read_nonce_from_bytes32_encoding(partial_data);
                 nonce.into()
             },
             None => Default::default(),
