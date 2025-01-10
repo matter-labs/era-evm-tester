@@ -342,7 +342,7 @@ impl ZkOS {
 
         // Now we have to do 2 things:
         // * mark that this account has this bytecode hash deployed
-        // * update account state - to say that this is EVM bytecode and nonce is 1.
+        // * update account state - to say that this is EVM bytecode.
 
         // We are updating both cold storage (hash map) and our storage tree.
 
@@ -352,7 +352,6 @@ impl ZkOS {
         self.tree.cold_storage.insert(flat_key, bytecode_hash);
         self.tree.storage_tree.insert(&flat_key, &bytecode_hash);
 
-        account_data.nonce = 1;
         let flat_key = derive_flat_storage_key(&ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, &key);
         self.tree
             .cold_storage
