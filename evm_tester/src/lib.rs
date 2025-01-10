@@ -3,7 +3,6 @@
 //!
 
 #![feature(allocator_api)]
-
 #![allow(non_camel_case_types)]
 #![allow(clippy::upper_case_acronyms)]
 #![allow(clippy::too_many_arguments)]
@@ -92,12 +91,10 @@ impl EvmTester {
         Ok(())
     }
 
-
     ///
     /// Runs all tests on ZK OS.
     ///
-    pub fn run_zk_os(self, vm: ZkOS) -> anyhow::Result<()>
-    {
+    pub fn run_zk_os(self, vm: ZkOS) -> anyhow::Result<()> {
         let tests = self.all_tests()?;
         let vm = Arc::new(vm);
 

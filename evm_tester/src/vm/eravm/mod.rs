@@ -6,9 +6,9 @@ pub mod address_iterator;
 pub mod address_iterator_evm;
 pub mod constants;
 pub mod deployers;
+pub mod evm_bytecode_hash;
 pub mod system_context;
 pub mod system_contracts;
-pub mod evm_bytecode_hash;
 
 #[cfg(feature = "vm2")]
 mod vm2_adapter;
@@ -1051,7 +1051,8 @@ impl EraVM {
             padded_bytecode.extend(vec![0; 32]);
         }
 
-        let bytecode_hash = evm_bytecode_hash::hash_evm_bytecode(bytecode.len() as u16, &padded_bytecode);
+        let bytecode_hash =
+            evm_bytecode_hash::hash_evm_bytecode(bytecode.len() as u16, &padded_bytecode);
 
         self.add_known_evm_contract(padded_bytecode.clone(), utils::h256_to_u256(&bytecode_hash));
         self.add_deployed_contract(
