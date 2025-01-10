@@ -12,7 +12,10 @@ use transaction::Transaction;
 use crate::{
     test::filler_structure::{AccountFillerStruct, Labels},
     utils,
-    vm::{eravm::system_context::SystemContext, zk_ee::{ZkOS, ZkOsEVMContext}},
+    vm::{
+        eravm::system_context::SystemContext,
+        zk_ee::{ZkOS, ZkOsEVMContext},
+    },
     EraVM, EraVMDeployer, Summary,
 };
 
@@ -454,8 +457,7 @@ impl Case {
         mut vm: ZkOS,
         test_name: String,
         test_group: Option<String>,
-    )
-    {
+    ) {
         let name = self.label;
 
         // Populate prestate
@@ -468,9 +470,12 @@ impl Case {
                 vm.set_predeployed_evm_contract(address, state.code.0);
             }
 
-            state.storage.into_iter().for_each(|(storage_key, storage_value)| {
-                vm.set_storage_slot(address, storage_key, utils::u256_to_h256(&storage_value));
-            });
+            state
+                .storage
+                .into_iter()
+                .for_each(|(storage_key, storage_value)| {
+                    vm.set_storage_slot(address, storage_key, utils::u256_to_h256(&storage_value));
+                });
         }
 
         let mut system_context = ZkOsEVMContext::default();

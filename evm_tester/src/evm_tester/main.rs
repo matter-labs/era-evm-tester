@@ -64,7 +64,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
             let vm = evm_tester::EraVM::new(era_compiler_common::Target::EVM)?;
 
             evm_tester.run_evm_interpreter::<evm_tester::EraVMSystemContractDeployer, true>(vm)
-        },
+        }
 
         evm_tester::Environment::ZkOS => {
             let vm = evm_tester::ZkOS::new();

@@ -9,7 +9,7 @@
 pub enum Environment {
     /// The EraVM-based EVM emulator.
     EVMEmulator,
-    ZkOS
+    ZkOS,
 }
 
 impl std::str::FromStr for Environment {
