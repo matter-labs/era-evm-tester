@@ -42,6 +42,7 @@ impl Element {
             Outcome::Passed { .. } => "PASSED".green(),
             Outcome::Failed { .. } => "FAILED".bright_red(),
             Outcome::Invalid { .. } => "INVALID".red(),
+            Outcome::Panicked { .. } => "PANICKED".bright_magenta(),
             Outcome::Ignored => "IGNORED".bright_black(),
         };
 
