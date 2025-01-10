@@ -32,6 +32,12 @@ pub enum Outcome {
         error: String,
         calldata: String,
     },
+    /// The `panicked` outcome. The test execution raised a panic.
+    Panicked {
+        /// The building error description.
+        error: String,
+        calldata: String,
+    },
     /// The `ignored` outcome. The test is ignored.
     Ignored,
 }
@@ -69,6 +75,19 @@ impl Outcome {
         S: ToString,
     {
         Self::Invalid {
+            error: error.to_string(),
+            calldata: hex::encode(calldata.as_slice()),
+        }
+    }
+
+    ///
+    /// A shortcut constructor.
+    ///
+    pub fn panicked<S>(error: S, calldata: Vec<u8>) -> Self
+    where
+        S: ToString,
+    {
+        Self::Panicked {
             error: error.to_string(),
             calldata: hex::encode(calldata.as_slice()),
         }
