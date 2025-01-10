@@ -61,7 +61,7 @@ zk_os_forward_system = {package = "forward_system",  git="ssh://git@github.com/m
 zk_ee = { package = "zk_ee",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 zk_os_evm_interpreter = { package = "evm_interpreter",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 zk_os_basic_system = { package = "basic_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zk_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+zk_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" , features = ["code_in_kernel_space"] }
 zk_os_system_hooks = { package = "system_hooks",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 
 [dependencies.web3]
@@ -73,3 +73,5 @@ features = ["http-rustls-tls", "test", "signing"]
 version = "=0.11.27"
 default-features = false
 features = ["blocking"]
+
+
