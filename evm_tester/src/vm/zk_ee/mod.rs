@@ -1,4 +1,3 @@
-
 use std::alloc::Global;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -19,8 +18,13 @@ use zk_os_basic_system::basic_io_implementer::address_into_special_storage_key;
 use zk_os_basic_system::basic_system::simple_growable_storage::TestingTree;
 use zk_os_evm_interpreter::utils::evm_bytecode_into_partial_account_data;
 use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource};
-use zk_os_forward_system::run::{run_batch, BatchContext, BatchOutput, PreimageSource, PreimageType, StorageCommitment, TxOutput};
-use zk_os_system_hooks::addresses_constants::{ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, BYTECODE_HASH_STORAGE_ADDRESS, NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS};
+use zk_os_forward_system::run::{
+    run_batch, BatchContext, BatchOutput, PreimageSource, PreimageType, StorageCommitment, TxOutput,
+};
+use zk_os_system_hooks::addresses_constants::{
+    ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, BYTECODE_HASH_STORAGE_ADDRESS,
+    NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS,
+};
 use zksync_types::fee::Fee;
 use zksync_types::{K256PrivateKey, H256, U256};
 
@@ -49,9 +53,8 @@ pub struct ZkOsExecutionResult {
     pub exception: bool,
     /// The number of gas used.
     pub gas: web3::types::U256,
-    pub address_deployed: Option<Address>
+    pub address_deployed: Option<Address>,
 }
-
 
 ///
 /// The ZK OS interface.
@@ -63,8 +66,7 @@ pub struct ZkOS {
 }
 
 impl ZkOS {
-    pub fn new(
-    ) -> Self {
+    pub fn new() -> Self {
         let tree = InMemoryTree {
             storage_tree: TestingTree::new_in(Global),
             cold_storage: HashMap::new(),
@@ -78,9 +80,7 @@ impl ZkOS {
         }
     }
 
-    pub fn clone(
-        vm: Arc<Self>,
-    ) -> Self {
+    pub fn clone(vm: Arc<Self>) -> Self {
         (*vm).clone()
     }
 
@@ -104,15 +104,17 @@ impl ZkOS {
         };
 
         let l2_tx = gen_l2_tx(
-            &K256PrivateKey::from_bytes(private_key).expect("Invalid private key"), 
-            to, 
-            calldata, 
-            value.unwrap_or_default(), 
+            &K256PrivateKey::from_bytes(private_key).expect("Invalid private key"),
+            to,
+            calldata,
+            value.unwrap_or_default(),
             nonce,
             fee,
-            system_context.block_timestamp as u64, 
-            37 // TODO: chainId is hardcoded system_context.chain_id as u64
-        ).context("Gen l2 tx").unwrap();
+            system_context.block_timestamp as u64,
+            37, // TODO: chainId is hardcoded system_context.chain_id as u64
+        )
+        .context("Gen l2 tx")
+        .unwrap();
 
         let tx = TransactionData::from(l2_tx);
 
@@ -124,8 +126,10 @@ impl ZkOS {
 
         let context = BatchContext {
             //todo: gas
-            eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string()).expect("Invalid basefee"),
-            ergs_price: ruint::Uint::from_str(&system_context.gas_price.to_string()).expect("Invalid ergs price"),
+            eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string())
+                .expect("Invalid basefee"),
+            ergs_price: ruint::Uint::from_str(&system_context.gas_price.to_string())
+                .expect("Invalid ergs price"),
             gas_per_pubdata: Default::default(),
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
@@ -144,47 +148,49 @@ impl ZkOS {
             storage_commitment,
             tree,
             preimage_source,
-            tx_source
+            tx_source,
         );
 
         self.apply_batch_execution_result(result)
     }
 
-    fn apply_batch_execution_result(&mut self, batch_execution_result: Result<BatchOutput, InternalError>) -> anyhow::Result<ZkOsExecutionResult, String> {
+    fn apply_batch_execution_result(
+        &mut self,
+        batch_execution_result: Result<BatchOutput, InternalError>,
+    ) -> anyhow::Result<ZkOsExecutionResult, String> {
         match batch_execution_result {
             Ok(result) => {
                 for storage_write in result.storage_writes.iter() {
-                    self.tree.cold_storage.insert(
-                        storage_write.key,
-                        storage_write.value,
-                    );
-                    self.tree.storage_tree.insert(
-                        &storage_write.key,
-                        &storage_write.value,
-                    );
+                    self.tree
+                        .cold_storage
+                        .insert(storage_write.key, storage_write.value);
+                    self.tree
+                        .storage_tree
+                        .insert(&storage_write.key, &storage_write.value);
                 }
 
                 for (hash, preimage) in result.published_preimages.iter() {
                     self.preimage_source.inner.insert(
-                        (
-                            PreimageType::Bytecode(ExecutionEnvironmentType::EVM),
-                            *hash,
-                        ),
+                        (PreimageType::Bytecode(ExecutionEnvironmentType::EVM), *hash),
                         preimage.clone(),
                     );
                 }
 
-                let tx_result = result.tx_results.get(0).expect("Do not have tx output").clone();
+                let tx_result = result
+                    .tx_results
+                    .get(0)
+                    .expect("Do not have tx output")
+                    .clone();
 
                 Self::get_transaction_execution_result(tx_result)
             }
-            Err(err) => {
-                Err(format!("{err:?}"))
-            }
+            Err(err) => Err(format!("{err:?}")),
         }
     }
 
-    fn get_transaction_execution_result(tx_result: Result<TxOutput, InvalidTransaction>) -> anyhow::Result<ZkOsExecutionResult, String> {
+    fn get_transaction_execution_result(
+        tx_result: Result<TxOutput, InvalidTransaction>,
+    ) -> anyhow::Result<ZkOsExecutionResult, String> {
         match tx_result {
             Ok(tx_output) => {
                 let mut execution_result = ZkOsExecutionResult::default();
@@ -197,27 +203,23 @@ impl ZkOS {
                         match execution_output {
                             zk_os_forward_system::run::ExecutionOutput::Call(data) => {
                                 execution_result.return_data = data.clone();
-                            },
+                            }
                             zk_os_forward_system::run::ExecutionOutput::Create(data, address) => {
                                 let bytes = address.to_be_bytes();
                                 execution_result.return_data = data.clone();
                                 execution_result.address_deployed = Some(Address::from(bytes));
-                            },
+                            }
                         }
-                    },
+                    }
                     zk_os_forward_system::run::ExecutionResult::Revert(vec) => {
                         execution_result.exception = true;
                         execution_result.return_data = vec.clone();
-                    },
+                    }
                 }
-                Ok(execution_result)                   
+                Ok(execution_result)
             }
-            Err(tx_err) => {
-                Err(format!("{tx_err:?}"))
-            }
+            Err(tx_err) => Err(format!("{tx_err:?}")),
         }
-
-        
     }
 
     ///
@@ -244,16 +246,9 @@ impl ZkOS {
         let key = address_into_special_storage_key(&address);
         let flat_key = derive_flat_storage_key(&NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS, &key);
 
-
         let value = h256_to_bytes32(u256_to_h256(value));
-        self.tree.cold_storage.insert(
-            flat_key,
-            value,
-        );
-        self.tree.storage_tree.insert(
-            &flat_key,
-            &value,
-        );
+        self.tree.cold_storage.insert(flat_key, value);
+        self.tree.storage_tree.insert(&flat_key, &value);
     }
 
     ///
@@ -270,7 +265,7 @@ impl ZkOS {
             Some(partial_data) => {
                 let nonce = zk_ee::system::reference_implementations::storage_format::account_code::PackedPartialAccountData::read_nonce_from_bytes32_encoding(partial_data);
                 nonce.into()
-            },
+            }
             None => Default::default(),
         }
     }
@@ -284,20 +279,15 @@ impl ZkOS {
         let flat_key = derive_flat_storage_key(&ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, &key);
 
         let mut partial_data = match self.tree.cold_storage.get(&flat_key) {
-            Some(partial_data) => {
-                *partial_data
-            },
-            None => Bytes32::default()
+            Some(partial_data) => *partial_data,
+            None => Bytes32::default(),
         };
 
         let partial_data_as_array = partial_data.as_u64_array_mut();
         partial_data_as_array[3] = value.try_into().expect("Nonce overflowed");
-        
+
         self.tree.cold_storage.insert(flat_key, partial_data);
-        self.tree.storage_tree.insert(
-            &flat_key,
-            &partial_data,
-        );
+        self.tree.storage_tree.insert(&flat_key, &partial_data);
     }
 
     pub fn get_storage_slot(
@@ -321,7 +311,7 @@ impl ZkOS {
         &mut self,
         address: Address,
         key: web3::types::U256,
-        value: web3::types::H256
+        value: web3::types::H256,
     ) {
         let address = address_to_b160(address);
         let key = h256_to_bytes32(u256_to_h256(key));
@@ -329,10 +319,7 @@ impl ZkOS {
 
         let value = h256_to_bytes32(value);
         self.tree.cold_storage.insert(flat_key, value);
-        self.tree.storage_tree.insert(
-            &flat_key,
-            &value,
-        );
+        self.tree.storage_tree.insert(&flat_key, &value);
     }
 
     pub fn set_predeployed_evm_contract(
@@ -342,7 +329,8 @@ impl ZkOS {
     ) {
         let address = address_to_b160(address);
 
-        let (mut account_data, mut bytecode_hash) = evm_bytecode_into_partial_account_data(&bytecode);
+        let (mut account_data, mut bytecode_hash) =
+            evm_bytecode_into_partial_account_data(&bytecode);
         PreimageType::Bytecode(ExecutionEnvironmentType::EVM).mark_hash(&mut bytecode_hash);
         self.preimage_source.inner.insert(
             (
@@ -351,24 +339,25 @@ impl ZkOS {
             ),
             bytecode.to_vec(),
         );
-    
+
         // Now we have to do 2 things:
         // * mark that this account has this bytecode hash deployed
-        // * update account state - to say that this is EVM bytecode and nonce is 1.
-    
+        // * update account state - to say that this is EVM bytecode.
+
         // We are updating both cold storage (hash map) and our storage tree.
-    
+
         let key = address_into_special_storage_key(&address);
-    
+
         let flat_key = derive_flat_storage_key(&BYTECODE_HASH_STORAGE_ADDRESS, &key);
         self.tree.cold_storage.insert(flat_key, bytecode_hash);
         self.tree.storage_tree.insert(&flat_key, &bytecode_hash);
 
-        account_data.nonce = 1;
         let flat_key = derive_flat_storage_key(&ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, &key);
-        self.tree.cold_storage
+        self.tree
+            .cold_storage
             .insert(flat_key, account_data.pack_to_bytes32());
-        self.tree.storage_tree
+        self.tree
+            .storage_tree
             .insert(&flat_key, &account_data.pack_to_bytes32());
     }
 
@@ -381,10 +370,16 @@ impl ZkOS {
 
         match bytecode_hash {
             Some(bytecode_hash) => {
-                let preimage = self.preimage_source.get_preimage(PreimageType::Bytecode(ExecutionEnvironmentType::EVM), *bytecode_hash);
-                assert!(preimage.is_some(), "Unknown bytecode hash: {bytecode_hash:?}");
+                let preimage = self.preimage_source.get_preimage(
+                    PreimageType::Bytecode(ExecutionEnvironmentType::EVM),
+                    *bytecode_hash,
+                );
+                assert!(
+                    preimage.is_some(),
+                    "Unknown bytecode hash: {bytecode_hash:?}"
+                );
                 preimage
-            },
+            }
             None => None,
         }
     }

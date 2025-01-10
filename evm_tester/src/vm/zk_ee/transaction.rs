@@ -3,10 +3,12 @@ use web3::ethabi::{encode, Address, Token};
 use zksync_types::api::TransactionRequest;
 use zksync_types::fee::Fee;
 use zksync_types::l2::{L2Tx, TransactionType};
-use zksync_types::{ExecuteTransactionCommon, K256PrivateKey, Nonce, PackedEthSignature, Transaction, H256, U256};
+use zksync_types::{
+    ExecuteTransactionCommon, K256PrivateKey, Nonce, PackedEthSignature, Transaction, H256, U256,
+};
 
 pub fn gen_l2_tx(
-    private_key: &zksync_types::K256PrivateKey, 
+    private_key: &zksync_types::K256PrivateKey,
     to: Option<Address>,
     data: Vec<u8>,
     value: U256,
@@ -16,7 +18,7 @@ pub fn gen_l2_tx(
     chain_id: u64,
 ) -> anyhow::Result<Transaction> {
     let initiator_address = private_key.address();
-    
+
     // We do a whole dance to reconstruct missing data: RLP encoding, hash and signature.
     let req = TransactionRequest {
         nonce: nonce.into(),
@@ -40,16 +42,15 @@ pub fn gen_l2_tx(
     let data = req
         .get_default_signed_message()
         .context("get_default_signed_message()")?;
-    
+
     let sig = PackedEthSignature::sign_raw(private_key, &data).context("sign_raw")?;
 
     let raw = req.get_signed_bytes(&sig).context("get_signed_bytes")?;
-    
+
     let (req, hash) =
         TransactionRequest::from_bytes_unverified(&raw).context("from_bytes_unverified()")?;
     // Since we allow users to specify `None` recipient, EVM emulation is implicitly enabled.
-    let mut tx =
-        L2Tx::from_request(req, 50000, true).context("from_request()")?;
+    let mut tx = L2Tx::from_request(req, 50000, true).context("from_request()")?;
     tx.set_input(raw, hash);
 
     tx.received_timestamp_ms = timestamp * 1000; // seconds to ms
@@ -89,9 +90,7 @@ pub(crate) struct TransactionData {
 }
 
 impl TransactionData {
-    pub fn abi_encode(
-        self,
-    ) -> Vec<u8> {
+    pub fn abi_encode(self) -> Vec<u8> {
         let mut res = encode(&[Token::Tuple(vec![
             Token::Uint(U256::from_big_endian(&self.tx_type.to_be_bytes())),
             Token::Address(self.from),
@@ -116,7 +115,6 @@ impl TransactionData {
         res
     }
 }
-
 
 impl From<Transaction> for TransactionData {
     fn from(execute_tx: Transaction) -> Self {
@@ -149,7 +147,9 @@ impl From<Transaction> for TransactionData {
                 let is_deployment_transaction = match execute_tx.execute.contract_address {
                     None =>
                     // that means it's a deploy transaction
-                        U256([1, 0, 0, 0]),
+                    {
+                        U256([1, 0, 0, 0])
+                    }
                     // all other transactions
                     Some(_) => U256::zero(),
                 };

@@ -147,8 +147,7 @@ impl Test {
     ///
     /// Runs the test on ZK OS.
     ///
-    pub fn run_zk_os(self, summary: Arc<Mutex<Summary>>, vm: Arc<ZkOS>)
-    {
+    pub fn run_zk_os(self, summary: Arc<Mutex<Summary>>, vm: Arc<ZkOS>) {
         for case in self.cases {
             if let Some(filter_calldata) = self.skipped_calldatas.as_ref() {
                 if filter_calldata.contains(&case.transaction.data) {
@@ -165,12 +164,7 @@ impl Test {
             }
 
             let vm = ZkOS::clone(vm.clone());
-            case.run_zk_os(
-                summary.clone(),
-                vm,
-                self.name.clone(),
-                self.group.clone(),
-            );
+            case.run_zk_os(summary.clone(), vm, self.name.clone(), self.group.clone());
         }
     }
 }
