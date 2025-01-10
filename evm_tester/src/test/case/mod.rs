@@ -454,6 +454,28 @@ impl Case {
     pub fn run_zk_os(
         self,
         summary: Arc<Mutex<Summary>>,
+        vm: ZkOS,
+        test_name: String,
+        test_group: Option<String>,
+    ) {
+        let calldata = self.transaction.data.0.clone();
+        let name = self.label.clone();
+        let result = std::panic::catch_unwind(|| {
+            self.run_zk_os_inner(summary.clone(), vm, test_name.clone(), test_group)
+        });
+        if let Err(e) = result {
+            Summary::panicked(
+                summary,
+                format!("{test_name}: {name}"),
+                format!("{:?}", e),
+                calldata,
+            )
+        }
+    }
+
+    fn run_zk_os_inner(
+        self,
+        summary: Arc<Mutex<Summary>>,
         mut vm: ZkOS,
         test_name: String,
         test_group: Option<String>,

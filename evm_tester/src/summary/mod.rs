@@ -32,6 +32,8 @@ pub struct Summary {
     invalid: usize,
     /// The ignored tests counter.
     ignored: usize,
+    /// The panicked tests counter.
+    panicked: usize,
 }
 
 impl Summary {
@@ -50,6 +52,7 @@ impl Summary {
             failed: 0,
             invalid: 0,
             ignored: 0,
+            panicked: 0,
         }
     }
 
@@ -62,6 +65,7 @@ impl Summary {
                 Outcome::Passed { .. } => continue,
                 Outcome::Failed { .. } => return false,
                 Outcome::Invalid { .. } => return false,
+                Outcome::Panicked { .. } => return false,
                 Outcome::Ignored => continue,
             }
         }
@@ -157,6 +161,17 @@ impl Summary {
     }
 
     ///
+    /// Adds a panicked outcome.
+    ///
+    pub fn panicked<S>(summary: Arc<Mutex<Self>>, name: String, error: S, calldata: Vec<u8>)
+    where
+        S: ToString,
+    {
+        let element = Element::new(name, Outcome::panicked(error, calldata));
+        summary.lock().expect("Sync").push_element(element);
+    }
+
+    ///
     /// Adds an ignored outcome.
     ///
     pub fn ignored(summary: Arc<Mutex<Self>>, name: String) {
@@ -198,6 +213,10 @@ impl Summary {
                 self.invalid += 1;
                 true
             }
+            Outcome::Panicked { .. } => {
+                self.panicked += 1;
+                true
+            }
             Outcome::Ignored => {
                 self.ignored += 1;
                 false
@@ -236,25 +255,31 @@ impl std::fmt::Display for Summary {
         )?;
         writeln!(
             f,
-            "║     {:7}                                   {:10}     ║",
+            "║     {:8}                                  {:10}     ║",
             "PASSED".green(),
             self.passed.to_string().green(),
         )?;
         writeln!(
             f,
-            "║     {:7}                                   {:10}     ║",
+            "║     {:8}                                  {:10}     ║",
             "FAILED".bright_red(),
             self.failed.to_string().bright_red(),
         )?;
         writeln!(
             f,
-            "║     {:7}                                   {:10}     ║",
+            "║     {:8}                                  {:10}     ║",
+            "PANICKED".bright_magenta(),
+            self.panicked.to_string().bright_magenta(),
+        )?;
+        writeln!(
+            f,
+            "║     {:8}                                  {:10}     ║",
             "INVALID".red(),
             self.invalid.to_string().red(),
         )?;
         writeln!(
             f,
-            "║     {:7}                                   {:10}     ║",
+            "║     {:8}                                  {:10}     ║",
             "IGNORED".bright_black(),
             self.ignored.to_string().bright_black(),
         )?;
