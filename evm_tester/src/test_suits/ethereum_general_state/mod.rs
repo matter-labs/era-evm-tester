@@ -6,10 +6,14 @@ use std::path::Path;
 use std::path::PathBuf;
 
 pub mod index;
+pub mod platforms;
+
+use platforms::index_for_environment;
 
 use crate::filters::Filters;
 use crate::test::Test;
 use crate::test_suits::Collection;
+use crate::Environment;
 
 ///
 /// The Ethereum tests directory.
@@ -17,13 +21,6 @@ use crate::test_suits::Collection;
 pub struct EthereumGeneralStateTestsDirectory;
 
 impl EthereumGeneralStateTestsDirectory {
-    ///
-    /// The index file path.
-    ///
-    /// Must be appended to the tests directory.
-    ///
-    const INDEX_NAME: &'static str = "ethereum-general-state-tests.yaml";
-
     ///
     /// Reads the Ethereum test index.
     ///
@@ -39,9 +36,9 @@ impl Collection for EthereumGeneralStateTestsDirectory {
         directory_path: &Path,
         filler_path: &Path,
         filters: &Filters,
+        environment: Environment,
     ) -> anyhow::Result<Vec<Test>> {
-        let index_path = PathBuf::from(Self::INDEX_NAME);
-
+        let index_path = PathBuf::from(index_for_environment(environment));
         Ok(Self::read_index(index_path.as_path())?
             .into_enabled_list(directory_path)
             .into_iter()
