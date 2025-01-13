@@ -8,6 +8,7 @@ pub mod transaction;
 
 use post_state_for_case::PostStateForCase;
 use transaction::Transaction;
+use zksync_types::U256;
 
 use crate::{
     test::filler_structure::{AccountFillerStruct, Labels},
@@ -646,7 +647,12 @@ impl Case {
         }
 
         if let Ok(res) = run_result {
-            if check_successful {
+            // For the test to pass, we need:
+            // * successful state changes
+            // * expect_exception => exception
+            // Note that not all reverting tests have an expected
+            // exception declared.
+            if check_successful && (!self.expect_exception || res.exception) {
                 Summary::passed_runtime(
                     summary,
                     format!("{test_name}: {name}"),
@@ -667,12 +673,24 @@ impl Case {
             }
             //}
         } else {
-            Summary::invalid(
-                summary,
-                format!("{test_name}: {name}"),
-                run_result.err().unwrap(),
-                self.transaction.data.0,
-            );
+            // Test case was invalid, we check if this was expected
+            if self.expect_exception && check_successful {
+                Summary::passed_runtime(
+                    summary,
+                    format!("{test_name}: {name}"),
+                    test_group,
+                    0,
+                    0,
+                    U256::zero(),
+                );
+            } else {
+                Summary::invalid(
+                    summary,
+                    format!("{test_name}: {name}"),
+                    run_result.err().unwrap(),
+                    self.transaction.data.0,
+                );
+            }
         }
     }
 }
