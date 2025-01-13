@@ -218,9 +218,12 @@ pub enum AccountFillerStructMaybe {
 }
 
 #[derive(Debug, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct ExpectStructure {
     pub indexes: Option<ExpectedIndexesStructure>,
     pub result: HashMap<AddressMaybe, AccountFillerStructMaybe>,
+    pub expect_exception:
+        Option<HashMap<GenericSerializedSimpleValue, GenericSerializedSimpleValue>>,
 }
 
 impl ExpectStructure {
