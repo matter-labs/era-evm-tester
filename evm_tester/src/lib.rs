@@ -9,6 +9,7 @@
 #![allow(clippy::type_complexity)]
 
 pub(crate) mod environment;
+pub(crate) mod platforms;
 pub(crate) mod filters;
 pub(crate) mod summary;
 pub(crate) mod test;
@@ -21,6 +22,7 @@ use std::path::Path;
 use std::sync::Arc;
 use std::sync::Mutex;
 
+use platforms::index_for_environment;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use test::Test;
@@ -78,7 +80,7 @@ impl EvmTester {
     where
         D: EraVMDeployer,
     {
-        let tests = self.all_tests()?;
+        let tests = self.all_tests(Environment::EVMEmulator)?;
         let vm = Arc::new(vm);
 
         let _: Vec<()> = tests
@@ -95,7 +97,7 @@ impl EvmTester {
     /// Runs all tests on ZK OS.
     ///
     pub fn run_zk_os(self, vm: ZkOS) -> anyhow::Result<()> {
-        let tests = self.all_tests()?;
+        let tests = self.all_tests(Environment::ZkOS)?;
         let vm = Arc::new(vm);
 
         let _: Vec<()> = tests
@@ -111,12 +113,15 @@ impl EvmTester {
     ///
     /// Returns all tests from all directories.
     ///
-    fn all_tests(&self) -> anyhow::Result<Vec<Test>> {
+    fn all_tests(&self, environment: Environment) -> anyhow::Result<Vec<Test>> {
         let mut tests = Vec::with_capacity(16384);
+
+        let index_path = index_for_environment(environment);
 
         tests.extend(self.directory::<EthereumGeneralStateTestsDirectory>(
             Self::GENERAL_STATE_TESTS,
             Self::GENERAL_STATE_TESTS_FILLER,
+            index_path
         )?);
 
         Ok(tests)
@@ -125,11 +130,11 @@ impl EvmTester {
     ///
     /// Returns all tests from the specified directory.
     ///
-    fn directory<T>(&self, path: &str, filler_path: &str) -> anyhow::Result<Vec<Test>>
+    fn directory<T>(&self, path: &str, filler_path: &str, index_path: &str) -> anyhow::Result<Vec<Test>>
     where
         T: Collection,
     {
-        T::read_all(Path::new(path), Path::new(filler_path), &self.filters).map_err(|error| {
+        T::read_all(Path::new(path), Path::new(filler_path), &self.filters, Path::new(index_path)).map_err(|error| {
             anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}")
         })
     }

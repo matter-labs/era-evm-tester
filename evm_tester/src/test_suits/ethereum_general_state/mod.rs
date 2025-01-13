@@ -18,13 +18,6 @@ pub struct EthereumGeneralStateTestsDirectory;
 
 impl EthereumGeneralStateTestsDirectory {
     ///
-    /// The index file path.
-    ///
-    /// Must be appended to the tests directory.
-    ///
-    const INDEX_NAME: &'static str = "ethereum-general-state-tests.yaml";
-
-    ///
     /// Reads the Ethereum test index.
     ///
     pub fn read_index(index_path: &Path) -> anyhow::Result<index::FSEntity> {
@@ -39,10 +32,10 @@ impl Collection for EthereumGeneralStateTestsDirectory {
         directory_path: &Path,
         filler_path: &Path,
         filters: &Filters,
+        index_path: &Path
     ) -> anyhow::Result<Vec<Test>> {
-        let index_path = PathBuf::from(Self::INDEX_NAME);
 
-        Ok(Self::read_index(index_path.as_path())?
+        Ok(Self::read_index(index_path)?
             .into_enabled_list(directory_path)
             .into_iter()
             .filter_map(|test| {
