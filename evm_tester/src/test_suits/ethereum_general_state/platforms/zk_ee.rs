@@ -1,4 +1,3 @@
-
 ///
 /// The index file path.
 ///

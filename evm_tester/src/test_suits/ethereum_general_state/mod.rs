@@ -6,10 +6,14 @@ use std::path::Path;
 use std::path::PathBuf;
 
 pub mod index;
+pub mod platforms;
+
+use platforms::index_for_environment;
 
 use crate::filters::Filters;
 use crate::test::Test;
 use crate::test_suits::Collection;
+use crate::Environment;
 
 ///
 /// The Ethereum tests directory.
@@ -32,9 +36,10 @@ impl Collection for EthereumGeneralStateTestsDirectory {
         directory_path: &Path,
         filler_path: &Path,
         filters: &Filters,
-        index_path: &Path,
+        environment: Environment,
     ) -> anyhow::Result<Vec<Test>> {
-        Ok(Self::read_index(index_path)?
+        let index_path = PathBuf::from(index_for_environment(environment));
+        Ok(Self::read_index(index_path.as_path())?
             .into_enabled_list(directory_path)
             .into_iter()
             .filter_map(|test| {

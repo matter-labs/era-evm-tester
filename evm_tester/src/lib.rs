@@ -10,7 +10,6 @@
 
 pub(crate) mod environment;
 pub(crate) mod filters;
-pub(crate) mod platforms;
 pub(crate) mod summary;
 pub(crate) mod test;
 pub(crate) mod test_suits;
@@ -22,7 +21,6 @@ use std::path::Path;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use platforms::index_for_environment;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use test::Test;
@@ -116,12 +114,10 @@ impl EvmTester {
     fn all_tests(&self, environment: Environment) -> anyhow::Result<Vec<Test>> {
         let mut tests = Vec::with_capacity(16384);
 
-        let index_path = index_for_environment(environment);
-
         tests.extend(self.directory::<EthereumGeneralStateTestsDirectory>(
             Self::GENERAL_STATE_TESTS,
             Self::GENERAL_STATE_TESTS_FILLER,
-            index_path,
+            environment,
         )?);
 
         Ok(tests)
@@ -134,7 +130,7 @@ impl EvmTester {
         &self,
         path: &str,
         filler_path: &str,
-        index_path: &str,
+        environment: Environment,
     ) -> anyhow::Result<Vec<Test>>
     where
         T: Collection,
@@ -143,7 +139,7 @@ impl EvmTester {
             Path::new(path),
             Path::new(filler_path),
             &self.filters,
-            Path::new(index_path),
+            environment,
         )
         .map_err(|error| anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}"))
     }
