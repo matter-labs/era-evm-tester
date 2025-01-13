@@ -17,7 +17,7 @@ use crate::{
 };
 
 use super::{
-    filler_structure::{ExpectStructure, FillerStructure, LabelValue, U256Parsed},
+    filler_structure::{self, ExpectStructure, FillerStructure, LabelValue, U256Parsed},
     test_structure::{env_section::EnvSection, pre_state::PreState, TestStructure},
 };
 
@@ -29,6 +29,7 @@ pub struct Case {
     pub transaction: Transaction,
     pub post_state: Option<PostStateForCase>,
     pub expected_state: HashMap<web3::types::Address, AccountFillerStruct>,
+    pub expect_exception: bool,
     pub env: EnvSection,
 }
 
@@ -85,14 +86,22 @@ impl Case {
         let mut cases = vec![];
 
         let mut indexes_for_expected_results = vec![];
-        let mut expected_results_states: Vec<HashMap<zksync_types::H160, AccountFillerStruct>> =
-            vec![];
+        // The boolean represents if the expectException flag is set.
+        let mut expected_results_states: Vec<(
+            HashMap<zksync_types::H160, AccountFillerStruct>,
+            bool,
+        )> = vec![];
 
         for expected_struct in &test_filler.expect {
             let mut indexes_for_struct = (vec![], vec![], vec![]);
 
             let expected_accounts = ExpectStructure::get_expected_result(&expected_struct.result);
-            expected_results_states.push(expected_accounts);
+            // TODO: maybe filter only the exceptions that mark it as "invalid".
+            let expect_exception = expected_struct
+                .expect_exception
+                .as_ref()
+                .is_some_and(|m| !m.is_empty());
+            expected_results_states.push((expected_accounts, expect_exception));
 
             if let Some(indexes) = expected_struct.indexes.as_ref() {
                 fill_indexes_for_expected_states(&indexes.data, &mut indexes_for_struct.0);
@@ -186,7 +195,7 @@ impl Case {
                     }
 
                     let index: usize = expected_state_index.try_into().unwrap();
-                    let expected_state = &expected_results_states[index];
+                    let (expected_state, expect_exception) = &expected_results_states[index];
 
                     cases.push(Case {
                         label: label.unwrap_or(case_idx.to_string()),
@@ -195,6 +204,7 @@ impl Case {
                         post_state: None,
                         expected_state: expected_state.clone(),
                         env: test_definition.env.clone(),
+                        expect_exception: *expect_exception,
                     });
 
                     case_counter += 1;
