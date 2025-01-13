@@ -19,6 +19,6 @@ pub trait Collection {
         directory_path: &Path,
         filler_path: &Path,
         filters: &Filters,
-        index_path: &Path
+        index_path: &Path,
     ) -> anyhow::Result<Vec<Test>>;
 }

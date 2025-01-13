@@ -9,8 +9,8 @@
 #![allow(clippy::type_complexity)]
 
 pub(crate) mod environment;
-pub(crate) mod platforms;
 pub(crate) mod filters;
+pub(crate) mod platforms;
 pub(crate) mod summary;
 pub(crate) mod test;
 pub(crate) mod test_suits;
@@ -121,7 +121,7 @@ impl EvmTester {
         tests.extend(self.directory::<EthereumGeneralStateTestsDirectory>(
             Self::GENERAL_STATE_TESTS,
             Self::GENERAL_STATE_TESTS_FILLER,
-            index_path
+            index_path,
         )?);
 
         Ok(tests)
@@ -130,12 +130,21 @@ impl EvmTester {
     ///
     /// Returns all tests from the specified directory.
     ///
-    fn directory<T>(&self, path: &str, filler_path: &str, index_path: &str) -> anyhow::Result<Vec<Test>>
+    fn directory<T>(
+        &self,
+        path: &str,
+        filler_path: &str,
+        index_path: &str,
+    ) -> anyhow::Result<Vec<Test>>
     where
         T: Collection,
     {
-        T::read_all(Path::new(path), Path::new(filler_path), &self.filters, Path::new(index_path)).map_err(|error| {
-            anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}")
-        })
+        T::read_all(
+            Path::new(path),
+            Path::new(filler_path),
+            &self.filters,
+            Path::new(index_path),
+        )
+        .map_err(|error| anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}"))
     }
 }
