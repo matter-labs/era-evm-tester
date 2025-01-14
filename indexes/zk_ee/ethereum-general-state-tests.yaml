@@ -413,8 +413,9 @@ entries:
           creationTxInitCodeSizeLimit.json:
             hash: '0xc70a4a5673cb5330590a49e903a2666d'
             enabled: true
-            skipCases: ["valid"]
-            comment: "Can't simulate refund for creation now"
+            # Skipped for Emulator
+            # skipCases: ["valid"]
+            # comment: "Can't simulate refund for creation now"
   VMTests:
     enabled: true
     entries:
@@ -526,17 +527,20 @@ entries:
           jump.json:
             hash: '0x62475b7705da2e36751f371843fd7121'
             enabled: true
-            skipCalldatas: ["0x693c61390000000000000000000000000000000000000000000000000000000000000009"]
-            comment: "We do not verify JUMPDEST"
+            # Skipped for Emulator
+            # skipCalldatas: ["0x693c61390000000000000000000000000000000000000000000000000000000000000009"]
+            # comment: "We do not verify JUMPDEST"
           jumpToPush.json:
             hash: '0x28247b885d6aeabbb071a17fedbc6c46'
-            enabled: false
-            comment: "TODO: we do not verify JUMPDEST"
+            enabled: true
+            # Disabled for Emulator
+            # comment: "TODO: we do not verify JUMPDEST"
           jumpi.json:
             hash: '0xd8f86a02a3715fcd499eeeddcb840262'
             enabled: true
-            skipCalldatas: ["0x693c61390000000000000000000000000000000000000000000000000000000000001009"]
-            comment: "We do not verify JUMPDEST"
+            # Skipped for Emulator
+            # skipCalldatas: ["0x693c61390000000000000000000000000000000000000000000000000000000000001009"]
+            # comment: "We do not verify JUMPDEST"
           loop_stacklimit.json:
             hash: '0xc7b02bd933ae2083ec0f83bfbbe6020e'
             enabled: true
@@ -586,8 +590,9 @@ entries:
             hash: '0x6789db0442c54f5ca71ee1cd2b43105d'
             enabled: true
       vmPerformance:
-        enabled: false
-        comment: "TODO: can't handle"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: can't handle"
         entries:
           loopExp.json:
             hash: '0xaaec56e90b8349037c06c3ee4d8da83c'
@@ -788,8 +793,9 @@ entries:
         enabled: true
   stBadOpcode:
     enabled: true
-    skipCalldatas: ["0x693c613900000000000000000000000000000000000000000000000000000060baccfa57"]
-    comment: "TODO: skipped tests with very deep recursion"
+    # Skipped for Emulator
+    # skipCalldatas: ["0x693c613900000000000000000000000000000000000000000000000000000060baccfa57"]
+    # comment: "TODO: skipped tests with very deep recursion"
     entries:
       eip2315NotRemoved.json:
         hash: '0xf5fc70227543d691f52484c512fb355c'
@@ -1411,22 +1417,25 @@ entries:
     entries:
       Call1024BalanceTooLow.json:
         hash: '0x4aa4f84912a5cb239ac99ccf7668908c'
-        enabled: false
-        comment: "TODO: out-of-gas due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-gas due to infinite loop"
       Call1024OOG.json:
         hash: '0x6893044a88497c8f6d81af7ef73dd074'
         enabled: true
       Call1024PreCalls.json:
         hash: '0x2522e55a4b8372f1f169ee1fe297516c'
-        enabled: false
-        comment: "TODO: out-of-gas due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-gas due to infinite loop"
       CallLoseGasOOG.json:
         hash: '0x8a51ec32b98a7cf8e56336cb6cfa175c'
         enabled: true
       CallRecursiveBombPreCall.json:
         hash: '0x038cf2132f3c474ea2042fb75a0dce23'
-        enabled: false
-        comment: "TODO: out-of-gas due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-gas due to infinite loop"
       Callcode1024BalanceTooLow.json:
         hash: '0xf51893e645f0e8bfa105164030602d36'
         enabled: true
@@ -1951,12 +1960,13 @@ entries:
         enabled: true
       CREATE2_HighNonce.json:
         hash: '0xa511f600c2d6dccf30d04032a693a722'
-        enabled: false
-        comment: "We have higher allowed nonce"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "We have higher allowed nonce"
       CREATE2_HighNonceDelegatecall.json:
         hash: '0xfc1a4d147fcf52b415c09ee5a01705d9'
         enabled: true
-        skipCases: ["A_MaxNonceMinus1_Call_B_MaxNonce_Create", "A_MaxNonce_DelegateCall_B_MaxNonceMinus1_Create", "A_MaxNonce_DelegateCall_B_MaxNonce_Create", "A_MaxNonce_Call_B_MaxNonce_Create", "A_MaxNonceMinus1_Call_B_MaxNonce_Create2", "A_MaxNonce_DelegateCall_B_MaxNonceMinus1_Create2", "A_MaxNonce_DelegateCall_B_MaxNonce_Create2", "A_MaxNonce_Call_B_MaxNonce_Create2"]
+        # skipCases: ["A_MaxNonceMinus1_Call_B_MaxNonce_Create", "A_MaxNonce_DelegateCall_B_MaxNonceMinus1_Create", "A_MaxNonce_DelegateCall_B_MaxNonce_Create", "A_MaxNonce_Call_B_MaxNonce_Create", "A_MaxNonceMinus1_Call_B_MaxNonce_Create2", "A_MaxNonce_DelegateCall_B_MaxNonceMinus1_Create2", "A_MaxNonce_DelegateCall_B_MaxNonce_Create2", "A_MaxNonce_Call_B_MaxNonce_Create2"]
       CREATE2_HighNonceMinus1.json:
         hash: '0x90c45fac491bab7ae168b89c2553d511'
         enabled: true
@@ -1989,16 +1999,19 @@ entries:
         enabled: true
       Create2OnDepth1023.json:
         hash: '0x6d62126eb2b0a2ad9bc41e0b3133cfef'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       Create2OnDepth1024.json:
         hash: '0x9b14493facfea71ef709fddb09098128'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       Create2Recursive.json:
         hash: '0x13e8fa3be5160ca61a5dbb3a806ecaec'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       CreateMessageReverted.json:
         hash: '0xd48a919939ed76b1b1a330dcf63cadfb'
         enabled: true
@@ -2019,8 +2032,9 @@ entries:
         enabled: true
       RevertInCreateInInitCreate2Paris.json:
         hash: '0x7b7ce35ea7761107883e6738f57d05d7'
-        enabled: false
-        comment: "TODO: We do not check for storage collisions"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: We do not check for storage collisions"
       RevertOpcodeCreate.json:
         hash: '0x40a2c8d4c1db079c3531106f3dfbc907'
         enabled: true
@@ -2071,8 +2085,9 @@ entries:
         enabled: true
       create2collisionStorageParis.json:
         hash: '0x9685ae439ced992a92a8f034539cc1db'
-        enabled: false
-        comment: "We do not check storage"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "We do not check storage"
       create2noCash.json:
         hash: '0xba886cce2a6fc16cbf730cc9fe6a908b'
         enabled: true
@@ -2162,8 +2177,9 @@ entries:
         enabled: true
       CREATE_HighNonce.json:
         hash: '0x362afcbf9eb7da9b47e4b860f2cd8b53'
-        enabled: false
-        comment: "We have higher allowed nonce"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "We have higher allowed nonce"
       CREATE_HighNonceMinus1.json:
         hash: '0x85f60cb5432c053ef7e89ed051541cdf'
         enabled: true
@@ -2244,29 +2260,33 @@ entries:
     entries:
       Call1024BalanceTooLow.json:
         hash: '0x65aeda1417bf287c0e6e52a3f76f5194'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       Call1024OOG.json:
         hash: '0x5a0290acb3aa9c2ddcf5d0878d5d577f'
         enabled: true
       Call1024PreCalls.json:
         hash: '0xd7fcf2df7933262b74049a1965d49cc4'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       CallLoseGasOOG.json:
         hash: '0xcc588a3a06e2de7247161e076e50fa78'
         enabled: true
       CallRecursiveBombPreCall.json:
         hash: '0x09d7c53e2e6b5c5d778f6f46943bc0a0'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       CallcodeLoseGasOOG.json:
         hash: '0x9fb2b5478f2b9e8163ee2d19b692db3d'
         enabled: true
       Delegatecall1024.json:
         hash: '0x0911a0f715ac7914199609374ef05056'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       Delegatecall1024OOG.json:
         hash: '0x14e7bc36954e0de5356977d0024c79cb'
         enabled: true
@@ -2481,13 +2501,15 @@ entries:
       gasCost.json:
         hash: '0x86a929189c824a6ad1e30965e7b8d3b9'
         enabled: true
-        skipCases: ["0"]
-        comment: "Storage model makes it difficult to compare 0 and None"
+        # Disabled for Emulator
+        # skipCases: ["0"]
+        # comment: "Storage model makes it difficult to compare 0 and None"
       gasCostBerlin.json:
         hash: '0x8eda027fd3ee9dd266e9fc5ab11423fd'
         enabled: true
-        skipCases: ["0"]
-        comment: "Storage model makes it difficult to compare 0 and None"
+        # Disabled for Emulator
+        # skipCases: ["0"]
+        # comment: "Storage model makes it difficult to compare 0 and None"
       gasCostExp.json:
         hash: '0x10162cc4f656376da099469656d8c430'
         enabled: true
@@ -2540,8 +2562,9 @@ entries:
         enabled: true
       transactionIntinsicBug_Paris.json:
         hash: '0x45935142f15694c73f46d6c57fbbc4f0'
-        enabled: false
-        comment: "Not implemented as part of VM"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "Not implemented as part of VM"
       typeTwoBerlin.json:
         hash: '0x4d9dcbc6b59580e9813d85aad238e2a2'
         enabled: true
@@ -2769,8 +2792,9 @@ entries:
       extcodehashEmpty_Paris.json:
         hash: '0xb9bf3e46b2b7f40f997e6328cb7b65af'
         enabled: true
-        skipCases: ["empty"]
-        comment: "TODO: can't call empty contracts in kernel space"
+        # Disabled for Emulator
+        # skipCases: ["empty"]
+        # comment: "TODO: can't call empty contracts in kernel space"
   stHomesteadSpecific:
     enabled: true
     entries:
@@ -3449,8 +3473,9 @@ entries:
       precompsEIP2929Cancun.json:
         hash: '0x7c234d1220f43fc7c4c72ec3daa5c196'
         enabled: true
-        skipCases: ["all"]
-        comment: "TODO: calls to the kernel space"
+        # Skipped for Emulator
+        # skipCases: ["all"]
+        # comment: "TODO: calls to the kernel space"
       sec80.json:
         hash: '0x9b78da80bdf255179581da085443babd'
         enabled: true
@@ -3968,8 +3993,9 @@ entries:
         enabled: true
       randomStatetest150.json:
         hash: '0xd5dd6d4037c27341d5992afee6c6e906'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest151.json:
         hash: '0x147f5bd7e4db7bfbc8747d4dab2d0e4e'
         enabled: true
@@ -3979,8 +4005,9 @@ entries:
         comment: "Relies on difficulty opcode (it is hardcoded now)"
       randomStatetest154.json:
         hash: '0x9a47688d7a92026343cc0c24c909ae3c'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest155.json:
         hash: '0x4badfd5057241721d99fefaa80c13150'
         enabled: true
@@ -3995,8 +4022,9 @@ entries:
         enabled: true
       randomStatetest159.json:
         hash: '0xde4befe6c1323dfd5d6e814039c10083'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest16.json:
         hash: '0x5d75669ee853f1d55fc3ccb6d4c5e8b5'
         enabled: true
@@ -4047,8 +4075,9 @@ entries:
         enabled: true
       randomStatetest178.json:
         hash: '0x42ca73df0649613ac2ad2856c5e995bc'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest179.json:
         hash: '0xf2b7e07cad9924e2e303d3f4606a9c2b'
         enabled: true
@@ -4403,8 +4432,9 @@ entries:
         enabled: true
       randomStatetest306.json:
         hash: '0x6fbc7fa5dd5d49f7a803b67ac0cda4f4'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest307.json:
         hash: '0x07eb33217c8acd494f25ecd4e421c78d'
         enabled: true
@@ -4640,8 +4670,9 @@ entries:
         enabled: true
       randomStatetest48.json:
         hash: '0xf9b8ccaacd859764a4bade480370612a'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest49.json:
         hash: '0xde03c07e8d89d8d4458943f6cc4f355d'
         enabled: true
@@ -4953,8 +4984,9 @@ entries:
         enabled: true
       randomStatetest458.json:
         hash: '0x6a580f0fe5aff1255e2d3ad2963da371'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest460.json:
         hash: '0xd2271e1e04c753d0eb14aaec5cca7be8'
         enabled: true
@@ -4976,8 +5008,9 @@ entries:
         comment: "Checks difficulty opcode (it is hardcoded now)"
       randomStatetest467.json:
         hash: '0x6cd348f51ca8d869dfe6e1067b9131aa'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest469.json:
         hash: '0xbe4c06d67c0f6717207440675fa00ab3'
         enabled: true
@@ -5199,8 +5232,9 @@ entries:
         enabled: true
       randomStatetest554.json:
         hash: '0x6ad6a6a31d835edf59b55094fe392afa'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest555.json:
         hash: '0x8bf2ff49f3086ca466946bb027393a1c'
         enabled: true
@@ -5387,8 +5421,9 @@ entries:
         enabled: true
       randomStatetest636.json:
         hash: '0xcb850e626b9be86ef7d063302d10c08d'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest637.json:
         hash: '0x8450a4d11edeaba8d839619137493b52'
         enabled: true
@@ -5397,8 +5432,9 @@ entries:
         enabled: true
       randomStatetest639.json:
         hash: '0xe2567a939477d8fbe49b94e47f095811'
-        enabled: false
-        comment: "TODO: infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: infinite loop"
       randomStatetest640.json:
         hash: '0x57830436e6eee63e7f8a2ccaac052cfc'
         enabled: true
@@ -5440,8 +5476,9 @@ entries:
         enabled: true
       recursiveCreateReturnValue.json:
         hash: '0x1c24333215bc164f3f62f7e16e4587f2'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
   stRefundTest:
     enabled: false
     comment: "We do not support EVM refunds"
@@ -5646,12 +5683,14 @@ entries:
         enabled: true
       LoopCallsDepthThenRevert2.json:
         hash: '0x848d97ffc9cf1afdaac1287ac469330d'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       LoopCallsDepthThenRevert3.json:
         hash: '0x9d49ccfff72b7600c9cd522a3701fcf3'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       LoopCallsThenRevert.json:
         hash: '0x1af9d14e44d68ee835577b1202e3c9ba'
         enabled: true
@@ -5678,8 +5717,9 @@ entries:
         enabled: true
       RevertInCreateInInit_Paris.json:
         hash: '0x0d98daa483736b05fbd72e7f6a4c533a'
-        enabled: false
-        comment: "TODO: expects revert due to storage collision"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: expects revert due to storage collision"
       RevertInDelegateCall.json:
         hash: '0x6cb258d0c84b1807e2fd33b30e370d21'
         enabled: true
@@ -5796,8 +5836,9 @@ entries:
         enabled: true
       InitCollisionParis.json:
         hash: '0xd58e2cdc4e84e14db5cc52caf9998ea6'
-        enabled: false
-        comment: "TODO: we do not destroy storage during contract creation"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: we do not destroy storage during contract creation"
       SstoreCallToSelfSubRefundBelowZero.json:
         hash: '0x26af959969119269a54e5de422ad7cde'
         enabled: true
@@ -5882,8 +5923,9 @@ entries:
       diffPlaces.json:
         hash: '0x8c24b97404c9da73e3d30a280cac06ef'
         enabled: true
-        skipCalldatas: ["0x693c613900000000000000000000000000000000000000000000000000000060baccfa57"]
-        comment: "Skip infinite loop"
+        # Skipped for Emulator
+        # skipCalldatas: ["0x693c613900000000000000000000000000000000000000000000000000000060baccfa57"]
+        # comment: "Skip infinite loop"
       selfBalance.json:
         hash: '0x611ad82c4accc82ad85c7699a25924a8'
         enabled: true
@@ -6183,12 +6225,14 @@ entries:
         enabled: true
       static_ABAcalls1.json:
         hash: '0x5d9aaedd60590ab027266834864fbd1a'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_ABAcalls2.json:
         hash: '0x019f28fac1f5f382559c3cc18dc0029d'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_ABAcalls3.json:
         hash: '0xb424889ab3dfb20113369c5326e452b5'
         enabled: true
@@ -6224,31 +6268,36 @@ entries:
         enabled: true
       static_Call1024BalanceTooLow.json:
         hash: '0x290befb6d8b44b2de8fd6a35d72fb8af'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1024BalanceTooLow2.json:
         hash: '0xe39cafbd786b4957f4aef0511dd34e2a'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1024OOG.json:
         hash: '0x601de9cf73aae015a46df4f12e65a941'
         enabled: true
       static_Call1024PreCalls.json:
         hash: '0x89e8811d9d36b8e86f4c728bac00e719'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1024PreCalls2.json:
         hash: '0x6bb2e184c3b1f197403628cf9bb87ed0'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1024PreCalls3.json:
         hash: '0xe435b4000db973205a2379426ea253d5'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1MB1024Calldepth.json:
         hash: '0x9b2569f386e09d54c0b8f94f605d139e'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call50000.json:
         hash: '0x297f9897e05c994f8e0cf8387f88f9eb'
         enabled: true
@@ -6266,16 +6315,19 @@ entries:
         enabled: true
       static_Call50000bytesContract50_1.json:
         hash: '0x4498834486274fa125c1396da6383f59'
-        enabled: false
-        comment: "TODO: contract code is too big"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: contract code is too big"
       static_Call50000bytesContract50_2.json:
         hash: '0xa66d136b523941a8a663e3b5a3560701'
-        enabled: false
-        comment: "TODO: contract code is too big"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: contract code is too big"
       static_Call50000bytesContract50_3.json:
         hash: '0x0cbd1ba45817fc942855d80fc4e67d5f'
-        enabled: false
-        comment: "TODO: contract code is too big"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: contract code is too big"
       static_CallAndCallcodeConsumeMoreGasThenTransactionHas.json:
         hash: '0x8e052bad683039642c1d2f4d41070c46'
         enabled: true
@@ -6383,8 +6435,9 @@ entries:
         enabled: true
       static_CallRecursiveBomb0_OOG_atMaxCallDepth.json:
         hash: '0xd2d0555d9eb2e5cadd3db68152abe6b6'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_CallRecursiveBomb1.json:
         hash: '0x0811e70fd2ab3c86bca21baf9fbe7693'
         enabled: true
@@ -6402,12 +6455,14 @@ entries:
         enabled: true
       static_CallRecursiveBombPreCall.json:
         hash: '0x8f1bebf20cb9c5cd95b340669c38d1fb'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_CallRecursiveBombPreCall2.json:
         hash: '0xd06fc2afe7e13dac7bb94d71a5c98b85'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_CallRipemd160_1.json:
         hash: '0x1f05fcc52932fb632b697c8de9855cef'
         enabled: true
@@ -6500,16 +6555,19 @@ entries:
         enabled: true
       static_LoopCallsDepthThenRevert.json:
         hash: '0x9542aeeba929837de41fa807df449e76'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_LoopCallsDepthThenRevert2.json:
         hash: '0x49859715c837a8c8d3e8b876cb7696d0'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_LoopCallsDepthThenRevert3.json:
         hash: '0xa6e7ef852d001cca792a011caed2b181'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       static_LoopCallsThenRevert.json:
         hash: '0xb7f76ef91c371d4838e9d88b85c4639f'
         enabled: true
@@ -7094,12 +7152,14 @@ entries:
         enabled: true
       ABAcalls1.json:
         hash: '0x64b050dacbadc1fd11a23980f7426621'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       ABAcalls2.json:
         hash: '0x7d3e914a2ece2dfc649abdb4c1391a4d'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       ABAcalls3.json:
         hash: '0xbf4b686ff67b626f6c909340d5ea5680'
         enabled: true
@@ -7117,8 +7177,9 @@ entries:
         enabled: true
       CallRecursiveBomb0_OOG_atMaxCallDepth.json:
         hash: '0xaca3fe36816a545689cf563dd6680e34'
-        enabled: false
-        comment: "TODO: out-of-ergs due to infinite loop"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out-of-ergs due to infinite loop"
       CallRecursiveBomb1.json:
         hash: '0xbfeafb4f31ce94d2639075c39c897091'
         enabled: true
@@ -7337,8 +7398,9 @@ entries:
         enabled: true
       static_Call50000_sha256.json:
         hash: '0x53ecbb1910b890bc0a696dc61974c576'
-        enabled: false
-        comment: "TODO: out of ergs"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "TODO: out of ergs"
   stTransactionTest:
     enabled: true
     entries:
@@ -7413,8 +7475,9 @@ entries:
         enabled: true
       SuicidesAndInternalCallSuicidesBonusGasAtCall.json:
         hash: '0x54c1a4ae2427fbaab105bba7fe0fa971'
-        enabled: false
-        comment: "We can't deploy contract at 0x00"
+        enabled: true
+        # Disabled for Emulator
+        # comment: "We can't deploy contract at 0x00"
       SuicidesAndInternalCallSuicidesBonusGasAtCallFailed.json:
         hash: '0xc48daa3c5faa732bb7d0c712bfc2a160'
         enabled: true
