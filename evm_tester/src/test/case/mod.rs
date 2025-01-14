@@ -17,7 +17,7 @@ use crate::{
         eravm::system_context::SystemContext,
         zk_ee::{ZkOS, ZkOsEVMContext},
     },
-    EraVM, EraVMDeployer, Summary,
+    EraVM, EraVMDeployer, Filters, Summary,
 };
 
 use super::{
@@ -86,6 +86,7 @@ impl Case {
     pub fn from_ethereum_test(
         test_definition: &TestStructure,
         test_filler: &FillerStructure,
+        filters: &Filters,
     ) -> Vec<Self> {
         let mut cases = vec![];
 
@@ -158,6 +159,16 @@ impl Case {
                         None
                     };
 
+                    // If label is not preset, we use the index
+                    let final_label = label.clone().unwrap_or(case_idx.to_string());
+
+                    // Apply label-based filter
+                    if !Filters::check_case_label(filters, final_label.as_str()) {
+                        case_counter += 1;
+
+                        continue;
+                    }
+
                     let prestate = test_definition.pre.clone();
 
                     let transaction = Transaction {
@@ -202,7 +213,7 @@ impl Case {
                     let (expected_state, expect_exception) = &expected_results_states[index];
 
                     cases.push(Case {
-                        label: label.unwrap_or(case_idx.to_string()),
+                        label: final_label,
                         prestate,
                         transaction,
                         post_state: None,
