@@ -96,6 +96,7 @@ impl Collection for EthereumGeneralStateTestsDirectory {
                     is_json,
                     test.skip_calldatas,
                     test.skip_cases,
+                    filters,
                 ))
             })
             .collect())
