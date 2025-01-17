@@ -13,16 +13,23 @@ pub struct Filters {
     path_filters: HashSet<String>,
     /// The group filters.
     group_filters: HashSet<String>,
+    /// The label filters.
+    label_filters: HashSet<String>,
 }
 
 impl Filters {
     ///
     /// A shortcut constructor.
     ///
-    pub fn new(path_filters: Vec<String>, group_filters: Vec<String>) -> Self {
+    pub fn new(
+        path_filters: Vec<String>,
+        group_filters: Vec<String>,
+        label_filters: Vec<String>,
+    ) -> Self {
         Self {
             path_filters: path_filters.into_iter().collect(),
             group_filters: group_filters.into_iter().collect(),
+            label_filters: label_filters.into_iter().collect(),
         }
     }
 
@@ -44,6 +51,13 @@ impl Filters {
     ///
     pub fn check_case_path(&self, path: &str) -> bool {
         self.path_filters.is_empty() || self.path_filters.iter().any(|filter| path.contains(filter))
+    }
+
+    ///
+    /// Check if the test case label is compatible with the filters.
+    ///
+    pub fn check_case_label(&self, label: &str) -> bool {
+        self.label_filters.is_empty() || self.label_filters.contains(label)
     }
 
     ///

@@ -19,6 +19,7 @@ use crate::summary::Summary;
 use crate::test::case::Case;
 use crate::vm::eravm::deployers::EraVMDeployer;
 use crate::vm::eravm::EraVM;
+use crate::Filters;
 use crate::ZkOS;
 
 fn wrap_numbers_in_quotes(input: &str) -> String {
@@ -81,6 +82,7 @@ impl Test {
         is_json: bool,
         skipped_calldatas: Option<Vec<web3::types::Bytes>>,
         skipped_cases: Option<Vec<String>>,
+        filters: &Filters,
     ) -> Self {
         let cleaned_str = str.replace("0x:bigint ", "");
         let test_structure: HashMap<String, TestStructure> =
@@ -100,7 +102,7 @@ impl Test {
         let test_definition = test_structure.get(keys[0]).expect("Always exists");
         let test_filler = test_filler_structure.get(keys[0]).expect("Always exists");
 
-        let cases = Case::from_ethereum_test(test_definition, test_filler);
+        let cases = Case::from_ethereum_test(test_definition, test_filler, filters);
 
         Self {
             name: test_name.clone(),

@@ -26,6 +26,10 @@ pub struct Arguments {
     #[structopt(short = "g", long = "group")]
     pub groups: Vec<String>,
 
+    /// Runs only tests with the specified labels.
+    #[structopt(short = "l", long = "label")]
+    pub labels: Vec<String>,
+
     /// Sets the number of threads, which execute the tests concurrently.
     #[structopt(short = "t", long = "threads")]
     pub threads: Option<usize>,
