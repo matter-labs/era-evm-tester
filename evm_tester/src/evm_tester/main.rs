@@ -110,4 +110,23 @@ mod tests {
 
         crate::main_inner(arguments).expect("Manual testing failed");
     }
+
+    #[test]
+    fn test_run_state_test() {
+        let test_path = "ethereum-tests/GeneralStateTests/stTransactionTest/PointAtInfinityECRecover.json";
+        std::env::set_current_dir("..").expect("Change directory failed");
+
+        let arguments = Arguments {
+            verbosity: false,
+            quiet: false,
+            paths: vec![test_path.to_owned()],
+            groups: vec![],
+            labels: vec![],
+            threads: Some(1),
+            environment: Some(evm_tester::Environment::ZkOS),
+            workflow: evm_tester::Workflow::BuildAndRun,
+        };
+
+        crate::main_inner(arguments).expect("Manual testing failed");
+    }
 }

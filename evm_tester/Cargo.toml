@@ -57,12 +57,19 @@ zksync_system_constants = { git = "https://github.com/matter-labs/zksync-era", b
 zksync_contracts = { git = "https://github.com/matter-labs/zksync-era", branch = "evm-emulator/testing", package = "zksync_contracts", commit ="fdeea9a44a2653d8f147553b3e18d4f702df5234" }
 zksync_basic_types = { git = "https://github.com/matter-labs/zksync-era", branch = "evm-emulator/testing", package = "zksync_basic_types", commit ="fdeea9a44a2653d8f147553b3e18d4f702df5234" }
 
-zk_os_forward_system = {package = "forward_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" }
-zk_ee = { package = "zk_ee",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zk_os_evm_interpreter = { package = "evm_interpreter",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zk_os_basic_system = { package = "basic_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zk_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" , features = ["code_in_kernel_space"] }
-zk_os_system_hooks = { package = "system_hooks",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+# zk_os_forward_system = {package = "forward_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" }
+# zk_ee = { package = "zk_ee",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+# zk_os_evm_interpreter = { package = "evm_interpreter",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+# zk_os_basic_system = { package = "basic_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+# zk_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" , features = ["code_in_kernel_space"] }
+# zk_os_system_hooks = { package = "system_hooks",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+
+zk_os_forward_system = { path = "../../zk_ee/forward_system", package = "forward_system" }
+zk_ee = { path = "../../zk_ee/zk_ee", package = "zk_ee"}
+zk_os_evm_interpreter = { path = "../../zk_ee/evm_interpreter", package = "evm_interpreter" }
+zk_os_basic_system = { path = "../../zk_ee/basic_system", package = "basic_system" }
+zk_os_basic_bootloader = { path = "../../zk_ee/basic_bootloader", package = "basic_bootloader", features = ["code_in_kernel_space"] }
+zk_os_system_hooks = { path = "../../zk_ee/system_hooks", package = "system_hooks" }
 
 [dependencies.web3]
 version = "=0.19.0"

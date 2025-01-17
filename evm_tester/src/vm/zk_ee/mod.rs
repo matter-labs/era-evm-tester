@@ -126,6 +126,7 @@ impl ZkOS {
 
         let context = BatchContext {
             //todo: gas
+            chain_id: 37,
             eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string())
                 .expect("Invalid basefee"),
             ergs_price: ruint::Uint::from_str(&system_context.gas_price.to_string())
