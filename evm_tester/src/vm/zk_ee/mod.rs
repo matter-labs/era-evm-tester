@@ -111,7 +111,7 @@ impl ZkOS {
             nonce,
             fee,
             system_context.block_timestamp as u64,
-            37, // TODO: chainId is hardcoded system_context.chain_id as u64
+            system_context.chain_id,
         )
         .context("Gen l2 tx")
         .unwrap();
@@ -133,6 +133,7 @@ impl ZkOS {
             gas_per_pubdata: Default::default(),
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
+            chain_id: system_context.chain_id,
         };
 
         let storage_commitment = StorageCommitment {
