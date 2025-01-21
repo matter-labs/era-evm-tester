@@ -7481,7 +7481,8 @@ entries:
         enabled: true
       SuicidesAndInternalCallSuicidesBonusGasAtCall.json:
         hash: '0x54c1a4ae2427fbaab105bba7fe0fa971'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
         # Disabled for Emulator
         # comment: "We can't deploy contract at 0x00"
       SuicidesAndInternalCallSuicidesBonusGasAtCallFailed.json:
@@ -7495,10 +7496,12 @@ entries:
         enabled: true
       SuicidesAndSendMoneyToItselfEtherDestroyed.json:
         hash: '0xa4727f3428024e25725b5147d09eee88'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       SuicidesStopAfterSuicide.json:
         hash: '0xcb8fcdce93abc75e418b0f052e383b33'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       TransactionDataCosts652.json:
         hash: '0x80e67baa1d2d949c6177a69739d5ef8a'
         enabled: true
