@@ -111,7 +111,7 @@ impl ZkOS {
             nonce,
             fee,
             system_context.block_timestamp as u64,
-            37, // TODO: chainId is hardcoded system_context.chain_id as u64
+            system_context.chain_id,
         )
         .context("Gen l2 tx")
         .unwrap();
@@ -133,6 +133,7 @@ impl ZkOS {
             gas_per_pubdata: Default::default(),
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
+            chain_id: system_context.chain_id,
         };
 
         let storage_commitment = StorageCommitment {
@@ -277,17 +278,19 @@ impl ZkOS {
         let address = address_to_b160(address);
         let key = address_into_special_storage_key(&address);
         let flat_key = derive_flat_storage_key(&ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, &key);
+        use zk_ee::system::reference_implementations::storage_format::account_code::*;
 
-        let mut partial_data = match self.tree.cold_storage.get(&flat_key) {
-            Some(partial_data) => *partial_data,
-            None => Bytes32::default(),
+        let mut partial_data: PackedPartialAccountData = match self.tree.cold_storage.get(&flat_key)
+        {
+            Some(partial_data) => PackedPartialAccountData::from_bytes32_encoding(partial_data),
+            None => PackedPartialAccountData::empty(),
         };
 
-        let partial_data_as_array = partial_data.as_u64_array_mut();
-        partial_data_as_array[3] = value.try_into().expect("Nonce overflowed");
+        partial_data.nonce = value.try_into().expect("nonce overflow");
+        let packed = partial_data.pack_to_bytes32();
 
-        self.tree.cold_storage.insert(flat_key, partial_data);
-        self.tree.storage_tree.insert(&flat_key, &partial_data);
+        self.tree.cold_storage.insert(flat_key, packed);
+        self.tree.storage_tree.insert(&flat_key, &packed);
     }
 
     pub fn get_storage_slot(
