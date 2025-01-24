@@ -94,8 +94,6 @@ impl ZkOS {
         nonce: u32,
         system_context: ZkOsEVMContext,
     ) -> anyhow::Result<ZkOsExecutionResult, String> {
-        println!("EXECUTING ZK OS {}", nonce);
-
         let fee = Fee {
             gas_limit,
             max_fee_per_gas: system_context.gas_price,
@@ -134,6 +132,10 @@ impl ZkOS {
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
             chain_id: system_context.chain_id,
+            gas_limit: system_context
+                .block_gas_limit
+                .try_into()
+                .expect("Block gas limit overflowed u64"),
         };
 
         let storage_commitment = StorageCommitment {
