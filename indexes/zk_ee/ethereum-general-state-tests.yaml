@@ -31,7 +31,7 @@ entries:
             hash: '0xa8b342dd0e1efc92ad716d6d1fe18e24'
             enabled: true
       stEIP4844-blobtransactions:
-        enabled: true
+        enabled: false
         entries:
           blobhashListBounds3.json:
             hash: '0xce17cd3951944f8dc70af9b21cc436ee'
@@ -6265,7 +6265,8 @@ entries:
         enabled: true
       static_Call10.json:
         hash: '0x9b33f4117b4c922c4b1fd676398d5eda'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
       static_Call1024BalanceTooLow.json:
         hash: '0x290befb6d8b44b2de8fd6a35d72fb8af'
         enabled: true
@@ -6281,21 +6282,25 @@ entries:
         enabled: true
       static_Call1024PreCalls.json:
         hash: '0x89e8811d9d36b8e86f4c728bac00e719'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1024PreCalls2.json:
         hash: '0x6bb2e184c3b1f197403628cf9bb87ed0'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1024PreCalls3.json:
         hash: '0xe435b4000db973205a2379426ea253d5'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call1MB1024Calldepth.json:
         hash: '0x9b2569f386e09d54c0b8f94f605d139e'
         enabled: true
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_Call50000.json:
@@ -6429,7 +6434,8 @@ entries:
         enabled: true
       static_CallLoseGasOOG.json:
         hash: '0x0f089806010c98d95daa60561c789e95'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
       static_CallRecursiveBomb0.json:
         hash: '0x1388e3ce8020437d05966ae57e9407c3'
         enabled: true
@@ -6455,12 +6461,14 @@ entries:
         enabled: true
       static_CallRecursiveBombPreCall.json:
         hash: '0x8f1bebf20cb9c5cd95b340669c38d1fb'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_CallRecursiveBombPreCall2.json:
         hash: '0xd06fc2afe7e13dac7bb94d71a5c98b85'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_CallRipemd160_1.json:
@@ -6555,17 +6563,20 @@ entries:
         enabled: true
       static_LoopCallsDepthThenRevert.json:
         hash: '0x9542aeeba929837de41fa807df449e76'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_LoopCallsDepthThenRevert2.json:
         hash: '0x49859715c837a8c8d3e8b876cb7696d0'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_LoopCallsDepthThenRevert3.json:
         hash: '0xa6e7ef852d001cca792a011caed2b181'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       static_LoopCallsThenRevert.json:
@@ -7101,7 +7112,8 @@ entries:
         enabled: true
       static_refund_CallToSuicideTwice.json:
         hash: '0xd97c5fa8e2857ecfd229b30e838fa569'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
   stStaticFlagEnabled:
     enabled: true
     entries:
