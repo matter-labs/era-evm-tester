@@ -40,7 +40,10 @@ pub struct Arguments {
     #[structopt(long = "environment")]
     pub environment: Option<evm_tester::Environment>,
 
-    /// Choose between `build` to compile tests only without running, and `run` to compile and run.
+    /// Choose between `build` to compile tests only without running, `run` to compile and run
+    /// or `bench` to also produce flamegraphs.
+    /// Note that you might want to set the ZKOS_DIR env var to point to the directory
+    /// containing the app.elf and app.bin from ZK OS to run benchmarks.
     #[structopt(long = "workflow", default_value = "run")]
     pub workflow: evm_tester::Workflow,
 }

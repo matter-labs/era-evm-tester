@@ -101,7 +101,11 @@ impl EvmTester {
         let _: Vec<()> = tests
             .into_par_iter()
             .map(|test| {
-                test.run_zk_os(self.summary.clone(), vm.clone());
+                test.run_zk_os(
+                    self.summary.clone(),
+                    vm.clone(),
+                    matches!(self.workflow, Workflow::Bench),
+                );
             })
             .collect();
 
