@@ -13,6 +13,8 @@ pub enum Workflow {
     BuildOnly,
     /// Build and execute tests.
     BuildAndRun,
+    /// Build, execute and benchmark tests.
+    Bench,
 }
 
 impl FromStr for Workflow {
@@ -22,6 +24,7 @@ impl FromStr for Workflow {
         match day {
             "build" => Ok(Workflow::BuildOnly),
             "run" => Ok(Workflow::BuildAndRun),
+            "bench" => Ok(Workflow::Bench),
             string => anyhow::bail!(
                 "Unknown workflow `{}`. Supported workflows: {}",
                 string,
@@ -40,6 +43,7 @@ impl std::fmt::Display for Workflow {
         match self {
             Workflow::BuildOnly => write!(f, "build"),
             Workflow::BuildAndRun => write!(f, "run"),
+            Workflow::Bench => write!(f, "bench"),
         }
     }
 }

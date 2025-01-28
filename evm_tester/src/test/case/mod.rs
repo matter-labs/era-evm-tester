@@ -479,11 +479,12 @@ impl Case {
         vm: ZkOS,
         test_name: String,
         test_group: Option<String>,
+        bench: bool,
     ) {
         let calldata = self.transaction.data.0.clone();
         let name = self.label.clone();
         let result = std::panic::catch_unwind(|| {
-            self.run_zk_os_inner(summary.clone(), vm, test_name.clone(), test_group)
+            self.run_zk_os_inner(summary.clone(), vm, test_name.clone(), test_group, bench)
         });
         if let Err(e) = result {
             Summary::panicked(
@@ -501,6 +502,7 @@ impl Case {
         mut vm: ZkOS,
         test_name: String,
         test_group: Option<String>,
+        bench: bool,
     ) {
         let name = self.label;
 
@@ -552,6 +554,7 @@ impl Case {
         if let Some(random) = self.env.current_random {
             system_context.block_difficulty = utils::u256_to_h256(&random);
         }
+        let test_id = format!("{}-{}", test_name, name);
         let run_result = vm.execute_transaction(
             self.transaction.secret_key,
             self.transaction.to.0,
@@ -560,6 +563,8 @@ impl Case {
             self.transaction.gas_limit,
             self.transaction.nonce.try_into().expect("Nonce overflow"),
             system_context,
+            bench,
+            test_id,
         );
 
         let mut check_successful = true;

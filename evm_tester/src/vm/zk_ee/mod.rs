@@ -93,6 +93,8 @@ impl ZkOS {
         gas_limit: U256,
         nonce: u32,
         system_context: ZkOsEVMContext,
+        bench: bool,
+        test_id: String,
     ) -> anyhow::Result<ZkOsExecutionResult, String> {
         let fee = Fee {
             gas_limit,
@@ -145,6 +147,36 @@ impl ZkOS {
 
         let tree = self.tree.clone();
         let preimage_source = self.preimage_source.clone();
+
+        // Output flamegraphs if on benchmarking mode
+        if bench {
+            use zk_os_forward_system::run::io_implementer_init_data;
+            use zk_os_forward_system::run::ForwardRunningOracle;
+            use zk_os_oracle_provider::BasicZkEEOracleWrapper;
+            use zk_os_oracle_provider::ReadWitnessSource;
+            use zk_os_oracle_provider::ZkEENonDeterminismSource;
+
+            let oracle: ForwardRunningOracle<InMemoryTree, InMemoryPreimageSource, TxListSource> =
+                ForwardRunningOracle {
+                    io_implementer_init_data: Some(io_implementer_init_data(Some(
+                        storage_commitment,
+                    ))),
+                    block_metadata: context,
+                    tree: tree.clone(),
+                    preimage_source: preimage_source.clone(),
+                    tx_source: tx_source.clone(),
+                    next_tx: None,
+                };
+            let oracle_wrapper = BasicZkEEOracleWrapper::new(oracle.clone());
+            let mut non_determinism_source = ZkEENonDeterminismSource::default();
+            non_determinism_source.add_external_processor(oracle_wrapper);
+            let copy_source = ReadWitnessSource::new(non_determinism_source);
+            let path = std::env::current_dir()
+                .unwrap()
+                .join(format!("{}.svg", test_id));
+            let _output =
+                zk_os_runner::run_default_with_flamegraph_path(1 << 25, copy_source, Some(path));
+        }
 
         let result = run_batch(
             context,

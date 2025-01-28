@@ -63,6 +63,8 @@ zk_os_evm_interpreter = { package = "evm_interpreter",  git="ssh://git@github.co
 zk_os_basic_system = { package = "basic_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 zk_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" , features = ["code_in_kernel_space"] }
 zk_os_system_hooks = { package = "system_hooks",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+zk_os_oracle_provider = {package = "oracle_provider", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+zk_os_runner = {package = "zk_os_runner", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 
 [dependencies.web3]
 version = "=0.19.0"
