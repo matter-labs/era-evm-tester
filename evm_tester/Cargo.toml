@@ -65,6 +65,7 @@ zk_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.
 zk_os_system_hooks = { package = "system_hooks",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 zk_os_oracle_provider = {package = "oracle_provider", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 zk_os_runner = {package = "zk_os_runner", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+risc_v_simulator = { git = "https://github.com/matter-labs/air_compiler", features=["delegation"]}
 
 [dependencies.web3]
 version = "=0.19.0"
