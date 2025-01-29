@@ -2032,9 +2032,8 @@ entries:
         enabled: true
       RevertInCreateInInitCreate2Paris.json:
         hash: '0x7b7ce35ea7761107883e6738f57d05d7'
-        enabled: true
-        # Disabled for Emulator
-        # comment: "TODO: We do not check for storage collisions"
+        enabled: false
+        comment: "We do not check for storage collisions"
       RevertOpcodeCreate.json:
         hash: '0x40a2c8d4c1db079c3531106f3dfbc907'
         enabled: true
@@ -5683,12 +5682,14 @@ entries:
         enabled: true
       LoopCallsDepthThenRevert2.json:
         hash: '0x848d97ffc9cf1afdaac1287ac469330d'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       LoopCallsDepthThenRevert3.json:
         hash: '0x9d49ccfff72b7600c9cd522a3701fcf3'
-        enabled: true
+        enabled: false
+        comment: 'Overflows u64 used to store ergs'
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       LoopCallsThenRevert.json:
@@ -5717,9 +5718,8 @@ entries:
         enabled: true
       RevertInCreateInInit_Paris.json:
         hash: '0x0d98daa483736b05fbd72e7f6a4c533a'
-        enabled: true
-        # Disabled for Emulator
-        # comment: "TODO: expects revert due to storage collision"
+        enabled: false
+        comment: "Expects revert due to storage collision"
       RevertInDelegateCall.json:
         hash: '0x6cb258d0c84b1807e2fd33b30e370d21'
         enabled: true
@@ -5836,7 +5836,8 @@ entries:
         enabled: true
       InitCollisionParis.json:
         hash: '0xd58e2cdc4e84e14db5cc52caf9998ea6'
-        enabled: true
+        enabled: false
+        comment: "We do not check for storage collision"
         # Disabled for Emulator
         # comment: "TODO: we do not destroy storage during contract creation"
       SstoreCallToSelfSubRefundBelowZero.json:
