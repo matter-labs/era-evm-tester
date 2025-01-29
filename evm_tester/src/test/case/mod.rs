@@ -513,7 +513,7 @@ impl Case {
             vm.set_nonce(address, state.nonce);
 
             if state.code.0.len() > 0 {
-                vm.set_predeployed_evm_contract(address, state.code.0);
+                vm.set_predeployed_evm_contract(address, state.code.0, state.nonce);
             }
 
             state

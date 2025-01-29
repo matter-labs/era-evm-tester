@@ -363,6 +363,7 @@ impl ZkOS {
         &mut self,
         address: web3::types::Address,
         bytecode: Vec<u8>,
+        nonce: U256,
     ) {
         let address = address_to_b160(address);
 
@@ -376,6 +377,7 @@ impl ZkOS {
             ),
             bytecode.to_vec(),
         );
+        account_data.nonce = nonce.try_into().expect("nonce overflow");
 
         // Now we have to do 2 things:
         // * mark that this account has this bytecode hash deployed
