@@ -530,6 +530,7 @@ impl Case {
         system_context.block_timestamp = self.env.current_timestamp.try_into().unwrap();
         system_context.coinbase = self.env.current_coinbase;
         system_context.block_gas_limit = self.env.current_gas_limit;
+        system_context.chain_id = 1; // Tests expect it to be 1
 
         if let Some(gas_price) = self.transaction.gas_price {
             system_context.gas_price = gas_price;
