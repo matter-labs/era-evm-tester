@@ -1567,7 +1567,8 @@ entries:
         enabled: true
       callcallcallcode_001_SuicideEnd.json:
         hash: '0x8696d3f520665caf0b4ae245f1c62e09'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       callcallcallcode_001_SuicideMiddle.json:
         hash: '0x4d1536e986f4cdf841a17a247641b17c'
         enabled: true
@@ -1747,7 +1748,8 @@ entries:
         enabled: true
       callcallcallcode_001_SuicideMiddle.json:
         hash: '0x5ca42874685e6280ecf5b5075fc4a762'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       callcallcallcode_ABCB_RECURSIVE.json:
         hash: '0x751eeb2297fb7583eb504a146fb17a47'
         enabled: true
@@ -1828,7 +1830,8 @@ entries:
         enabled: true
       callcodecallcall_100_SuicideMiddle.json:
         hash: '0x185263825b20b4be4cc2a0b80a1c4512'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       callcodecallcall_ABCB_RECURSIVE.json:
         hash: '0x373a981f94bf362b1a3d6f72628a5859'
         enabled: true
@@ -1849,7 +1852,8 @@ entries:
         enabled: true
       callcodecallcallcode_101_SuicideMiddle.json:
         hash: '0x4716954154c18ee36a19c8b4ab437de1'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       callcodecallcallcode_ABCB_RECURSIVE.json:
         hash: '0xb37f2e02259e87f32ac748e570eeac02'
         enabled: true
@@ -2378,10 +2382,12 @@ entries:
         enabled: true
       SuicideToExistingContract.json:
         hash: '0x86924dc5e28e8a25dce6cdb92ddd1227'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       SuicideToNotExistingContract.json:
         hash: '0xee941c0c05b607da54552b977674180a'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       Transaction64Rule_d64e0.json:
         hash: '0x80d8bc47261d86f97a38d119dc84b07d'
         enabled: true
@@ -2688,7 +2694,8 @@ entries:
         enabled: true
       callToSuicideThenExtcodehash.json:
         hash: '0xae8669ffe196a8dea26f774a6275ee32'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       codeCopyZero_Paris.json:
         hash: '0xef5a2a3d1f99278369d11c01b666ab44'
         enabled: true
@@ -2730,16 +2737,19 @@ entries:
         enabled: true
       extCodeHashDeletedAccount.json:
         hash: '0x73882a049ae89d689e887169fddd83dd'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       extCodeHashDeletedAccount1.json:
         hash: '0xcb27a4a53b0bf4c579bde26ffc85b848'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       extCodeHashDeletedAccount1Cancun.json:
         hash: '0x5b68f3a45548e5c3323c19d828ad97ec'
         enabled: true
       extCodeHashDeletedAccount2.json:
         hash: '0x2dfcd06e574c88b2157404fc4a9b29df'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       extCodeHashDeletedAccount2Cancun.json:
         hash: '0xe8af991f66ff8f855dd7b98433877ca4'
         enabled: true
@@ -2784,10 +2794,12 @@ entries:
         enabled: true
       extCodeHashSubcallSuicide.json:
         hash: '0xc7ccb731db5e90f02a53ca61beaf2de0'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       extCodeHashSubcallSuicideCancun.json:
         hash: '0x9bad46faf94a38a837253868cd788b28'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       extcodehashEmpty_Paris.json:
         hash: '0xb9bf3e46b2b7f40f997e6328cb7b65af'
         enabled: true
@@ -3411,16 +3423,20 @@ entries:
         enabled: true
       NonZeroValue_SUICIDE.json:
         hash: '0xadef147c7f42a69494902d96421fd8fd'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       NonZeroValue_SUICIDE_ToEmpty_Paris.json:
         hash: '0x1050395486574be8c1331002bfb97972'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       NonZeroValue_SUICIDE_ToNonNonZeroBalance.json:
         hash: '0x7d79aeb510671c50f3bef041f08c8c51'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       NonZeroValue_SUICIDE_ToOneStorageKey_Paris.json:
         hash: '0x5543b758e60741943c1160b2db83ca78'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       NonZeroValue_TransactionCALL.json:
         hash: '0x19a3adacea4c3e2e1dcf2b5cc6c92670'
         enabled: true
@@ -7360,7 +7376,8 @@ entries:
         enabled: true
       suicideSendEtherPostDeath.json:
         hash: '0xaa148f172f272540b9c1e5199d1398a2'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       suicideSendEtherToMe.json:
         hash: '0x31ad541a6d6f364690bf443fb0ce7e5b'
         enabled: true
@@ -7776,16 +7793,20 @@ entries:
         enabled: true
       ZeroValue_SUICIDE.json:
         hash: '0xe44d5f27b5df6af77548bad25dd8cdc5'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       ZeroValue_SUICIDE_ToEmpty_Paris.json:
         hash: '0x2497ef597fb795a3a428eb9276cde073'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       ZeroValue_SUICIDE_ToNonZeroBalance.json:
         hash: '0x03c460dc89366c678f5033c4a6596be1'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       ZeroValue_SUICIDE_ToOneStorageKey_Paris.json:
         hash: '0xf3f74d2e1f5eb1a323a0eeb04fd6c43b'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       ZeroValue_TransactionCALL.json:
         hash: '0x2d5babf6aacca6eb520360a2afffdb28'
         enabled: true
