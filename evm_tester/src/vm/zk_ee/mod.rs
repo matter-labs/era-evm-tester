@@ -413,15 +413,19 @@ impl ZkOS {
 
         match bytecode_hash {
             Some(bytecode_hash) => {
-                let preimage = self.preimage_source.get_preimage(
-                    PreimageType::Bytecode(ExecutionEnvironmentType::EVM),
-                    *bytecode_hash,
-                );
-                assert!(
-                    preimage.is_some(),
-                    "Unknown bytecode hash: {bytecode_hash:?}"
-                );
-                preimage
+                if *bytecode_hash == Bytes32::zero() {
+                    None
+                } else {
+                    let preimage = self.preimage_source.get_preimage(
+                        PreimageType::Bytecode(ExecutionEnvironmentType::EVM),
+                        *bytecode_hash,
+                    );
+                    assert!(
+                        preimage.is_some(),
+                        "Unknown bytecode hash: {bytecode_hash:?}"
+                    );
+                    preimage
+                }
             }
             None => None,
         }
