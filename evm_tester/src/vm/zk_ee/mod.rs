@@ -16,6 +16,7 @@ use zk_ee::utils::Bytes32;
 use zk_os_basic_bootloader::bootloader::errors::InvalidTransaction;
 use zk_os_basic_system::basic_io_implementer::address_into_special_storage_key;
 use zk_os_basic_system::basic_system::simple_growable_storage::TestingTree;
+use zk_os_basic_system::basic_system::BlockHashes;
 use zk_os_evm_interpreter::utils::evm_bytecode_into_partial_account_data;
 use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource};
 use zk_os_forward_system::run::{
@@ -138,6 +139,9 @@ impl ZkOS {
                 .block_gas_limit
                 .try_into()
                 .expect("Block gas limit overflowed u64"),
+            coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_bytes())
+                .expect("Invalid coinbase"),
+            block_hashes: BlockHashes::default(),
         };
 
         let storage_commitment = StorageCommitment {
