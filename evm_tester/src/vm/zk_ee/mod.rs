@@ -371,9 +371,7 @@ impl ZkOS {
     ) {
         let address = address_to_b160(address);
 
-        let (mut account_data, mut bytecode_hash) =
-            evm_bytecode_into_partial_account_data(&bytecode);
-        PreimageType::Bytecode(ExecutionEnvironmentType::EVM).mark_hash(&mut bytecode_hash);
+        let (mut account_data, bytecode_hash) = evm_bytecode_into_partial_account_data(&bytecode);
         self.preimage_source.inner.insert(
             (
                 PreimageType::Bytecode(ExecutionEnvironmentType::EVM),
