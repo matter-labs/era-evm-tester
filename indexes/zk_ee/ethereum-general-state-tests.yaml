@@ -6128,7 +6128,8 @@ entries:
         enabled: true
       TestContractSuicide.json:
         hash: '0xa364f7e1fc7b8309e7d4d121a2021ff0'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       TestCryptographicFunctions.json:
         hash: '0x505df3b00722cf5c5de51f0baec7dd36'
         enabled: true
