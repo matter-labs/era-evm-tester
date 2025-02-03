@@ -778,7 +778,8 @@ entries:
         enabled: true
       suicideNonConst.json:
         hash: '0x0d9e27150a46a9bf7ae9418627f2f7ae'
-        enabled: true
+        enabled: false
+        comment:  "SelfDestruct is not EIP-6780 compliant"
       xorNonConst.json:
         hash: '0x6778da0eed21ede5b7c939d44c850545'
         enabled: true
