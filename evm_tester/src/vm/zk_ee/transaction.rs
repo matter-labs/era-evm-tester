@@ -50,7 +50,7 @@ pub fn gen_l2_tx(
     let (req, hash) =
         TransactionRequest::from_bytes_unverified(&raw).context("from_bytes_unverified()")?;
     // Since we allow users to specify `None` recipient, EVM emulation is implicitly enabled.
-    let mut tx = L2Tx::from_request(req, 50000, true).context("from_request()")?;
+    let mut tx = L2Tx::from_request(req, 60000, true).context("from_request()")?;
     tx.set_input(raw, hash);
 
     tx.received_timestamp_ms = timestamp * 1000; // seconds to ms
