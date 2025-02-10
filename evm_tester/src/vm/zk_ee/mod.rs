@@ -15,16 +15,16 @@ use zk_ee::system::ExecutionEnvironmentType;
 use zk_ee::utils::Bytes32;
 use zk_os_basic_bootloader::bootloader::errors::InvalidTransaction;
 use zk_os_basic_system::basic_io_implementer::address_into_special_storage_key;
+use zk_os_basic_system::basic_io_implementer::io_implementer::{
+    ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, BYTECODE_HASH_STORAGE_ADDRESS,
+    NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS,
+};
 use zk_os_basic_system::basic_system::simple_growable_storage::TestingTree;
 use zk_os_basic_system::basic_system::BlockHashes;
 use zk_os_evm_interpreter::utils::evm_bytecode_into_partial_account_data;
 use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource};
 use zk_os_forward_system::run::{
     run_batch, BatchContext, BatchOutput, PreimageSource, PreimageType, StorageCommitment, TxOutput,
-};
-use zk_os_system_hooks::addresses_constants::{
-    ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, BYTECODE_HASH_STORAGE_ADDRESS,
-    NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS,
 };
 use zksync_types::fee::Fee;
 use zksync_types::{K256PrivateKey, H256, U256};
