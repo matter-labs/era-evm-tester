@@ -16,6 +16,7 @@ pub fn gen_l2_tx(
     fee: Fee,
     timestamp: u64,
     chain_id: u64,
+    transaction_type: Option<zksync_types::U64>,
 ) -> anyhow::Result<Transaction> {
     let initiator_address = private_key.address();
 
@@ -27,13 +28,13 @@ pub fn gen_l2_tx(
         value,
         gas_price: fee.max_fee_per_gas,
         gas: fee.gas_limit,
-        max_priority_fee_per_gas: None,
+        max_priority_fee_per_gas: Some(fee.max_priority_fee_per_gas),
         input: zksync_types::web3::Bytes(data),
         v: None,
         r: None,
         s: None,
         raw: None,
-        transaction_type: None,
+        transaction_type,
         access_list: None,
         eip712_meta: None,
         chain_id: Some(chain_id),

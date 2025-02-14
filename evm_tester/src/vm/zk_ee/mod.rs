@@ -24,10 +24,13 @@ use zk_os_basic_system::basic_system::BlockHashes;
 use zk_os_evm_interpreter::utils::evm_bytecode_into_partial_account_data;
 use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource};
 use zk_os_forward_system::run::{
-    run_batch, BatchContext, BatchOutput, PreimageSource, PreimageType, StorageCommitment, TxOutput,
+    run_batch, run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, PreimageType,
+    StorageCommitment, TxOutput,
 };
 use zksync_types::fee::Fee;
 use zksync_types::{K256PrivateKey, H256, U256};
+
+use crate::test::case::transaction::Transaction;
 
 mod transaction;
 
@@ -87,32 +90,37 @@ impl ZkOS {
 
     pub fn execute_transaction(
         &mut self,
-        private_key: H256,
-        to: Option<web3::types::Address>,
-        value: Option<U256>,
-        calldata: Vec<u8>,
-        gas_limit: U256,
-        nonce: u32,
+        transaction: &Transaction,
         system_context: ZkOsEVMContext,
         bench: bool,
         test_id: String,
     ) -> anyhow::Result<ZkOsExecutionResult, String> {
+        let tx_type = if transaction.max_priority_fee_per_gas.is_some() {
+            Some(2.into())
+        } else {
+            None
+        };
         let fee = Fee {
-            gas_limit,
-            max_fee_per_gas: system_context.gas_price,
-            max_priority_fee_per_gas: Default::default(),
+            gas_limit: transaction.gas_limit,
+            max_fee_per_gas: transaction
+                .max_fee_per_gas
+                .unwrap_or(system_context.gas_price),
+            max_priority_fee_per_gas: transaction
+                .max_priority_fee_per_gas
+                .unwrap_or(system_context.gas_price),
             gas_per_pubdata_limit: Default::default(),
         };
 
         let l2_tx = gen_l2_tx(
-            &K256PrivateKey::from_bytes(private_key).expect("Invalid private key"),
-            to,
-            calldata,
-            value.unwrap_or_default(),
-            nonce,
+            &K256PrivateKey::from_bytes(transaction.secret_key).expect("Invalid private key"),
+            transaction.to.0,
+            transaction.data.0.clone(),
+            transaction.value,
+            transaction.nonce.try_into().expect("Nonce overflow"),
             fee,
             system_context.block_timestamp as u64,
             system_context.chain_id,
+            tx_type,
         )
         .context("Gen l2 tx")
         .unwrap();
@@ -182,7 +190,7 @@ impl ZkOS {
                 zk_os_runner::run_default_with_flamegraph_path(1 << 25, copy_source, Some(path));
         }
 
-        let result = run_batch(
+        let result = run_batch_with_oracle_dump(
             context,
             storage_commitment,
             tree,
