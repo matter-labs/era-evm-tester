@@ -556,17 +556,7 @@ impl Case {
             system_context.block_difficulty = utils::u256_to_h256(&random);
         }
         let test_id = format!("{}-{}", test_name, name);
-        let run_result = vm.execute_transaction(
-            self.transaction.secret_key,
-            self.transaction.to.0,
-            Some(self.transaction.value),
-            self.transaction.data.0.clone(),
-            self.transaction.gas_limit,
-            self.transaction.nonce.try_into().expect("Nonce overflow"),
-            system_context,
-            bench,
-            test_id,
-        );
+        let run_result = vm.execute_transaction(&self.transaction, system_context, bench, test_id);
 
         let mut check_successful = true;
         let mut expected: Option<String> = None;
