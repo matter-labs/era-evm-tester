@@ -2507,15 +2507,13 @@ entries:
       gasCost.json:
         hash: '0x86a929189c824a6ad1e30965e7b8d3b9'
         enabled: true
-        # Disabled for Emulator
-        # skipCases: ["0"]
-        # comment: "Storage model makes it difficult to compare 0 and None"
+        skipCases: ["0"]
+        comment: "Storage model makes it difficult to compare 0 and None"
       gasCostBerlin.json:
         hash: '0x8eda027fd3ee9dd266e9fc5ab11423fd'
         enabled: true
-        # Disabled for Emulator
-        # skipCases: ["0"]
-        # comment: "Storage model makes it difficult to compare 0 and None"
+        skipCases: ["0"]
+        comment: "Storage model makes it difficult to compare 0 and None"
       gasCostExp.json:
         hash: '0x10162cc4f656376da099469656d8c430'
         enabled: true
@@ -3467,13 +3465,17 @@ entries:
     entries:
       blake2B.json:
         hash: '0xe5d4c17c1c431ab6587ef30478085655'
-        enabled: true
+        enabled: false
+        comment: "blake2B is not supported"
       delegatecall09Undefined.json:
         hash: '0x03e142633b7ebecf6752eb4b3430d677'
         enabled: true
       idPrecomps.json:
         hash: '0xe2559484a6c46d4c528e37193573ef27'
         enabled: true
+        skipCalldatas: ["0x693c61390000000000000000000000000000000000000000000000000000000000000009",
+         "0x693c6139000000000000000000000000000000000000000000000000000000000000000a"]
+        comment: "Blake2B and KZG precompiles not supported"
       identity_to_bigger.json:
         hash: '0x67559b40427c08167793ee01d59ec8e3'
         enabled: true
@@ -3500,10 +3502,12 @@ entries:
     entries:
       CALLBlake2f.json:
         hash: '0xebf2d4d1e9f2de2895479232ac717df7'
-        enabled: true
+        enabled: false
+        comment: "Blake precompile is not supported"
       CALLCODEBlake2f.json:
         hash: '0xa6ee5d2bc2b36a53e7fe4b29f36542bf'
-        enabled: true
+        enabled: false
+        comment: "Blake precompile is not supported"
       CALLCODEEcrecover0.json:
         hash: '0x96c7fabb2cd2452e463a0814a3a83c0a'
         enabled: true
@@ -7391,7 +7395,8 @@ entries:
     entries:
       CALLBlake2f_MaxRounds.json:
         hash: '0xb5d3ebf4c267ce466e461f7ca2c99248'
-        enabled: true
+        enabled: false
+        comment: "Blake precompile is not supported"
       sstore_combinations_initial00_2_Paris.json:
         hash: '0xfa275e0a38dc1e80d34258a63b853ff6'
         enabled: true
