@@ -13,6 +13,7 @@ use std::sync::Mutex;
 
 use era_compiler_common::EVMVersion;
 use filler_structure::FillerStructure;
+use lazy_static::lazy_static;
 use regex::Regex;
 use test_structure::TestStructure;
 
@@ -22,6 +23,10 @@ use crate::vm::eravm::deployers::EraVMDeployer;
 use crate::vm::eravm::EraVM;
 use crate::Filters;
 use crate::ZkOS;
+
+lazy_static! {
+    static ref MUTATION_TESTS_RE: Regex = Regex::new(r"^(.+)_m\d+\.json").unwrap();
+}
 
 fn wrap_numbers_in_quotes(input: &str) -> String {
     // Match numbers not already inside quotes
@@ -115,8 +120,6 @@ impl Test {
 
         // read mutants
         // filter all files in directory by regexp and run
-        let mutation_test_re = Regex::new(r"^(.+)_m\d+\.json").unwrap();
-
         let test_path = path.clone();
         let mut directory = test_path.clone();
         directory.pop();
@@ -129,8 +132,8 @@ impl Test {
             .filter(|x| {
                 let filename = x.file_name();
                 let filename = filename.to_str().unwrap();
-                if mutation_test_re.is_match(&filename) {
-                    let base_name = mutation_test_re
+                if MUTATION_TESTS_RE.is_match(&filename) {
+                    let base_name = MUTATION_TESTS_RE
                         .captures(&filename)
                         .unwrap()
                         .get(1)
