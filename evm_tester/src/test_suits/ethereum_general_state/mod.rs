@@ -97,6 +97,8 @@ impl Collection for EthereumGeneralStateTestsDirectory {
                     test.skip_calldatas,
                     test.skip_cases,
                     filters,
+                    test.path,
+                    None,
                 ))
             })
             .collect())

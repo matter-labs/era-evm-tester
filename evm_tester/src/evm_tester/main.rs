@@ -68,7 +68,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
         evm_tester::Environment::ZkOS => {
             let vm = evm_tester::ZkOS::new();
-            evm_tester.run_zk_os(vm)
+            evm_tester.run_zk_os(vm, arguments.mutation)
         }
     }?;
 
@@ -106,6 +106,7 @@ mod tests {
             threads: Some(1),
             environment: None,
             workflow: evm_tester::Workflow::BuildAndRun,
+            mutation: false,
         };
 
         crate::main_inner(arguments).expect("Manual testing failed");

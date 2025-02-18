@@ -137,8 +137,6 @@ impl ZkOS {
             //todo: gas
             eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string())
                 .expect("Invalid basefee"),
-            gas_price: ruint::Uint::from_str(&system_context.gas_price.to_string())
-                .expect("Invalid gas price"),
             gas_per_pubdata: Default::default(),
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
