@@ -23,6 +23,7 @@ use std::sync::Mutex;
 
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
+use regex::Regex;
 use test::Test;
 
 pub use crate::environment::Environment;
@@ -94,18 +95,30 @@ impl EvmTester {
     ///
     /// Runs all tests on ZK OS.
     ///
-    pub fn run_zk_os(self, vm: ZkOS) -> anyhow::Result<()> {
+    pub fn run_zk_os(self, vm: ZkOS, run_mutation_tests: bool) -> anyhow::Result<()> {
         let tests = self.all_tests(Environment::ZkOS)?;
         let vm = Arc::new(vm);
-
         let _: Vec<()> = tests
             .into_par_iter()
-            .map(|test| {
+            .map(|mut test| {
+                let mutants = test.mutants;
+                test.mutants = vec![];
+
                 test.run_zk_os(
                     self.summary.clone(),
                     vm.clone(),
                     matches!(self.workflow, Workflow::Bench),
                 );
+
+                if run_mutation_tests {
+                    for mutant in mutants {
+                        mutant.run_zk_os(
+                            self.summary.clone(),
+                            vm.clone(),
+                            matches!(self.workflow, Workflow::Bench),
+                        );
+                    }
+                }
             })
             .collect();
 

@@ -7,6 +7,7 @@ pub mod filler_structure;
 pub mod test_structure;
 
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -52,6 +53,8 @@ pub struct Test {
     evm_version: Option<EVMVersion>,
     skipped_calldatas: Option<Vec<web3::types::Bytes>>,
     skipped_cases: Option<Vec<String>>,
+    pub path: PathBuf,
+    pub mutants: Vec<Test>,
 }
 
 impl Test {
@@ -65,6 +68,8 @@ impl Test {
         evm_version: Option<EVMVersion>,
         skipped_calldatas: Option<Vec<web3::types::Bytes>>,
         skipped_cases: Option<Vec<String>>,
+        path: PathBuf,
+        mutants: Vec<Test>,
     ) -> Self {
         Self {
             name,
@@ -73,6 +78,8 @@ impl Test {
             evm_version,
             skipped_calldatas,
             skipped_cases,
+            path,
+            mutants,
         }
     }
 
@@ -83,6 +90,8 @@ impl Test {
         skipped_calldatas: Option<Vec<web3::types::Bytes>>,
         skipped_cases: Option<Vec<String>>,
         filters: &Filters,
+        path: PathBuf,
+        name_override: Option<String>,
     ) -> Self {
         let cleaned_str = str.replace("0x:bigint ", "");
         let test_structure: HashMap<String, TestStructure> =
@@ -104,13 +113,76 @@ impl Test {
 
         let cases = Case::from_ethereum_test(test_definition, test_filler, filters);
 
+        // read mutants
+        // filter all files in directory by regexp and run
+        let mutation_test_re = Regex::new(r"^(.+)_m\d+\.json").unwrap();
+
+        let test_path = path.clone();
+        let mut directory = test_path.clone();
+        directory.pop();
+
+        let base_test_name = test_path.file_stem().unwrap().to_str().unwrap();
+
+        let files: Vec<_> = std::fs::read_dir(directory)
+            .unwrap()
+            .map(|x| x.unwrap())
+            .filter(|x| {
+                let filename = x.file_name();
+                let filename = filename.to_str().unwrap();
+                if mutation_test_re.is_match(&filename) {
+                    let base_name = mutation_test_re
+                        .captures(&filename)
+                        .unwrap()
+                        .get(1)
+                        .unwrap()
+                        .as_str();
+                    if base_name == base_test_name {
+                        return true;
+                    }
+                }
+                false
+            })
+            .collect();
+
+        let mutants: Vec<_> = files
+            .into_iter()
+            .map(|file| {
+                let test_str = std::fs::read_to_string(file.path()).unwrap();
+                Test::from_ethereum_test(
+                    &test_str,
+                    filler_str,
+                    is_json,
+                    skipped_calldatas.clone(),
+                    skipped_cases.clone(),
+                    filters,
+                    file.path(),
+                    Some(
+                        file.path()
+                            .file_stem()
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .to_string(),
+                    ),
+                )
+            })
+            .collect();
+
+        let name = if let Some(name) = name_override {
+            name
+        } else {
+            test_name.clone()
+        };
+
         Self {
-            name: test_name.clone(),
+            name,
             cases,
             group: None,
             evm_version: None,
             skipped_calldatas,
             skipped_cases,
+            path,
+            mutants,
         }
     }
 

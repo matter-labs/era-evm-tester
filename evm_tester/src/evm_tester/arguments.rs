@@ -46,6 +46,10 @@ pub struct Arguments {
     /// containing the app.elf and app.bin from ZK OS to run benchmarks.
     #[structopt(long = "workflow", default_value = "run")]
     pub workflow: evm_tester::Workflow,
+
+    /// Will run generated mutation tests for test cases.
+    #[structopt(short = "m", long = "mutation")]
+    pub mutation: bool,
 }
 
 impl Arguments {
