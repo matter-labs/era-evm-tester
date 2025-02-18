@@ -25,7 +25,7 @@ use crate::Filters;
 use crate::ZkOS;
 
 lazy_static! {
-    static ref MUTATION_TESTS_RE: Regex = Regex::new(r"^(.+)_m\d+\.json").unwrap();
+    static ref MUTATION_TESTS_RE: Regex = Regex::new(r"^(.+)_m_[0-9a-fA-F]+\.json").unwrap();
 }
 
 fn wrap_numbers_in_quotes(input: &str) -> String {
