@@ -1,4 +1,5 @@
 use std::alloc::Global;
+use std::cmp::min;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -13,6 +14,7 @@ use zk_ee::common_structs::derive_flat_storage_key;
 use zk_ee::system::system_trait::errors::InternalError;
 use zk_ee::system::ExecutionEnvironmentType;
 use zk_ee::utils::Bytes32;
+use zk_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
 use zk_os_basic_bootloader::bootloader::errors::InvalidTransaction;
 use zk_os_basic_system::basic_io_implementer::address_into_special_storage_key;
 use zk_os_basic_system::basic_io_implementer::io_implementer::{
@@ -133,6 +135,13 @@ impl ZkOS {
             transactions: vec![encoded_tx].into(),
         };
 
+        let block_gas_limit: u64 = system_context
+            .block_gas_limit
+            .try_into()
+            .expect("Block gas limit overflowed u64");
+        // Override block gas limit
+        let gas_limit = min(block_gas_limit, MAX_BLOCK_GAS_LIMIT);
+
         let context = BatchContext {
             //todo: gas
             eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string())
@@ -141,10 +150,7 @@ impl ZkOS {
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
             chain_id: system_context.chain_id,
-            gas_limit: system_context
-                .block_gas_limit
-                .try_into()
-                .expect("Block gas limit overflowed u64"),
+            gas_limit,
             coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_bytes())
                 .expect("Invalid coinbase"),
             block_hashes: BlockHashes::default(),
