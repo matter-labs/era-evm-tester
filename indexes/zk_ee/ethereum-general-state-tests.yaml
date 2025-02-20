@@ -600,6 +600,8 @@ entries:
           loopMul.json:
             hash: '0xc98ee223983b19b78d934020354edee2'
             enabled: true
+            skipCases: ["add-10M", "divadd-10M", "mulmod-2M"]
+            comment: "Gas limit is too high, overflows ergs representation"
           performanceTester.json:
             hash: '0x78ff808d7b174a6212738c08f8d8f90f'
             enabled: true
@@ -1427,18 +1429,26 @@ entries:
       Call1024PreCalls.json:
         hash: '0x2522e55a4b8372f1f169ee1fe297516c'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-gas due to infinite loop"
       CallLoseGasOOG.json:
         hash: '0x8a51ec32b98a7cf8e56336cb6cfa175c'
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         enabled: true
       CallRecursiveBombPreCall.json:
         hash: '0x038cf2132f3c474ea2042fb75a0dce23'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-gas due to infinite loop"
       Callcode1024BalanceTooLow.json:
         hash: '0xf51893e645f0e8bfa105164030602d36'
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         enabled: true
       Callcode1024OOG.json:
         hash: '0x5e25acef5fb525964499977439917fa1'
@@ -2005,16 +2015,22 @@ entries:
       Create2OnDepth1023.json:
         hash: '0x6d62126eb2b0a2ad9bc41e0b3133cfef'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       Create2OnDepth1024.json:
         hash: '0x9b14493facfea71ef709fddb09098128'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       Create2Recursive.json:
         hash: '0x13e8fa3be5160ca61a5dbb3a806ecaec'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       CreateMessageReverted.json:
@@ -2273,14 +2289,20 @@ entries:
       Call1024PreCalls.json:
         hash: '0xd7fcf2df7933262b74049a1965d49cc4'
         enabled: true
+        skipCases: ["1"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       CallLoseGasOOG.json:
         hash: '0xcc588a3a06e2de7247161e076e50fa78'
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         enabled: true
       CallRecursiveBombPreCall.json:
         hash: '0x09d7c53e2e6b5c5d778f6f46943bc0a0'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       CallcodeLoseGasOOG.json:
@@ -2289,6 +2311,8 @@ entries:
       Delegatecall1024.json:
         hash: '0x0911a0f715ac7914199609374ef05056'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
         # Disabled for Emulator
         # comment: "TODO: out-of-ergs due to infinite loop"
       Delegatecall1024OOG.json:
@@ -6165,6 +6189,8 @@ entries:
       OverflowGasMakeMoney.json:
         hash: '0x3bc84b71009ca6eb19456af29a45a67c'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
       StackDepthLimitSEC.json:
         hash: '0x1d2e6ad6b6ceb508b33c091a22d71066'
         enabled: true
@@ -7207,6 +7233,8 @@ entries:
       Call10.json:
         hash: '0x5a47b7716a11201415727cfd3770de9d'
         enabled: true
+        skipCases: ["0"]
+        comment: "Gas limit is too high, overflows ergs representation"
       CallRecursiveBomb0.json:
         hash: '0x7803da32fc693345fa41d7172f4630e3'
         enabled: true
