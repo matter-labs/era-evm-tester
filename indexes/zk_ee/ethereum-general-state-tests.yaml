@@ -413,9 +413,8 @@ entries:
           creationTxInitCodeSizeLimit.json:
             hash: '0xc70a4a5673cb5330590a49e903a2666d'
             enabled: true
-            # Skipped for Emulator
-            # skipCases: ["valid"]
-            # comment: "Can't simulate refund for creation now"
+            skipCases: ["valid"]
+            comment: "Can't simulate refund for creation now"
   VMTests:
     enabled: true
     entries:
@@ -2118,9 +2117,8 @@ entries:
         enabled: true
       create2collisionStorageParis.json:
         hash: '0x9685ae439ced992a92a8f034539cc1db'
-        enabled: true
-        # Disabled for Emulator
-        # comment: "We do not check storage"
+        enabled: false
+        comment: "We do not check storage for collision"
       create2noCash.json:
         hash: '0xba886cce2a6fc16cbf730cc9fe6a908b'
         enabled: true
@@ -3946,7 +3944,8 @@ entries:
         enabled: true
       randomStatetest100.json:
         hash: '0x12a097ea736389b24cfea7524c6cd1d4'
-        enabled: true
+        enabled: false
+        comment: "DIFFICULTY opcode is mocked"
       randomStatetest102.json:
         hash: '0x961902f1b4cbeb882c1e765899356d69'
         enabled: true
@@ -4381,7 +4380,8 @@ entries:
         enabled: true
       randomStatetest26.json:
         hash: '0x4ffda73e1ac611c02f9554e19407a2ea'
-        enabled: true
+        enabled: false
+        comment: "DIFFICULTY opcode is mocked"
       randomStatetest260.json:
         hash: '0x61d489eb7b2b99809f85b90f9224092d'
         enabled: true
@@ -4513,7 +4513,8 @@ entries:
         enabled: true
       randomStatetest303.json:
         hash: '0xbba6c8a67ea8b973da1247a7e45ffad7'
-        enabled: true
+        enabled: false
+        comment: "DIFFICULTY opcode is mocked"
       randomStatetest304.json:
         hash: '0xdc6add873310141d2c6126281c17dd0e'
         enabled: true
