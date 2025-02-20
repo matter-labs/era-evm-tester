@@ -2550,7 +2550,7 @@ entries:
         hash: '0x86a929189c824a6ad1e30965e7b8d3b9'
         enabled: true
         skipCases: ["0", "45"]
-        comment: "Storage model makes it difficult to compare 0 and None, SELFDESTRUCY"
+        comment: "Storage model makes it difficult to compare 0 and None, SELFDESTRUCT"
       gasCostBerlin.json:
         hash: '0x8eda027fd3ee9dd266e9fc5ab11423fd'
         enabled: true
