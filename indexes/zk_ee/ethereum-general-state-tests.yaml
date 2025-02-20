@@ -639,7 +639,8 @@ entries:
             enabled: true
           suicide.json:
             hash: '0xf56d885943099e991f468de23fcf2e12'
-            enabled: true
+            enabled: false
+            comment: "SELFDESTRUCT is not EVM equivalent"
           swap.json:
             hash: '0x8e83d949ce09372f698cb43a092cf0eb'
             enabled: true
@@ -794,6 +795,8 @@ entries:
       CrashingTransaction.json:
         hash: '0x555b980f9312d88395c51b51bc3987b5'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
   stBadOpcode:
     enabled: true
     # Skipped for Emulator
@@ -1543,6 +1546,8 @@ entries:
       createInitOOGforCREATE.json:
         hash: '0x5847e50f2a7d70da764c89616ddd3cf1'
         enabled: true
+        skipCases: ["1"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       createJS_ExampleContract.json:
         hash: '0xe010392b0016afe5bd9dddddc3bc8899'
         enabled: true
@@ -1991,6 +1996,8 @@ entries:
       Create2OOGFromCallRefunds.json:
         hash: '0x1c45e8824c9c63c3e438d10360de5d58'
         enabled: true
+        skipCases: ["SelfDestruct_Refund_NoOoG"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       Create2OOGafterInitCode.json:
         hash: '0x62bfd126630eb58251626076e55dbae1'
         enabled: true
@@ -2094,12 +2101,18 @@ entries:
       create2collisionSelfdestructed.json:
         hash: '0x187179c9ffba508d7dd69088742a6ee8'
         enabled: true
+        skipCases: ["0", "1", "2"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       create2collisionSelfdestructed2.json:
         hash: '0x3697a0ccc0a75561e42ef9cdd15a399a'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       create2collisionSelfdestructedOOG.json:
         hash: '0x8c919995b15d997ade55cfef264c31ab'
         enabled: true
+        skipCases: ["0", "1", "2"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       create2collisionSelfdestructedRevert.json:
         hash: '0x8e4c24ec4051a7b3dc4bfbc7c4f22b2d'
         enabled: true
@@ -2141,6 +2154,8 @@ entries:
       CREATE_AcreateB_BSuicide_BStore.json:
         hash: '0xb6e7343f041b3ed6d30a49079e198edf'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       CREATE_ContractRETURNBigOffset.json:
         hash: '0x6240114fffa9ef449c5dc8c40e2581a3'
         enabled: true
@@ -2221,9 +2236,13 @@ entries:
       CreateOOGFromCallRefunds.json:
         hash: '0x754560c66d74d149bce83df5974f5e0b'
         enabled: true
+        skipCases: ["SelfDestruct_Refund_NoOoG"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       CreateOOGFromEOARefunds.json:
         hash: '0xdfb35b443b88d68c09ce715f4e2f892c'
         enabled: true
+        skipCases: ["SelfDestruct_Refund_NoOoG"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       CreateOOGafterInitCode.json:
         hash: '0x6f9d49d36c4920caa53aac4fafcfacbf'
         enabled: true
@@ -2521,7 +2540,8 @@ entries:
         enabled: true
       eip2929-ff.json:
         hash: '0xef25d598ab7722c746ba229bc15523ba'
-        enabled: true
+        enabled: false
+        comment: "SELFDESTRUCT is not EVM equivalent"
       eip2929.json:
         hash: '0xe53fd2a3063066365b61bd0fca185dd3'
         enabled: true
@@ -2531,13 +2551,13 @@ entries:
       gasCost.json:
         hash: '0x86a929189c824a6ad1e30965e7b8d3b9'
         enabled: true
-        skipCases: ["0"]
-        comment: "Storage model makes it difficult to compare 0 and None"
+        skipCases: ["0", "45"]
+        comment: "Storage model makes it difficult to compare 0 and None, SELFDESTRUCY"
       gasCostBerlin.json:
         hash: '0x8eda027fd3ee9dd266e9fc5ab11423fd'
         enabled: true
-        skipCases: ["0"]
-        comment: "Storage model makes it difficult to compare 0 and None"
+        skipCases: ["0", "45"]
+        comment: "Storage model makes it difficult to compare 0 and None, SELFDESTRUCT"
       gasCostExp.json:
         hash: '0x10162cc4f656376da099469656d8c430'
         enabled: true
@@ -2605,12 +2625,18 @@ entries:
       CALL_OneVCallSuicide.json:
         hash: '0xaa8fc2361d2a6f3d82a0e62f5ea7c7da'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       CALL_OneVCallSuicide2.json:
         hash: '0x15c2968474c4a428b65307a17a3666e6'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       CALL_ZeroVCallSuicide.json:
         hash: '0xe688ee8bcc7e4a6257e63c093ace9a52'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       EXP_Empty.json:
         hash: '0xf7f623abe35b6345151782f349c939fb'
         enabled: true
@@ -2728,6 +2754,8 @@ entries:
       dynamicAccountOverwriteEmpty_Paris.json:
         hash: '0xe9def9d37fa03433183a13fd20a7f2cd'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeCopyBounds.json:
         hash: '0x6415a1860d4ff291a6d22d865165e841'
         enabled: true
@@ -2746,12 +2774,18 @@ entries:
       extCodeHashCreatedAndDeletedAccount.json:
         hash: '0xd414e2c8b1546feb170d5f46827abbeb'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashCreatedAndDeletedAccountCall.json:
         hash: '0xc7be2790e135d2fcbc8d89c265b35ae4'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashCreatedAndDeletedAccountRecheckInOuterCall.json:
         hash: '0xd53b8df4dc2861bbeb19fb419754056c'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashCreatedAndDeletedAccountStaticCall.json:
         hash: '0xb8058a7b2f04d3244776d362eab1a3ed'
         enabled: true
@@ -2769,6 +2803,8 @@ entries:
       extCodeHashDeletedAccount1Cancun.json:
         hash: '0x5b68f3a45548e5c3323c19d828ad97ec'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashDeletedAccount2.json:
         hash: '0x2dfcd06e574c88b2157404fc4a9b29df'
         enabled: false
@@ -2776,15 +2812,23 @@ entries:
       extCodeHashDeletedAccount2Cancun.json:
         hash: '0xe8af991f66ff8f855dd7b98433877ca4'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashDeletedAccount3.json:
         hash: '0xdceaf31f96b994dd4e830ad46832220d'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashDeletedAccount4.json:
         hash: '0xfc5513e48be6a385ff5d9307e6656a84'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashDeletedAccountCancun.json:
         hash: '0xc2b993c0bdb4a7f5714d2f159f25af81'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extCodeHashDynamicArgument.json:
         hash: '0xc407cb6a19342eb6c731d397f3abadfb'
         enabled: true
@@ -2826,6 +2870,8 @@ entries:
       extcodehashEmpty_Paris.json:
         hash: '0xb9bf3e46b2b7f40f997e6328cb7b65af'
         enabled: true
+        skipCases: ["dead"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
         # Disabled for Emulator
         # skipCases: ["empty"]
         # comment: "TODO: can't call empty contracts in kernel space"
@@ -6202,7 +6248,8 @@ entries:
         enabled: true
       eoaEmptyParis.json:
         hash: '0xd73b3599c1934dc65058a6287a1c412e'
-        enabled: true
+        enabled: false
+        comment: "SELFDESTRUCT is not EVM equivalent"
       failed_tx_xcf416c53_Paris.json:
         hash: '0x8e525647bba51454157763367f9a67d5'
         enabled: true
@@ -7081,9 +7128,13 @@ entries:
       static_callcodecallcodecall_110_SuicideEnd.json:
         hash: '0xb2acfe7f37b4ec6f9ab03e02bb20878f'
         enabled: true
+        skipCases: ["0", "1"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       static_callcodecallcodecall_110_SuicideEnd2.json:
         hash: '0xb2300a126c4c1ea38f296c95b78f876d'
         enabled: true
+        skipCases: ["0", "1"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       static_callcodecallcodecall_110_SuicideMiddle.json:
         hash: '0x7319a374077c8f87d9d3492e8d2f3450'
         enabled: true
@@ -7229,7 +7280,8 @@ entries:
         enabled: true
       ABAcallsSuicide1.json:
         hash: '0xff615a63cd23f69f085257ea71e193c4'
-        enabled: true
+        enabled: false
+        comment: "SELFDESTRUCT is not EVM equivalent"
       Call10.json:
         hash: '0x5a47b7716a11201415727cfd3770de9d'
         enabled: true
@@ -7371,16 +7423,19 @@ entries:
         enabled: true
       doubleSelfdestructTest.json:
         hash: '0x3e3b68ae69d7d85dc004156dc62e8267'
-        enabled: true
+        enabled: false
+        comment: "SELFDESTRUCT is not EVM equivalent"
       doubleSelfdestructTouch_Paris.json:
         hash: '0x42c3cabf295f26278387003bdb698e9f'
-        enabled: true
+        enabled: false
+        comment: "SELFDESTRUCT is not EVM equivalent"
       extcodecopy.json:
         hash: '0x3cbcddb5814206d3f9af7cf5fa89f27c'
         enabled: true
       multiSelfdestruct.json:
         hash: '0x7f80e019c218163648b485f60df4210d'
-        enabled: true
+        enabled: false
+        comment: "SELFDESTRUCT is not EVM equivalent"
       return0.json:
         hash: '0x49103980f2b68a504d2fc8efeda6e3c0'
         enabled: true
@@ -7414,7 +7469,8 @@ entries:
         comment: "SelfDestruct is not EIP-6780 compliant"
       suicideSendEtherToMe.json:
         hash: '0x31ad541a6d6f364690bf443fb0ce7e5b'
-        enabled: true
+        enabled: false
+        comment: "SELFDESTRUCT is not EVM equivalent"
       testRandomTest.json:
         hash: '0xea1d60b254e346e9a575c9ae2ac84685'
         enabled: true
@@ -7555,7 +7611,8 @@ entries:
         enabled: true
       SuicidesAndInternalCallSuicidesOOG.json:
         hash: '0xe4ade51114547b87fd61e654eb10c85b'
-        enabled: true
+        enabled: false
+        comment: "SelfDestruct is not EIP-6780 compliant"
       SuicidesAndInternalCallSuicidesSuccess.json:
         hash: '0x22365be5336d1948cb7d539c28053437'
         enabled: true
