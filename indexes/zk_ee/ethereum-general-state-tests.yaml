@@ -2273,7 +2273,8 @@ entries:
         enabled: true
       CreateTransactionHighNonce.json:
         hash: '0x085cb8640bc9a574d53fd9ca7f9e49c1'
-        enabled: true
+        enabled: false
+        comment: "Tester doesn't support nonces larger than u32"
       CreateTransactionRefundEF.json:
         hash: '0x0bbd65a97161d802ffcb760dbd8c32a8'
         enabled: true
