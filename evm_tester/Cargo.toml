@@ -40,6 +40,7 @@ once_cell = "=1.20.2"
 rayon = "=1.10.0"
 lazy_static = "=1.5.0"
 bincode = "=1.3.3"
+parity-scale-codec-derive = "=3.6.12"
 
 evm = { git = "https://github.com/rust-ethereum/evm", rev = "f7a23df6c478ca6a151af5f60e62944800529a61" }
 revm = { git = "https://github.com/bluealloy/revm", rev = "fa5650ee8a4d802f4f3557014dd157adfb074460" }
@@ -65,7 +66,7 @@ zk_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.
 zk_os_system_hooks = { package = "system_hooks",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 zk_os_oracle_provider = {package = "oracle_provider", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
 zk_os_runner = {package = "zk_os_runner", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-risc_v_simulator = { git = "https://github.com/matter-labs/air_compiler", features=["delegation"]}
+risc_v_simulator = { git = "https://github.com/matter-labs/air_compiler", branch = "av_bigint_precompile", features=["delegation", "opcode_stats"]}
 
 [dependencies.web3]
 version = "=0.19.0"
