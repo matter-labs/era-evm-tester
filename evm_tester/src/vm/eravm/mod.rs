@@ -15,6 +15,7 @@ mod vm2_adapter;
 
 use address_iterator::EraVMAddressIterator;
 use era_compiler_common::EVMVersion;
+use system_contracts::ADDRESS_EVM_HASHES_STORAGE;
 use std::collections::HashMap;
 use std::ops::Add;
 use std::path::PathBuf;
@@ -1062,14 +1063,10 @@ impl EraVM {
 
         let evm_hash = keccak256(&bytecode);
 
-        let address_as_uint256 = utils::address_to_h256(&address);
-        let storage_slot_encoding = utils::h256_to_u256(&address_as_uint256)
-            + (U256::from(1) << U256::from(Self::CONTRACT_DEPLOYER_EVM_HASH_PREFIX_SHIFT));
-
         self.storage.insert(
             zkevm_tester::compiler_tests::StorageKey {
-                address: web3::types::Address::from_low_u64_be(ADDRESS_CONTRACT_DEPLOYER.into()),
-                key: storage_slot_encoding,
+                address: ADDRESS_EVM_HASHES_STORAGE,
+                key: utils::h256_to_u256(&bytecode_hash),
             },
             H256::from_slice(&evm_hash),
         );
