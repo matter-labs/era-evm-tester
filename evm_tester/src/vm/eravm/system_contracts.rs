@@ -26,6 +26,11 @@ use colored::Colorize;
 /// The EVMGasManager system contract address.
 pub const ADDRESS_EVM_GAS_MANAGER: u16 = 0x8013;
 
+pub const ADDRESS_EVM_HASHES_STORAGE: Address = web3::types::H160([
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x80, 0x15,
+]);
+
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Build {
     /// The bytecode.
@@ -34,7 +39,7 @@ pub struct Build {
     pub bytecode_hash: Option<[u8; era_compiler_common::BYTE_LENGTH_FIELD]>,
 }
 
-pub static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 26] = [
+pub static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 27] = [
     (
         "",
         "AccountCodeStorage",
@@ -167,6 +172,12 @@ pub static SYSTEM_CONTRACT_LIST: [(&str, &str, Address, ContractLanguage); 26] =
         "EvmGasManager",
         EVM_GAS_MANAGER_ADDRESS,
         ContractLanguage::Yul,
+    ), 
+    (
+        "",
+        "EvmHashesStorage",
+        ADDRESS_EVM_HASHES_STORAGE,
+        ContractLanguage::Sol,
     ),
     // For now, only zero address and the bootloader address have empty bytecode at the init
     // In the future, we might want to set all of the system contracts this way.
