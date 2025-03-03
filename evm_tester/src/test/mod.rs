@@ -136,8 +136,6 @@ impl Test {
 
             mutation_tests_directory = base_directory_path.join(relative_path);
             mutation_tests_directory.pop();
-
-            println!("{mutation_tests_directory}");
         }
 
         // read all mutation tests
