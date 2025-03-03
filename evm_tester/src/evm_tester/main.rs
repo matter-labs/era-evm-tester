@@ -44,7 +44,12 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     let filters = evm_tester::Filters::new(arguments.paths, arguments.groups, arguments.labels);
 
-    let evm_tester = evm_tester::EvmTester::new(summary.clone(), filters, arguments.workflow)?;
+    let evm_tester = evm_tester::EvmTester::new(
+        summary.clone(),
+        filters,
+        arguments.workflow,
+        arguments.mutation_path,
+    )?;
 
     let environment = match arguments.environment {
         Some(environment @ evm_tester::Environment::EVMEmulator) => environment,
@@ -107,6 +112,7 @@ mod tests {
             environment: None,
             workflow: evm_tester::Workflow::BuildAndRun,
             mutation: false,
+            mutation_path: None,
         };
 
         crate::main_inner(arguments).expect("Manual testing failed");

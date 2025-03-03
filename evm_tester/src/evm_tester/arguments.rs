@@ -50,6 +50,10 @@ pub struct Arguments {
     /// Will run generated mutation tests for test cases.
     #[structopt(short = "m", long = "mutation")]
     pub mutation: bool,
+
+    /// The path to the mutated tests directory
+    #[structopt(long = "mutation_path")]
+    pub mutation_path: Option<String>,
 }
 
 impl Arguments {

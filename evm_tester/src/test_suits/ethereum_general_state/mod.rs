@@ -37,6 +37,7 @@ impl Collection for EthereumGeneralStateTestsDirectory {
         filler_path: &Path,
         filters: &Filters,
         environment: Environment,
+        mutation_path: Option<String>,
     ) -> anyhow::Result<Vec<Test>> {
         let index_path = PathBuf::from(index_for_environment(environment));
         Ok(Self::read_index(index_path.as_path())?
@@ -98,6 +99,8 @@ impl Collection for EthereumGeneralStateTestsDirectory {
                     test.skip_cases,
                     filters,
                     test.path,
+                    relative_path,
+                    mutation_path.clone(),
                     None,
                 ))
             })
