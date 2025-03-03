@@ -161,7 +161,7 @@ impl EvmTester {
             Path::new(filler_path),
             &self.filters,
             environment,
-            mutation_path,
+            self.mutation_path.clone(),
         )
         .map_err(|error| anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}"))
     }

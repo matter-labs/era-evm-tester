@@ -131,10 +131,10 @@ impl Test {
 
         let mut mutation_tests_directory = directory;
 
-        if let Some(mutation_path) = mutation_path {
+        if let Some(mutation_path) = mutation_path.as_ref() {
             let base_directory_path = PathBuf::from_str(&mutation_path).unwrap();
 
-            mutation_tests_directory = base_directory_path.join(relative_path);
+            mutation_tests_directory = base_directory_path.join(relative_path.clone());
             mutation_tests_directory.pop();
         }
 
@@ -172,8 +172,8 @@ impl Test {
                     skipped_cases.clone(),
                     filters,
                     file.path(),
-                    relative_path,
-                    mutation_path,
+                    relative_path.clone(),
+                    mutation_path.clone(),
                     Some(
                         file.path()
                             .file_stem()

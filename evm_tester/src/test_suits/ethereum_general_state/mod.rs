@@ -100,7 +100,7 @@ impl Collection for EthereumGeneralStateTestsDirectory {
                     filters,
                     test.path,
                     relative_path,
-                    mutation_path,
+                    mutation_path.clone(),
                     None,
                 ))
             })
