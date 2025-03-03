@@ -48,6 +48,8 @@ pub struct EvmTester {
     pub filters: Filters,
     /// Actions to perform.
     pub workflow: Workflow,
+    /// Optional path to the mutated tests directory
+    pub mutation_path: Option<String>,
 }
 
 impl EvmTester {
@@ -64,11 +66,13 @@ impl EvmTester {
         summary: Arc<Mutex<Summary>>,
         filters: Filters,
         workflow: Workflow,
+        mutation_path: Option<String>,
     ) -> anyhow::Result<Self> {
         Ok(Self {
             summary,
             filters,
             workflow,
+            mutation_path,
         })
     }
 
@@ -157,6 +161,7 @@ impl EvmTester {
             Path::new(filler_path),
             &self.filters,
             environment,
+            mutation_path,
         )
         .map_err(|error| anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}"))
     }

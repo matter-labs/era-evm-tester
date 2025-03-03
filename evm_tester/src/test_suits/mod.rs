@@ -21,5 +21,6 @@ pub trait Collection {
         filler_path: &Path,
         filters: &Filters,
         environment: Environment,
+        mutation_path: Option<String>,
     ) -> anyhow::Result<Vec<Test>>;
 }

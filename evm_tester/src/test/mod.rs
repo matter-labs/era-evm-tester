@@ -8,6 +8,7 @@ pub mod test_structure;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -96,6 +97,8 @@ impl Test {
         skipped_cases: Option<Vec<String>>,
         filters: &Filters,
         path: PathBuf,
+        relative_path: PathBuf,
+        mutation_path: Option<String>,
         name_override: Option<String>,
     ) -> Self {
         let cleaned_str = str.replace("0x:bigint ", "");
@@ -126,7 +129,19 @@ impl Test {
 
         let base_test_name = test_path.file_stem().unwrap().to_str().unwrap();
 
-        let files: Vec<_> = std::fs::read_dir(directory)
+        let mut mutation_tests_directory = directory;
+
+        if let Some(mutation_path) = mutation_path {
+            let base_directory_path = PathBuf::from_str(&mutation_path).unwrap();
+
+            mutation_tests_directory = base_directory_path.join(relative_path);
+            mutation_tests_directory.pop();
+
+            println!("{mutation_tests_directory}");
+        }
+
+        // read all mutation tests
+        let files: Vec<_> = std::fs::read_dir(mutation_tests_directory)
             .unwrap()
             .map(|x| x.unwrap())
             .filter(|x| {
@@ -159,6 +174,8 @@ impl Test {
                     skipped_cases.clone(),
                     filters,
                     file.path(),
+                    relative_path,
+                    mutation_path,
                     Some(
                         file.path()
                             .file_stem()
