@@ -75,7 +75,7 @@ zk_os_runner = {package = "zk_os_runner", git="ssh://git@github.com/matter-labs/
 #zk_os_basic_bootloader = { package = "basic_bootloader", path = "../../zk_ee/basic_bootloader", features = ["evm-compatibility"] }
 #zk_os_system_hooks = { package = "system_hooks", path = "../../zk_ee/system_hooks"}
 #zk_os_oracle_provider = {package = "oracle_provider", path = "../../zk_ee/oracle_provider"}
-#zk_os_runner = {package = "zk_os_runner", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+#zk_os_runner = {package = "zk_os_runner", path = "../../zk_ee/zk_os_runner" }
 
 risc_v_simulator = { git = "https://github.com/matter-labs/air_compiler", branch = "av_bigint_precompile", features=["delegation", "opcode_stats"]}
 
