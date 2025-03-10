@@ -16,14 +16,11 @@ use zk_ee::system::ExecutionEnvironmentType;
 use zk_ee::utils::Bytes32;
 use zk_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
 use zk_os_basic_bootloader::bootloader::errors::InvalidTransaction;
-use zk_os_basic_system::basic_io_implementer::address_into_special_storage_key;
-use zk_os_basic_system::basic_io_implementer::io_implementer::{
-    ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, BYTECODE_HASH_STORAGE_ADDRESS,
-    NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS,
-};
-use zk_os_basic_system::basic_system::simple_growable_storage::TestingTree;
-use zk_os_basic_system::basic_system::BlockHashes;
-use zk_os_evm_interpreter::utils::evm_bytecode_into_partial_account_data;
+use zk_os_basic_system::system_implementation::io::address_into_special_storage_key;
+use zk_os_basic_system::system_implementation::io::AccountProperties;
+use zk_os_basic_system::system_implementation::io::TestingTree;
+use zk_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
+use zk_os_basic_system::system_implementation::system::BlockHashes;
 use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource};
 use zk_os_forward_system::run::{
     run_batch, run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, PreimageType,
@@ -166,6 +163,7 @@ impl ZkOS {
 
         // Output flamegraphs if on benchmarking mode
         if bench {
+            use zk_ee::system::types_config::EthereumIOTypesConfig;
             use zk_os_forward_system::run::io_implementer_init_data;
             use zk_os_forward_system::run::ForwardRunningOracle;
             use zk_os_oracle_provider::BasicZkEEOracleWrapper;
@@ -183,7 +181,8 @@ impl ZkOS {
                     tx_source: tx_source.clone(),
                     next_tx: None,
                 };
-            let oracle_wrapper = BasicZkEEOracleWrapper::new(oracle.clone());
+            let oracle_wrapper =
+                BasicZkEEOracleWrapper::<EthereumIOTypesConfig, _>::new(oracle.clone());
             let mut non_determinism_source = ZkEENonDeterminismSource::default();
             non_determinism_source.add_external_processor(oracle_wrapper);
             let copy_source = ReadWitnessSource::new(non_determinism_source);
@@ -221,10 +220,7 @@ impl ZkOS {
                 }
 
                 for (hash, preimage) in result.published_preimages.iter() {
-                    self.preimage_source.inner.insert(
-                        (PreimageType::Bytecode(ExecutionEnvironmentType::EVM), *hash),
-                        preimage.clone(),
-                    );
+                    self.preimage_source.inner.insert(*hash, preimage.clone());
                 }
 
                 let tx_result = result
@@ -273,74 +269,81 @@ impl ZkOS {
         }
     }
 
+    fn get_account_properties(&mut self, address: web3::types::Address) -> AccountProperties {
+        let address = address_to_b160(address);
+        let key = address_into_special_storage_key(&address);
+        let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
+        match self.tree.cold_storage.get(&flat_key) {
+            None => AccountProperties::default(),
+            Some(account_hash) => {
+                // Get from preimage:
+                let encoded = self
+                    .preimage_source
+                    .get_preimage(*account_hash)
+                    .unwrap_or_default();
+                AccountProperties::decode(encoded.try_into().unwrap())
+                    .expect("Failed to decode account properties")
+            }
+        }
+    }
+
+    fn set_account_properties(
+        &mut self,
+        address: web3::types::Address,
+        properties: AccountProperties,
+    ) {
+        let encoding = properties.encoding();
+        let properties_hash = properties.compute_hash();
+
+        // Save preimage
+        self.preimage_source
+            .inner
+            .insert(properties_hash, encoding.to_vec());
+
+        // Save account hash
+        let address = address_to_b160(address);
+        let key = address_into_special_storage_key(&address);
+        let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
+        self.tree.cold_storage.insert(flat_key, properties_hash);
+        self.tree.storage_tree.insert(&flat_key, &properties_hash);
+    }
+
     ///
     /// Returns the balance of the specified address.
     ///
-    pub fn get_balance(&self, address: web3::types::Address) -> web3::types::U256 {
-        let address = address_to_b160(address);
-        let key = address_into_special_storage_key(&address);
-        let flat_key = derive_flat_storage_key(&NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS, &key);
-
-        let value = self.tree.cold_storage.get(&flat_key);
-        if let Some(res) = value {
-            h256_to_u256(bytes32_to_h256(*res))
-        } else {
-            Default::default()
-        }
+    pub fn get_balance(&mut self, address: web3::types::Address) -> web3::types::U256 {
+        let properties = self.get_account_properties(address);
+        U256::from_big_endian(
+            &properties
+                .nominal_token_balance
+                .to_be_bytes::<{ ruint::aliases::U256::BYTES }>(),
+        )
     }
 
     ///
     /// Changes the balance of the specified address.
     ///
     pub fn set_balance(&mut self, address: web3::types::Address, value: web3::types::U256) {
-        let address = address_to_b160(address);
-        let key = address_into_special_storage_key(&address);
-        let flat_key = derive_flat_storage_key(&NOMINAL_TOKEN_BALANCE_STORAGE_ADDRESS, &key);
-
-        let value = h256_to_bytes32(u256_to_h256(value));
-        self.tree.cold_storage.insert(flat_key, value);
-        self.tree.storage_tree.insert(&flat_key, &value);
+        let mut properties = self.get_account_properties(address);
+        properties.nominal_token_balance = ruint::aliases::U256::from_be_bytes(value.into());
+        self.set_account_properties(address, properties)
     }
 
     ///
     /// Returns the nonce of the specified address.
     ///
-    pub fn get_nonce(&self, address: web3::types::Address) -> web3::types::U256 {
-        let address = address_to_b160(address);
-        let key = address_into_special_storage_key(&address);
-        let flat_key = derive_flat_storage_key(&ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, &key);
-
-        let partial_data = self.tree.cold_storage.get(&flat_key);
-
-        match partial_data {
-            Some(partial_data) => {
-                let nonce = zk_ee::system::reference_implementations::storage_format::account_code::PackedPartialAccountData::read_nonce_from_bytes32_encoding(partial_data);
-                nonce.into()
-            }
-            None => Default::default(),
-        }
+    pub fn get_nonce(&mut self, address: web3::types::Address) -> web3::types::U256 {
+        let properties = self.get_account_properties(address);
+        properties.nonce.into()
     }
 
     ///
     /// Changes the nonce of the specified address.
     ///
     pub fn set_nonce(&mut self, address: web3::types::Address, value: web3::types::U256) {
-        let address = address_to_b160(address);
-        let key = address_into_special_storage_key(&address);
-        let flat_key = derive_flat_storage_key(&ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, &key);
-        use zk_ee::system::reference_implementations::storage_format::account_code::*;
-
-        let mut partial_data: PackedPartialAccountData = match self.tree.cold_storage.get(&flat_key)
-        {
-            Some(partial_data) => PackedPartialAccountData::from_bytes32_encoding(partial_data),
-            None => PackedPartialAccountData::empty(),
-        };
-
-        partial_data.nonce = value.try_into().expect("nonce overflow");
-        let packed = partial_data.pack_to_bytes32();
-
-        self.tree.cold_storage.insert(flat_key, packed);
-        self.tree.storage_tree.insert(&flat_key, &packed);
+        let mut properties = self.get_account_properties(address);
+        properties.nonce = value.try_into().expect("nonce overflow");
+        self.set_account_properties(address, properties)
     }
 
     pub fn get_storage_slot(
@@ -375,69 +378,79 @@ impl ZkOS {
         self.tree.storage_tree.insert(&flat_key, &value);
     }
 
+    pub fn evm_bytecode_into_account_properties(
+        &mut self,
+        address: Address,
+        bytecode: &[u8],
+    ) -> AccountProperties {
+        use zk_os_basic_system::system_implementation::io::DEFAULT_CODE_VERSION_BYTE;
+        use zk_os_crypto::blake2s::Blake2s256;
+        use zk_os_crypto::sha3::Keccak256;
+        use zk_os_crypto::MiniDigest;
+
+        let observable_bytecode_hash = Bytes32::from_array(Keccak256::digest(bytecode));
+        let bytecode_hash = Bytes32::from_array(Blake2s256::digest(bytecode));
+        let mut result = self.get_account_properties(address);
+
+        result.observable_bytecode_hash = observable_bytecode_hash;
+        result.bytecode_hash = bytecode_hash;
+        result.versioning_data.set_as_deployed();
+        result
+            .versioning_data
+            .set_ee_version(ExecutionEnvironmentType::EVM as u8);
+        result
+            .versioning_data
+            .set_code_version(DEFAULT_CODE_VERSION_BYTE);
+        result.bytecode_len = bytecode.len() as u32;
+        result.artifacts_len = 0;
+        result.observable_bytecode_len = bytecode.len() as u32;
+
+        result
+    }
+
     pub fn set_predeployed_evm_contract(
         &mut self,
         address: web3::types::Address,
         bytecode: Vec<u8>,
         nonce: U256,
     ) {
-        let address = address_to_b160(address);
-
-        let (mut account_data, bytecode_hash) = evm_bytecode_into_partial_account_data(&bytecode);
-        self.preimage_source.inner.insert(
-            (
-                PreimageType::Bytecode(ExecutionEnvironmentType::EVM),
-                bytecode_hash,
-            ),
-            bytecode.to_vec(),
-        );
+        let mut account_data = self.evm_bytecode_into_account_properties(address, &bytecode);
         account_data.nonce = nonce.try_into().expect("nonce overflow");
+        let address = address_to_b160(address);
 
         // Now we have to do 2 things:
         // * mark that this account has this bytecode hash deployed
-        // * update account state - to say that this is EVM bytecode.
+        // * update account state - to say that this is EVM bytecode and nonce is 0.
 
         // We are updating both cold storage (hash map) and our storage tree.
 
         let key = address_into_special_storage_key(&address);
 
-        let flat_key = derive_flat_storage_key(&BYTECODE_HASH_STORAGE_ADDRESS, &key);
-        self.tree.cold_storage.insert(flat_key, bytecode_hash);
-        self.tree.storage_tree.insert(&flat_key, &bytecode_hash);
-
-        let flat_key = derive_flat_storage_key(&ACCOUNT_PARTIAL_DATA_STORAGE_ADDRESS, &key);
-        self.tree
-            .cold_storage
-            .insert(flat_key, account_data.pack_to_bytes32());
-        self.tree
-            .storage_tree
-            .insert(&flat_key, &account_data.pack_to_bytes32());
+        let data_hash = account_data.compute_hash();
+        let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
+        self.tree.cold_storage.insert(flat_key, data_hash);
+        self.tree.storage_tree.insert(&flat_key, &data_hash);
+        self.preimage_source
+            .inner
+            .insert(account_data.bytecode_hash, bytecode.to_vec());
+        self.preimage_source
+            .inner
+            .insert(data_hash, account_data.encoding().to_vec());
     }
 
     pub fn get_code(&mut self, address: Address) -> Option<Vec<u8>> {
-        let address = address_to_b160(address);
-        let key = address_into_special_storage_key(&address);
-        let flat_key = derive_flat_storage_key(&BYTECODE_HASH_STORAGE_ADDRESS, &key);
+        let properties = self.get_account_properties(address);
+        let bytecode_hash = properties.bytecode_hash;
 
-        let bytecode_hash = self.tree.cold_storage.get(&flat_key);
-
-        match bytecode_hash {
-            Some(bytecode_hash) => {
-                if *bytecode_hash == Bytes32::zero() {
-                    None
-                } else {
-                    let preimage = self.preimage_source.get_preimage(
-                        PreimageType::Bytecode(ExecutionEnvironmentType::EVM),
-                        *bytecode_hash,
-                    );
-                    assert!(
-                        preimage.is_some(),
-                        "Unknown bytecode hash: {bytecode_hash:?}"
-                    );
-                    preimage
-                }
-            }
-            None => None,
+        if bytecode_hash == Bytes32::zero() {
+            None
+        } else {
+            let preimage = self.preimage_source.get_preimage(bytecode_hash);
+            assert!(
+                preimage.is_some(),
+                "Unknown bytecode hash: {bytecode_hash:?}"
+            );
+            preimage
         }
     }
 }
