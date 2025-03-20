@@ -791,6 +791,8 @@ entries:
       ContractCreationSpam.json:
         hash: '0x5cf467d4825f3ccd70785c5dfe3d9933'
         enabled: true
+        skipCases: ["0"]
+        comment: "SELFDESTRUCT is not EVM equivalent"
       CrashingTransaction.json:
         hash: '0x555b980f9312d88395c51b51bc3987b5'
         enabled: true
