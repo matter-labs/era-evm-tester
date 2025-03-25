@@ -5,11 +5,11 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use anyhow::Context;
-use evm::utils::{h256_to_u256, u256_to_h256};
+use evm::utils::u256_to_h256;
 use revm::primitives::ruint;
 use revm::primitives::ruint::aliases::B160;
 use transaction::{gen_l2_tx, TransactionData};
-use web3::ethabi::{encode, Address, Token};
+use web3::ethabi::Address;
 use zk_ee::common_structs::derive_flat_storage_key;
 use zk_ee::system::system_trait::errors::InternalError;
 use zk_ee::system::ExecutionEnvironmentType;
@@ -23,8 +23,8 @@ use zk_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_AD
 use zk_os_basic_system::system_implementation::system::BlockHashes;
 use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource};
 use zk_os_forward_system::run::{
-    run_batch, run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, PreimageType,
-    StorageCommitment, TxOutput,
+    run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, StorageCommitment,
+    TxOutput,
 };
 use zksync_types::fee::Fee;
 use zksync_types::{K256PrivateKey, H256, U256};
