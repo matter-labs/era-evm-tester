@@ -48,7 +48,7 @@ dependencies = [
  "getrandom 0.2.15",
  "once_cell",
  "version_check",
- "zerocopy",
+ "zerocopy 0.7.35",
 ]
 
 [[package]]
@@ -125,7 +125,7 @@ dependencies = [
  "keccak-asm",
  "paste",
  "proptest",
- "rand",
+ "rand 0.8.5",
  "ruint",
  "rustc-hash",
  "serde",
@@ -483,7 +483,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1df2c09229cbc5a028b1d70e00fdb2acee28b1055dfb5ca73eea49c5a25c4e7c"
 dependencies = [
  "num-traits",
- "rand",
+ "rand 0.8.5",
 ]
 
 [[package]]
@@ -493,7 +493,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94893f1e0c6eeab764ade8dc4c0db24caf4fe7cbbaafc0eba0a9030f447b5185"
 dependencies = [
  "num-traits",
- "rand",
+ "rand 0.8.5",
 ]
 
 [[package]]
@@ -503,7 +503,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "246a225cc6131e9ee4f24619af0f19d67761fff15d7ccc22e42b80846e69449a"
 dependencies = [
  "num-traits",
- "rand",
+ "rand 0.8.5",
 ]
 
 [[package]]
@@ -725,7 +725,7 @@ checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 [[package]]
 name = "basic_bootloader"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -743,7 +743,7 @@ dependencies = [
 [[package]]
 name = "basic_system"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
  "cfg-if",
@@ -756,9 +756,9 @@ dependencies = [
  "iwasm_interpreter",
  "miniz_nostd_compression",
  "ruint",
- "secp256k1 0.1.0",
  "serde",
  "storage_models",
+ "system_hooks",
  "zk_ee",
 ]
 
@@ -881,7 +881,7 @@ dependencies = [
 [[package]]
 name = "blake2s_u32"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#5a8686de4409b97dc1d500912b94ae47caec0de2"
+source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
 dependencies = [
  "unroll",
 ]
@@ -1234,7 +1234,7 @@ checksum = "43da5946c66ffcc7745f48db692ffbb10a83bfe0afd96235c5c2a4fb23994929"
 [[package]]
 name = "crypto"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -1243,6 +1243,8 @@ dependencies = [
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
  "blake2",
+ "cfg-if",
+ "const_for",
  "k256",
  "modexp",
  "p256",
@@ -1258,7 +1260,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0dc92fb57ca44df6db8059111ab3af99a63d5d0f8375d9972e319a379c6bab76"
 dependencies = [
  "generic-array",
- "rand_core",
+ "rand_core 0.6.4",
  "subtle",
  "zeroize",
 ]
@@ -1544,7 +1546,7 @@ dependencies = [
  "group",
  "pem-rfc7468",
  "pkcs8",
- "rand_core",
+ "rand_core 0.6.4",
  "sec1",
  "subtle",
  "zeroize",
@@ -1585,7 +1587,7 @@ dependencies = [
  "hex",
  "k256",
  "log",
- "rand",
+ "rand 0.8.5",
  "rlp",
  "serde",
  "sha3 0.10.8",
@@ -1705,7 +1707,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
 dependencies = [
  "libc",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1772,7 +1774,7 @@ dependencies = [
  "k256",
  "num_enum 0.7.3",
  "open-fastrlp",
- "rand",
+ "rand 0.8.5",
  "rlp",
  "serde",
  "serde_json",
@@ -1854,6 +1856,7 @@ dependencies = [
  "basic_system",
  "bincode",
  "colored",
+ "crypto",
  "era-compiler-common",
  "era-compiler-downloader",
  "evm",
@@ -1901,7 +1904,7 @@ dependencies = [
 [[package]]
 name = "evm_interpreter"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -1950,7 +1953,7 @@ version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ded41244b729663b1e574f1b4fb731469f69f79c17667b5d776b16cda0479449"
 dependencies = [
- "rand_core",
+ "rand_core 0.6.4",
  "subtle",
 ]
 
@@ -1959,7 +1962,7 @@ name = "field"
 version = "0.1.0"
 source = "git+https://github.com/matter-labs/air_compiler?branch=av_bigint_precompile#33ca529b6fe4c276aaa8d7f861004af421c384c7"
 dependencies = [
- "rand",
+ "rand 0.8.5",
  "seq-macro",
  "serde",
 ]
@@ -1967,9 +1970,9 @@ dependencies = [
 [[package]]
 name = "field"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#5a8686de4409b97dc1d500912b94ae47caec0de2"
+source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
 dependencies = [
- "rand",
+ "rand 0.9.0",
  "seq-macro",
  "serde",
 ]
@@ -2005,7 +2008,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "835c052cb0c08c1acf6ffd71c022172e18723949c8282f2b9f27efbc51e64534"
 dependencies = [
  "byteorder",
- "rand",
+ "rand 0.8.5",
  "rustc-hex",
  "static_assertions",
 ]
@@ -2065,7 +2068,7 @@ dependencies = [
 [[package]]
 name = "forward_system"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
  "basic_bootloader",
@@ -2271,7 +2274,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0f9ef7462f7c099f518d754361858f86d8a07af53ba9af0fe635bbccb151a63"
 dependencies = [
  "ff",
- "rand_core",
+ "rand_core 0.6.4",
  "subtle",
 ]
 
@@ -3023,7 +3026,7 @@ checksum = "d75a2a4b1b190afb6f5425f10f6a8f959d2ea0b9c2b1d79553551850539e4674"
 [[package]]
 name = "iwasm_ee"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -3036,7 +3039,7 @@ dependencies = [
 [[package]]
 name = "iwasm_interpreter"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
 ]
@@ -3044,7 +3047,7 @@ dependencies = [
 [[package]]
 name = "iwasm_specification"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "num-derive",
  "num-traits",
@@ -3304,7 +3307,7 @@ checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 [[package]]
 name = "miniz_nostd_compression"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "adler",
 ]
@@ -3332,7 +3335,7 @@ dependencies = [
 [[package]]
 name = "modexp"
 version = "1.0.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 
 [[package]]
 name = "multibase"
@@ -3391,7 +3394,7 @@ source = "git+https://github.com/matter-labs/air_compiler?branch=av_bigint_preco
 [[package]]
 name = "non_determinism_source"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#5a8686de4409b97dc1d500912b94ae47caec0de2"
+source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
 
 [[package]]
 name = "nu-ansi-term"
@@ -3553,7 +3556,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af1844ef2428cc3e1cb900be36181049ef3d3193c63e43026cfe202983b27a56"
 dependencies = [
- "proc-macro-crate 3.2.0",
+ "proc-macro-crate 1.3.1",
  "proc-macro2",
  "quote",
  "syn 2.0.99",
@@ -3769,7 +3772,7 @@ dependencies = [
  "once_cell",
  "opentelemetry",
  "percent-encoding",
- "rand",
+ "rand 0.8.5",
  "serde_json",
  "thiserror 1.0.69",
  "tokio",
@@ -3779,7 +3782,7 @@ dependencies = [
 [[package]]
 name = "oracle_provider"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "ringbuffer",
  "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
@@ -4004,18 +4007,18 @@ source = "git+https://github.com/matter-labs/air_compiler?branch=av_bigint_preco
 dependencies = [
  "field 0.1.0 (git+https://github.com/matter-labs/air_compiler?branch=av_bigint_precompile)",
  "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/air_compiler?branch=av_bigint_precompile)",
- "rand",
+ "rand 0.8.5",
  "unroll",
 ]
 
 [[package]]
 name = "poseidon2"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#5a8686de4409b97dc1d500912b94ae47caec0de2"
+source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
 dependencies = [
  "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
  "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
- "rand",
+ "rand 0.9.0",
  "unroll",
 ]
 
@@ -4031,7 +4034,7 @@ version = "0.2.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77957b295656769bb8ad2b6a6b09d897d94f05c41b069aede1fcdaa675eaea04"
 dependencies = [
- "zerocopy",
+ "zerocopy 0.7.35",
 ]
 
 [[package]]
@@ -4153,8 +4156,8 @@ dependencies = [
  "bitflags 2.9.0",
  "lazy_static",
  "num-traits",
- "rand",
- "rand_chacha",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
  "rand_xorshift",
  "regex-syntax 0.8.5",
  "rusty-fork",
@@ -4345,9 +4348,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34af8d1a0e25924bc5b7c43c079c942339d8f0a8b57c39049bef581b46327404"
 dependencies = [
  "libc",
- "rand_chacha",
- "rand_core",
+ "rand_chacha 0.3.1",
+ "rand_core 0.6.4",
  "serde",
+]
+
+[[package]]
+name = "rand"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3779b94aeb87e8bd4e834cee3650289ee9e0d5677f976ecdb6d219e5f4f6cd94"
+dependencies = [
+ "rand_chacha 0.9.0",
+ "rand_core 0.9.3",
+ "zerocopy 0.8.24",
 ]
 
 [[package]]
@@ -4357,7 +4371,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6c10a63a0fa32252be49d21e7709d4d4baf8d231c2dbce1eaa8141b9b127d88"
 dependencies = [
  "ppv-lite86",
- "rand_core",
+ "rand_core 0.6.4",
+]
+
+[[package]]
+name = "rand_chacha"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3022b5f1df60f26e1ffddd6c66e8aa15de382ae63b3a0c1bfc0e4d3e3f325cb"
+dependencies = [
+ "ppv-lite86",
+ "rand_core 0.9.3",
 ]
 
 [[package]]
@@ -4370,12 +4394,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "rand_core"
+version = "0.9.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99d9a13982dcf210057a8a78572b2217b667c3beacbf3a0d8b454f6f82837d38"
+dependencies = [
+ "getrandom 0.3.1",
+]
+
+[[package]]
 name = "rand_xorshift"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d25bf25ec5ae4a3f1b92f929810509a2f53d7dca2f50b794ff57e3face536c8f"
 dependencies = [
- "rand_core",
+ "rand_core 0.6.4",
 ]
 
 [[package]]
@@ -4700,7 +4733,7 @@ dependencies = [
  "memmap2",
  "object 0.36.7",
  "poseidon2 0.1.0 (git+https://github.com/matter-labs/air_compiler?branch=av_bigint_precompile)",
- "rand",
+ "rand 0.8.5",
  "ringbuffer",
  "ruint",
 ]
@@ -4708,7 +4741,7 @@ dependencies = [
 [[package]]
 name = "risc_v_simulator"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#5a8686de4409b97dc1d500912b94ae47caec0de2"
+source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
 dependencies = [
  "addr2line 0.22.0",
  "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
@@ -4717,7 +4750,7 @@ dependencies = [
  "memmap2",
  "object 0.36.7",
  "poseidon2 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
- "rand",
+ "rand 0.9.0",
  "ringbuffer",
  "ruint",
 ]
@@ -4774,7 +4807,7 @@ dependencies = [
  "parity-scale-codec",
  "primitive-types",
  "proptest",
- "rand",
+ "rand 0.8.5",
  "rlp",
  "ruint-macro",
  "serde",
@@ -4834,7 +4867,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5026,16 +5059,6 @@ dependencies = [
 
 [[package]]
 name = "secp256k1"
-version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
-dependencies = [
- "cfg-if",
- "const_for",
- "crypto",
-]
-
-[[package]]
-name = "secp256k1"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25996b82292a7a57ed3508f052cfff8640d38d32018784acd714758b43da9c8f"
@@ -5049,7 +5072,7 @@ version = "0.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9465315bc9d4566e1724f0fffcbcc446268cb522e60f9a27bcded6b19c108113"
 dependencies = [
- "rand",
+ "rand 0.8.5",
  "secp256k1-sys 0.10.1",
 ]
 
@@ -5194,7 +5217,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "901f761681f97db3db836ef9e094acdd8756c40215326c194201941947164ef1"
 dependencies = [
  "once_cell",
- "rand",
+ "rand 0.8.5",
  "sentry-types",
  "serde",
  "serde_json",
@@ -5241,7 +5264,7 @@ checksum = "da956cca56e0101998c8688bc65ce1a96f00673a0e58e663664023d4c7911e82"
 dependencies = [
  "debugid",
  "hex",
- "rand",
+ "rand 0.8.5",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
@@ -5492,7 +5515,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de"
 dependencies = [
  "digest 0.10.7",
- "rand_core",
+ "rand_core 0.6.4",
 ]
 
 [[package]]
@@ -5570,7 +5593,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5582,7 +5605,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "storage_models"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
  "either",
@@ -5669,7 +5692,7 @@ dependencies = [
  "byteorder",
  "crunchy",
  "lazy_static",
- "rand",
+ "rand 0.8.5",
  "rustc-hex",
 ]
 
@@ -5772,7 +5795,7 @@ dependencies = [
 [[package]]
 name = "system_hooks"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "crypto",
  "evm_interpreter",
@@ -5797,7 +5820,7 @@ dependencies = [
  "getrandom 0.3.1",
  "once_cell",
  "rustix",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -6100,7 +6123,7 @@ dependencies = [
  "indexmap 1.9.3",
  "pin-project",
  "pin-project-lite",
- "rand",
+ "rand 0.8.5",
  "slab",
  "tokio",
  "tokio-util",
@@ -6267,7 +6290,7 @@ dependencies = [
  "http 0.2.12",
  "httparse",
  "log",
- "rand",
+ "rand 0.8.5",
  "rustls 0.21.12",
  "sha1",
  "thiserror 1.0.69",
@@ -6740,7 +6763,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -7067,7 +7090,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b9b4fd18abc82b8136838da5d50bae7bdea537c574d8dc1a34ed098d6c166f0"
 dependencies = [
  "byteorder",
- "zerocopy-derive",
+ "zerocopy-derive 0.7.35",
+]
+
+[[package]]
+name = "zerocopy"
+version = "0.8.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2586fea28e186957ef732a5f8b3be2da217d65c5969d4b1e17f973ebbe876879"
+dependencies = [
+ "zerocopy-derive 0.8.24",
 ]
 
 [[package]]
@@ -7075,6 +7107,17 @@ name = "zerocopy-derive"
 version = "0.7.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fa4f8080344d4671fb4e831a13ad1e68092748387dfc4f55e356242fae12ce3e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.99",
+]
+
+[[package]]
+name = "zerocopy-derive"
+version = "0.8.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a996a8f63c5c4448cd959ac1bab0aaa3306ccfd060472f85943ee0750f0169be"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7147,7 +7190,7 @@ dependencies = [
 [[package]]
 name = "zk_ee"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "arrayvec 0.7.6",
  "bitflags 2.9.0",
@@ -7199,7 +7242,7 @@ dependencies = [
 [[package]]
 name = "zk_os_runner"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#24817f505e23056e0d7869a048bd3130dd210182"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
 dependencies = [
  "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
 ]
@@ -7287,7 +7330,7 @@ dependencies = [
  "anyhow",
  "once_cell",
  "pin-project",
- "rand",
+ "rand 0.8.5",
  "sha3 0.10.8",
  "thiserror 1.0.69",
  "time",
@@ -7304,7 +7347,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2f9fa69ef68e6a1955a1d7b33077103fb6d106b560fec0d599c6de268f5be03"
 dependencies = [
  "anyhow",
- "rand",
+ "rand 0.8.5",
  "thiserror 1.0.69",
  "zksync_concurrency",
 ]
@@ -7331,7 +7374,7 @@ dependencies = [
  "anyhow",
  "blake2",
  "hex",
- "rand",
+ "rand 0.8.5",
  "secp256k1 0.27.0",
  "serde",
  "serde_json",
@@ -7362,7 +7405,7 @@ dependencies = [
  "prost 0.12.6",
  "prost-reflect",
  "quick-protobuf 0.8.1",
- "rand",
+ "rand 0.8.5",
  "serde",
  "serde_json",
  "serde_yaml",
