@@ -276,13 +276,18 @@ impl ZkOS {
         match self.tree.cold_storage.get(&flat_key) {
             None => AccountProperties::default(),
             Some(account_hash) => {
-                // Get from preimage:
-                let encoded = self
-                    .preimage_source
-                    .get_preimage(*account_hash)
-                    .unwrap_or_default();
-                AccountProperties::decode(encoded.try_into().unwrap())
-                    .expect("Failed to decode account properties")
+                if account_hash.is_zero() {
+                    // Empty (default) account
+                    AccountProperties::default()
+                } else {
+                    // Get from preimage:
+                    let encoded = self
+                        .preimage_source
+                        .get_preimage(*account_hash)
+                        .unwrap_or_default();
+                    AccountProperties::decode(encoded.try_into().unwrap())
+                        .expect("Failed to decode account properties")
+                }
             }
         }
     }
