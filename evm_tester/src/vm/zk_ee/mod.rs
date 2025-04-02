@@ -219,7 +219,7 @@ impl ZkOS {
                         .insert(&storage_write.key, &storage_write.value);
                 }
 
-                for (hash, preimage) in result.published_preimages.iter() {
+                for (hash, preimage, _) in result.published_preimages.iter() {
                     self.preimage_source.inner.insert(*hash, preimage.clone());
                 }
 
