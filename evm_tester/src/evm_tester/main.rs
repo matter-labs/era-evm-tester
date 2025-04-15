@@ -49,6 +49,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
         filters,
         arguments.workflow,
         arguments.mutation_path,
+        arguments.run_ethereum_spec_tests,
     )?;
 
     let environment = match arguments.environment {
@@ -113,6 +114,7 @@ mod tests {
             workflow: evm_tester::Workflow::BuildAndRun,
             mutation: false,
             mutation_path: None,
+            run_ethereum_spec_tests: false,
         };
 
         crate::main_inner(arguments).expect("Manual testing failed");

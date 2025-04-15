@@ -21,7 +21,7 @@ use crate::{
 };
 
 use super::{
-    filler_structure::{self, ExpectStructure, FillerStructure, LabelValue, U256Parsed},
+    filler_structure::{ExpectStructure, FillerStructure, LabelValue, U256Parsed},
     test_structure::{env_section::EnvSection, pre_state::PreState, TestStructure},
 };
 
@@ -129,6 +129,153 @@ impl Case {
                     vec!["-1".to_string()],
                 );
             }
+
+            indexes_for_expected_results.push(indexes_for_struct);
+        }
+
+        fn is_case_allowed(label: &Option<String>, index: usize, ruleset: &Vec<String>) -> bool {
+            ruleset.contains(&"-1".to_string())
+                || ruleset.contains(&index.to_string())
+                || (label.is_some() && ruleset.contains(label.as_ref().unwrap()))
+        }
+
+        let mut case_counter = 0;
+        for (data_index, data) in test_definition.transaction.data.iter().enumerate() {
+            for (gas_limit_index, gas_limit) in
+                test_definition.transaction.gas_limit.iter().enumerate()
+            {
+                for (value_index, value) in test_definition.transaction.value.iter().enumerate() {
+                    let case_idx = case_counter;
+
+                    let label = if test_definition._info.labels.is_some() {
+                        test_definition
+                            ._info
+                            .labels
+                            .as_ref()
+                            .unwrap()
+                            .get(&data_index)
+                            .cloned()
+                    } else {
+                        None
+                    };
+
+                    // If label is not preset, we use the index
+                    let final_label = label.clone().unwrap_or(case_idx.to_string());
+
+                    // Apply label-based filter
+                    if !Filters::check_case_label(filters, final_label.as_str()) {
+                        case_counter += 1;
+
+                        continue;
+                    }
+
+                    let prestate = test_definition.pre.clone();
+
+                    let transaction = Transaction {
+                        data: data.clone(),
+                        gas_limit: *gas_limit,
+                        gas_price: test_definition.transaction.gas_price,
+                        nonce: test_definition.transaction.nonce,
+                        secret_key: test_definition.transaction.secret_key,
+                        to: test_definition.transaction.to,
+                        sender: test_definition.transaction.sender,
+                        value: *value,
+                        max_fee_per_gas: test_definition.transaction.max_fee_per_gas,
+                        max_priority_fee_per_gas: test_definition
+                            .transaction
+                            .max_priority_fee_per_gas,
+                    };
+
+                    /*let post_state_for_case = PostStateForCase {
+                        hash: expected_result.hash,
+                        logs: expected_result.logs,
+                        txbytes: expected_result.txbytes.clone(),
+                        expect_exception: expected_result.expect_exception.clone(),
+                    };*/
+
+                    let mut expected_state_index: isize = -1;
+
+                    for (idx, index_tuple) in indexes_for_expected_results.iter().enumerate() {
+                        if is_case_allowed(&label, data_index, &index_tuple.0)
+                            && is_case_allowed(&label, gas_limit_index, &index_tuple.1)
+                            && is_case_allowed(&label, value_index, &index_tuple.2)
+                        {
+                            expected_state_index = idx.try_into().unwrap();
+                            break;
+                        }
+                    }
+
+                    if expected_state_index == -1 {
+                        panic!("Not found expected state for case: {case_idx}");
+                    }
+
+                    let index: usize = expected_state_index.try_into().unwrap();
+                    let (expected_state, expect_exception) = &expected_results_states[index];
+
+                    cases.push(Case {
+                        label: final_label,
+                        prestate,
+                        transaction,
+                        post_state: None,
+                        expected_state: expected_state.clone(),
+                        env: test_definition.env.clone(),
+                        expect_exception: *expect_exception,
+                    });
+
+                    case_counter += 1;
+                }
+            }
+        }
+
+        cases
+    }
+
+    pub fn from_ethereum_spec_test(
+        test_definition: &TestStructure,
+        filters: &Filters,
+        hardfork_version: &str,
+    ) -> Vec<Self> {
+        let mut cases = vec![];
+
+        let mut indexes_for_expected_results = vec![];
+        // The boolean represents if the expectException flag is set.
+        let mut expected_results_states: Vec<(
+            HashMap<zksync_types::H160, AccountFillerStruct>,
+            bool,
+        )> = vec![];
+
+        let post_state_structs = test_definition.post.get(hardfork_version);
+
+        if post_state_structs.is_none() {
+            // Don't have tests for current hardfork
+            return vec![];
+        }
+
+        for post_state in post_state_structs.unwrap() {
+            let mut indexes_for_struct = (vec![], vec![], vec![]);
+
+            if post_state.state.is_none() {
+                panic!("Empty state in expected state struct (not filled)");
+            }
+
+            let expected_accounts =
+                ExpectStructure::get_expected_result(post_state.state.as_ref().unwrap());
+
+            let expect_exception = post_state
+                .expect_exception
+                .as_ref()
+                .is_some_and(|m| !m.is_empty());
+            expected_results_states.push((expected_accounts, expect_exception));
+
+            indexes_for_struct
+                .0
+                .push(post_state.indexes.data.to_string());
+            indexes_for_struct
+                .1
+                .push(post_state.indexes.gas.to_string());
+            indexes_for_struct
+                .2
+                .push(post_state.indexes.value.to_string());
 
             indexes_for_expected_results.push(indexes_for_struct);
         }
@@ -564,16 +711,21 @@ impl Case {
         // TODO merge with prestate!
         for (address, filler_struct) in self.expected_state {
             if filler_struct.balance.is_some() {
-                let expected_balance = filler_struct.balance.as_ref().unwrap();
-                if let Some(expected_balance_value) = expected_balance.as_value() {
-                    if vm.get_balance(address) != expected_balance_value {
-                        expected = Some(format!(
-                            "Balance of {address:?}: {:?}",
-                            expected_balance_value
-                        ));
-                        actual = Some(vm.get_balance(address).to_string());
-                        check_successful = false;
-                        break;
+                // We do not have equivalent gas refunds, so balances will be different
+                if address != self.transaction.sender.unwrap()
+                    && address != self.env.current_coinbase
+                {
+                    let expected_balance = filler_struct.balance.as_ref().unwrap();
+                    if let Some(expected_balance_value) = expected_balance.as_value() {
+                        if vm.get_balance(address) != expected_balance_value {
+                            expected = Some(format!(
+                                "Balance of {address:?}: {:?}",
+                                expected_balance_value
+                            ));
+                            actual = Some(vm.get_balance(address).to_string());
+                            check_successful = false;
+                            break;
+                        }
                     }
                 }
             }

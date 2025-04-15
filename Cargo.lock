@@ -27,12 +27,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "adler"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f26201604c87b1e01bd3d98f8d5d9a8fcbb815e8cedb41ffccbeb4bf593a35fe"
-
-[[package]]
 name = "adler2"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -725,15 +719,13 @@ checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 [[package]]
 name = "basic_bootloader"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
  "either",
  "evm_interpreter",
  "hex",
- "iwasm_ee",
- "iwasm_interpreter",
  "ruint",
  "seq-macro",
  "system_hooks",
@@ -743,18 +735,16 @@ dependencies = [
 [[package]]
 name = "basic_system"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "arrayvec 0.7.6",
+ "bottom",
  "cfg-if",
  "const_for",
  "crypto",
  "either",
  "evm_interpreter",
  "hex",
- "iwasm_ee",
- "iwasm_interpreter",
- "miniz_nostd_compression",
  "ruint",
  "serde",
  "storage_models",
@@ -881,7 +871,7 @@ dependencies = [
 [[package]]
 name = "blake2s_u32"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
+source = "git+https://github.com/matter-labs/air_compiler#361cca00dc80c96cf37f801bce0f1ef08f6d030e"
 dependencies = [
  "unroll",
 ]
@@ -922,6 +912,11 @@ dependencies = [
  "threadpool",
  "zeroize",
 ]
+
+[[package]]
+name = "bottom"
+version = "0.1.0"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 
 [[package]]
 name = "bumpalo"
@@ -1234,7 +1229,7 @@ checksum = "43da5946c66ffcc7745f48db692ffbb10a83bfe0afd96235c5c2a4fb23994929"
 [[package]]
 name = "crypto"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
@@ -1707,7 +1702,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1904,7 +1899,7 @@ dependencies = [
 [[package]]
 name = "evm_interpreter"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -1970,7 +1965,7 @@ dependencies = [
 [[package]]
 name = "field"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
+source = "git+https://github.com/matter-labs/air_compiler#361cca00dc80c96cf37f801bce0f1ef08f6d030e"
 dependencies = [
  "rand 0.9.0",
  "seq-macro",
@@ -2068,7 +2063,7 @@ dependencies = [
 [[package]]
 name = "forward_system"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "arrayvec 0.7.6",
  "basic_bootloader",
@@ -3024,36 +3019,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d75a2a4b1b190afb6f5425f10f6a8f959d2ea0b9c2b1d79553551850539e4674"
 
 [[package]]
-name = "iwasm_ee"
-version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
-dependencies = [
- "arrayvec 0.7.6",
- "crypto",
- "iwasm_interpreter",
- "iwasm_specification",
- "ruint",
- "zk_ee",
-]
-
-[[package]]
-name = "iwasm_interpreter"
-version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
-dependencies = [
- "arrayvec 0.7.6",
-]
-
-[[package]]
-name = "iwasm_specification"
-version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
-dependencies = [
- "num-derive",
- "num-traits",
-]
-
-[[package]]
 name = "js-sys"
 version = "0.3.77"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3305,14 +3270,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
-name = "miniz_nostd_compression"
-version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
-dependencies = [
- "adler",
-]
-
-[[package]]
 name = "miniz_oxide"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3335,7 +3292,7 @@ dependencies = [
 [[package]]
 name = "modexp"
 version = "1.0.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 
 [[package]]
 name = "multibase"
@@ -3394,7 +3351,7 @@ source = "git+https://github.com/matter-labs/air_compiler?branch=av_bigint_preco
 [[package]]
 name = "non_determinism_source"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
+source = "git+https://github.com/matter-labs/air_compiler#361cca00dc80c96cf37f801bce0f1ef08f6d030e"
 
 [[package]]
 name = "nu-ansi-term"
@@ -3446,17 +3403,6 @@ name = "num-conv"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51d515d32fb182ee37cda2ccdcb92950d6a3c2893aa280e540671c2cd0f3b1d9"
-
-[[package]]
-name = "num-derive"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed3955f1a9c7c0c15e092f9c887db08b1fc683305fdf6eb6684f22555355e202"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.99",
-]
 
 [[package]]
 name = "num-format"
@@ -3782,7 +3728,7 @@ dependencies = [
 [[package]]
 name = "oracle_provider"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "ringbuffer",
  "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
@@ -4014,7 +3960,7 @@ dependencies = [
 [[package]]
 name = "poseidon2"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
+source = "git+https://github.com/matter-labs/air_compiler#361cca00dc80c96cf37f801bce0f1ef08f6d030e"
 dependencies = [
  "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
  "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
@@ -4741,7 +4687,7 @@ dependencies = [
 [[package]]
 name = "risc_v_simulator"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#e5af55895811720a8ced488c4fe0a766424ba20e"
+source = "git+https://github.com/matter-labs/air_compiler#361cca00dc80c96cf37f801bce0f1ef08f6d030e"
 dependencies = [
  "addr2line 0.22.0",
  "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
@@ -4867,7 +4813,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5593,7 +5539,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5605,7 +5551,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "storage_models"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "arrayvec 0.7.6",
  "either",
@@ -5795,8 +5741,9 @@ dependencies = [
 [[package]]
 name = "system_hooks"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
+ "arrayvec 0.7.6",
  "crypto",
  "evm_interpreter",
  "ruint",
@@ -5820,7 +5767,7 @@ dependencies = [
  "getrandom 0.3.1",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -7190,7 +7137,7 @@ dependencies = [
 [[package]]
 name = "zk_ee"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "arrayvec 0.7.6",
  "bitflags 2.9.0",
@@ -7242,7 +7189,7 @@ dependencies = [
 [[package]]
 name = "zk_os_runner"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#91f4c0960eb98abdb4978e41b9f68892d9fb167c"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#71149e6e6ac63487f224342d63ad8b7f1fd1339c"
 dependencies = [
  "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
 ]
