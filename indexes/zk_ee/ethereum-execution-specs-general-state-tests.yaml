@@ -384,7 +384,8 @@ entries:
                 hash: '0xcee8bcd9ad69b0e18c73fec55dec4592'
                 enabled: true
       eip152_blake2:
-        enabled: true
+        enabled: false
+        comment: "Blake2 is not supported"
         entries:
           blake2:
             enabled: true
