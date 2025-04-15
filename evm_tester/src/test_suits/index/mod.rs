@@ -96,7 +96,7 @@ impl FSEntity {
     ///
     pub fn into_enabled_list(self, initial: &Path) -> Vec<EnabledTest> {
         let mut accumulator = Vec::with_capacity(16384);
-        self.into_enabled_list_recursive(initial, &mut accumulator, &vec![], &vec![]);
+        self.into_enabled_list_recursive(initial, &mut accumulator, &vec![], &vec![], &vec![]);
         accumulator.sort_by_key(|test| test.path.to_owned());
         accumulator
     }
@@ -107,6 +107,7 @@ impl FSEntity {
     pub fn into_enabled_test(self, initial: &Path, path: &Path) -> Option<EnabledTest> {
         let mut skipped_calldatas: Vec<web3::types::Bytes> = vec![];
         let mut skipped_cases: Vec<String> = vec![];
+        let mut skipped_names: Vec<String> = vec![];
 
         let mut current_entity = self;
         for path_part in path.iter() {
@@ -118,6 +119,10 @@ impl FSEntity {
 
                     if let Some(additional_skipped_cases) = directory.skip_cases {
                         skipped_cases.extend(additional_skipped_cases);
+                    }
+
+                    if let Some(additional_skipped_names) = directory.skip_names {
+                        skipped_names.extend(additional_skipped_names);
                     }
 
                     current_entity = match directory
@@ -144,6 +149,7 @@ impl FSEntity {
                     file.group,
                     Some(skipped_calldatas),
                     Some(skipped_cases),
+                    Some(skipped_names),
                 ))
             }
         }
@@ -201,6 +207,7 @@ impl FSEntity {
                     comment: old_comment,
                     skip_calldatas: old_skip_calldatas,
                     skip_cases: old_skip_cases,
+                    skip_names: old_skip_names,
                 }),
                 Self::Directory(Directory {
                     enabled: new_enabled,
@@ -208,12 +215,14 @@ impl FSEntity {
                     comment: new_comment,
                     skip_calldatas: new_skip_calldatas,
                     skip_cases: new_skip_cases,
+                    skip_names: new_skip_names,
                 }),
             ) => {
                 *new_enabled = *old_enabled;
                 *new_comment = old_comment.clone();
                 *new_skip_calldatas = old_skip_calldatas.clone();
                 *new_skip_cases = old_skip_cases.clone();
+                *new_skip_names = old_skip_names.clone();
 
                 (old_entities, new_entities)
             }
@@ -263,9 +272,11 @@ impl FSEntity {
         accumulator: &mut Vec<EnabledTest>,
         skipped_calldatas: &Vec<web3::types::Bytes>,
         skipped_cases: &Vec<String>,
+        skipped_names: &Vec<String>,
     ) {
         let mut skipped_calldatas_new = skipped_calldatas.clone();
         let mut skipped_cases_new = skipped_cases.clone();
+        let mut skipped_names_new = skipped_names.clone();
 
         let entries = match self {
             Self::File(file) => {
@@ -281,11 +292,16 @@ impl FSEntity {
                     skipped_cases_new.extend(additional_skipped_cases);
                 }
 
+                if let Some(additional_skipped_names) = file.skip_names {
+                    skipped_names_new.extend(additional_skipped_names);
+                }
+
                 accumulator.push(EnabledTest::new(
                     current.to_owned(),
                     file.group,
                     Some(skipped_calldatas_new),
                     Some(skipped_cases_new),
+                    Some(skipped_names_new),
                 ));
                 return;
             }
@@ -314,6 +330,7 @@ impl FSEntity {
                 accumulator,
                 &skipped_calldatas_new,
                 &skipped_cases_new,
+                &skipped_names_new,
             );
         }
     }

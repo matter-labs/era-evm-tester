@@ -213,6 +213,7 @@ impl Test {
         str: &str,
         skipped_calldatas: Option<Vec<web3::types::Bytes>>,
         skipped_cases: Option<Vec<String>>,
+        skipped_names: Option<Vec<String>>,
         filters: &Filters,
         path: PathBuf,
         _relative_path: PathBuf,
@@ -228,6 +229,12 @@ impl Test {
         for (test_name, test_definition) in test_structure {
             if !filters.check_test_name(&test_name) {
                 continue;
+            }
+
+            if let Some(skipped_names_refs) = skipped_names.as_ref() {
+                if skipped_names_refs.contains(&test_name) {
+                    continue;
+                }
             }
 
             let cases = Case::from_ethereum_spec_test(&test_definition, filters, "Cancun");

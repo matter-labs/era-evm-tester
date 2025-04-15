@@ -870,6 +870,16 @@ entries:
               gas_usage.json:
                 hash: '0xffda45f517aafbdd9672fc350d75abb4'
                 enabled: true
+                comment: "test_gas_usage uses access lists to inflate intrinsic cost. We do not support access lists and ignore them"
+                skipNames:
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_32_bytes-too_little_intrinsic_gas]"
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_max_size_zeros-too_little_intrinsic_gas]"
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_49121_bytes-too_little_intrinsic_gas]"
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_empty-too_little_intrinsic_gas]"
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_33_bytes-too_little_intrinsic_gas]"
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_max_size_ones-too_little_intrinsic_gas]"
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_single_byte-too_little_intrinsic_gas]"
+                    - "tests/shanghai/eip3860_initcode/test_initcode.py::TestContractCreationGasUsage::test_gas_usage[fork_Cancun-state_test-initcode_49120_bytes-too_little_intrinsic_gas]"
           with_eof:
             enabled: true
             entries:

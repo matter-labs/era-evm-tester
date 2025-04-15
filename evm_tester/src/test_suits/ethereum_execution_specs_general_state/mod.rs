@@ -78,6 +78,7 @@ impl Collection for EthereumExecutionSpecsGeneralStateTestsDirectory {
                     &file,
                     test.skip_calldatas,
                     test.skip_cases,
+                    test.skip_names,
                     filters,
                     test.path,
                     relative_path,
