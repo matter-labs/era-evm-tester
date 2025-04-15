@@ -25,6 +25,7 @@ use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use regex::Regex;
 use test::Test;
+use test_suits::ethereum_execution_specs_general_state::EthereumExecutionSpecsGeneralStateTestsDirectory;
 
 pub use crate::environment::Environment;
 pub use crate::filters::Filters;
@@ -50,12 +51,15 @@ pub struct EvmTester {
     pub workflow: Workflow,
     /// Optional path to the mutated tests directory
     pub mutation_path: Option<String>,
+    pub run_spec_tests: bool,
 }
 
 impl EvmTester {
     /// The General state transition tests directory.
     const GENERAL_STATE_TESTS: &'static str = "ethereum-tests/GeneralStateTests";
     const GENERAL_STATE_TESTS_FILLER: &'static str = "ethereum-tests/src/GeneralStateTestsFiller";
+
+    const EXECUTION_SPECS_GENERAL_STATE_TESTS: &'static str = "ethereum-fixtures/state_tests";
 }
 
 impl EvmTester {
@@ -67,12 +71,14 @@ impl EvmTester {
         filters: Filters,
         workflow: Workflow,
         mutation_path: Option<String>,
+        run_spec_tests: bool,
     ) -> anyhow::Result<Self> {
         Ok(Self {
             summary,
             filters,
             workflow,
             mutation_path,
+            run_spec_tests,
         })
     }
 
@@ -140,6 +146,16 @@ impl EvmTester {
             Self::GENERAL_STATE_TESTS_FILLER,
             environment,
         )?);
+
+        if self.run_spec_tests {
+            tests.extend(
+                self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
+                    Self::EXECUTION_SPECS_GENERAL_STATE_TESTS,
+                    "", // don't need fillers here
+                    environment,
+                )?,
+            );
+        }
 
         Ok(tests)
     }

@@ -89,6 +89,7 @@ impl Test {
         }
     }
 
+    // TODO: reimplement using ethereum spec tests (prefill expected state)
     pub fn from_ethereum_test(
         str: &str,
         filler_str: &str,
@@ -202,6 +203,54 @@ impl Test {
             path,
             mutants,
         }
+    }
+
+    pub fn from_ethereum_spec_test(
+        str: &str,
+        skipped_calldatas: Option<Vec<web3::types::Bytes>>,
+        skipped_cases: Option<Vec<String>>,
+        filters: &Filters,
+        path: PathBuf,
+        _relative_path: PathBuf,
+        _mutation_path: Option<String>,
+        name_override: Option<String>,
+    ) -> Vec<Self> {
+        let cleaned_str = str.replace("0x:bigint ", "");
+        let test_structure: HashMap<String, TestStructure> =
+            serde_json::from_str(&cleaned_str).unwrap();
+
+        let mut tests = vec![];
+
+        for (test_name, test_definition) in test_structure {
+            let cases = Case::from_ethereum_spec_test(&test_definition, filters, "Cancun");
+
+            // read mutants
+            // filter all files in directory by regexp and run
+            let test_path = path.clone();
+            let mut directory = test_path.clone();
+            directory.pop();
+
+            let name = if let Some(name) = name_override.as_ref() {
+                name.clone()
+            } else {
+                test_name.clone()
+            };
+
+            // TODO mutantion not supported here
+
+            tests.push(Self {
+                name,
+                cases,
+                group: None,
+                evm_version: None,
+                skipped_calldatas: skipped_calldatas.clone(), // TODO not convenient
+                skipped_cases: skipped_cases.clone(),         // TODO not convenient
+                path: path.clone(),
+                mutants: vec![],
+            });
+        }
+
+        tests
     }
 
     ///

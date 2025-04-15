@@ -54,6 +54,10 @@ pub struct Arguments {
     /// The path to the mutated tests directory
     #[structopt(long = "mutation_path")]
     pub mutation_path: Option<String>,
+
+    /// Temp, until we debug spec tests
+    #[structopt(long = "spec_tests")]
+    pub run_ethereum_spec_tests: bool,
 }
 
 impl Arguments {

@@ -2,7 +2,9 @@
 //! The buildable compiler test trait.
 //!
 
+pub mod ethereum_execution_specs_general_state;
 pub mod ethereum_general_state;
+pub mod index;
 
 use crate::filters::Filters;
 use crate::test::Test;

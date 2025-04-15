@@ -1,4 +1,8 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
+
+use crate::test::filler_structure::{AccountFillerStructMaybe, AddressMaybe};
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct PostStateIndexes {
@@ -15,4 +19,5 @@ pub struct PostState {
     pub logs: web3::types::H256,
     pub txbytes: web3::types::Bytes,
     pub expect_exception: Option<String>,
+    pub state: Option<HashMap<AddressMaybe, AccountFillerStructMaybe>>,
 }

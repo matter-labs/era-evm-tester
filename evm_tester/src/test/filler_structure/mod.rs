@@ -1,5 +1,6 @@
 use serde::{Deserialize, Deserializer};
 use std::{collections::HashMap, str::FromStr};
+use web3::types::Address;
 
 #[derive(Debug, Clone, Hash, PartialEq)]
 pub enum U256Parsed {
@@ -236,7 +237,9 @@ impl ExpectStructure {
             if let AddressMaybe::Val(addr) = key {
                 match value {
                     AccountFillerStructMaybe::Val(account_struct) => {
-                        storage.insert(*addr, account_struct.clone());
+                        let mut account_struct = account_struct.clone();
+
+                        storage.insert(*addr, account_struct);
                     }
                     AccountFillerStructMaybe::Comment(comment) => {
                         panic!("Unexpected value instead of account struct: {comment}");

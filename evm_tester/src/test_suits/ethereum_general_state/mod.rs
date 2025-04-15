@@ -5,7 +5,6 @@
 use std::path::Path;
 use std::path::PathBuf;
 
-pub mod index;
 pub mod platforms;
 
 use platforms::index_for_environment;
@@ -14,6 +13,8 @@ use crate::filters::Filters;
 use crate::test::Test;
 use crate::test_suits::Collection;
 use crate::Environment;
+
+use super::index;
 
 ///
 /// The Ethereum tests directory.
