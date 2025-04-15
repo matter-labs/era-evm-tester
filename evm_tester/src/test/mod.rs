@@ -120,7 +120,11 @@ impl Test {
         let test_definition = test_structure.get(keys[0]).expect("Always exists");
         let test_filler = test_filler_structure.get(keys[0]).expect("Always exists");
 
-        let cases = Case::from_ethereum_test(test_definition, test_filler, filters);
+        let cases = if filters.check_test_name(&test_name) {
+            Case::from_ethereum_test(test_definition, test_filler, filters)
+        } else {
+            vec![]
+        };
 
         // read mutants
         // filter all files in directory by regexp and run
@@ -222,6 +226,10 @@ impl Test {
         let mut tests = vec![];
 
         for (test_name, test_definition) in test_structure {
+            if !filters.check_test_name(&test_name) {
+                continue;
+            }
+
             let cases = Case::from_ethereum_spec_test(&test_definition, filters, "Cancun");
 
             // read mutants

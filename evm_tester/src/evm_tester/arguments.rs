@@ -22,6 +22,10 @@ pub struct Arguments {
     #[structopt(short = "p", long = "path")]
     pub paths: Vec<String>,
 
+    /// Runs only tests with specified names.
+    #[structopt(short = "n", long = "name")]
+    pub names: Vec<String>,
+
     /// Runs only tests from the specified groups.
     #[structopt(short = "g", long = "group")]
     pub groups: Vec<String>,
