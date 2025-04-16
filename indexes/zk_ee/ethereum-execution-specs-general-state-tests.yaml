@@ -832,7 +832,8 @@ entries:
     enabled: true
     entries:
       eip3651_warm_coinbase:
-        enabled: true
+        enabled: false
+        comment: "Coinbase is hardcoded in production"
         entries:
           warm_coinbase:
             enabled: true
