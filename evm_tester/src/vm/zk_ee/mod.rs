@@ -21,7 +21,7 @@ use zk_os_basic_system::system_implementation::io::AccountProperties;
 use zk_os_basic_system::system_implementation::io::TestingTree;
 use zk_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
 use zk_os_basic_system::system_implementation::system::BlockHashes;
-use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource};
+use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource, NoopTxCallback};
 use zk_os_forward_system::run::{
     run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, StorageCommitment,
     TxOutput,
@@ -199,6 +199,7 @@ impl ZkOS {
             tree,
             preimage_source,
             tx_source,
+            NoopTxCallback
         );
 
         self.apply_batch_execution_result(result)
