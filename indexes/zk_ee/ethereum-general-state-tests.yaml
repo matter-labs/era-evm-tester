@@ -2523,12 +2523,12 @@ entries:
       gasCost.json:
         hash: '0x86a929189c824a6ad1e30965e7b8d3b9'
         enabled: true
-        skipCalldatas: ["000000"]
+        skipCalldatas: ["0x000000"]
         comment: "Writes 0 to empty slot, we skip this diff"
       gasCostBerlin.json:
         hash: '0x8eda027fd3ee9dd266e9fc5ab11423fd'
         enabled: true
-        skipCalldatas: ["000000"]
+        skipCalldatas: ["0x000000"]
         comment: "Writes 0 to empty slot, we skip this diff"
       gasCostExp.json:
         hash: '0x10162cc4f656376da099469656d8c430'
