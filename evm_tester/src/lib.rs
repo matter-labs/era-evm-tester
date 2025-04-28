@@ -7,6 +7,8 @@
 #![allow(clippy::upper_case_acronyms)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::type_complexity)]
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
 
 pub(crate) mod environment;
 pub(crate) mod filters;
