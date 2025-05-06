@@ -11,8 +11,9 @@ use revm::primitives::ruint::aliases::B160;
 use transaction::{gen_l2_tx, TransactionData};
 use web3::ethabi::Address;
 use zk_ee::common_structs::derive_flat_storage_key;
-use zk_ee::system::system_trait::errors::InternalError;
-use zk_ee::system::ExecutionEnvironmentType;
+use zk_ee::execution_environment_type::ExecutionEnvironmentType;
+use zk_ee::system::errors::InternalError;
+use zk_ee::system::metadata::BlockHashes;
 use zk_ee::utils::Bytes32;
 use zk_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
 use zk_os_basic_bootloader::bootloader::errors::InvalidTransaction;
@@ -20,8 +21,9 @@ use zk_os_basic_system::system_implementation::io::address_into_special_storage_
 use zk_os_basic_system::system_implementation::io::AccountProperties;
 use zk_os_basic_system::system_implementation::io::TestingTree;
 use zk_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
-use zk_os_basic_system::system_implementation::system::BlockHashes;
-use zk_os_forward_system::run::test_impl::{InMemoryPreimageSource, InMemoryTree, TxListSource, NoopTxCallback};
+use zk_os_forward_system::run::test_impl::{
+    InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
+};
 use zk_os_forward_system::run::{
     run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, StorageCommitment,
     TxOutput,
@@ -163,7 +165,7 @@ impl ZkOS {
 
         // Output flamegraphs if on benchmarking mode
         if bench {
-            use zk_ee::system::types_config::EthereumIOTypesConfig;
+            use zk_ee::types_config::EthereumIOTypesConfig;
             use zk_os_forward_system::run::io_implementer_init_data;
             use zk_os_forward_system::run::ForwardRunningOracle;
             use zk_os_oracle_provider::BasicZkEEOracleWrapper;
@@ -199,7 +201,7 @@ impl ZkOS {
             tree,
             preimage_source,
             tx_source,
-            NoopTxCallback
+            NoopTxCallback,
         );
 
         self.apply_batch_execution_result(result)
