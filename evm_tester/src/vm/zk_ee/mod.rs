@@ -197,7 +197,6 @@ impl ZkOS {
 
         let result = run_batch_with_oracle_dump(
             context,
-            storage_commitment,
             tree,
             preimage_source,
             tx_source,
