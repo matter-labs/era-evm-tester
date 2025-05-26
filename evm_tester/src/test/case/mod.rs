@@ -15,7 +15,7 @@ use crate::{
     utils,
     vm::{
         eravm::system_context::SystemContext,
-        zk_ee::{ZkOS, ZkOsEVMContext},
+        zk_ee::{ZKsyncOS, ZKsyncOSEVMContext},
     },
     EraVM, EraVMDeployer, Filters, Summary,
 };
@@ -618,12 +618,12 @@ impl Case {
     }
 
     ///
-    /// Runs the case on ZK OS.
+    /// Runs the case on ZKsync OS.
     ///
-    pub fn run_zk_os(
+    pub fn run_zksync_os(
         self,
         summary: Arc<Mutex<Summary>>,
-        vm: ZkOS,
+        vm: ZKsyncOS,
         test_name: String,
         test_group: Option<String>,
         bench: bool,
@@ -631,7 +631,7 @@ impl Case {
         let calldata = self.transaction.data.0.clone();
         let name = self.label.clone();
         let result = std::panic::catch_unwind(|| {
-            self.run_zk_os_inner(summary.clone(), vm, test_name.clone(), test_group, bench)
+            self.run_zksync_os_inner(summary.clone(), vm, test_name.clone(), test_group, bench)
         });
         if let Err(e) = result {
             Summary::panicked(
@@ -643,10 +643,10 @@ impl Case {
         }
     }
 
-    fn run_zk_os_inner(
+    fn run_zksync_os_inner(
         self,
         summary: Arc<Mutex<Summary>>,
-        mut vm: ZkOS,
+        mut vm: ZKsyncOS,
         test_name: String,
         test_group: Option<String>,
         bench: bool,
@@ -671,7 +671,7 @@ impl Case {
                 });
         }
 
-        let mut system_context = ZkOsEVMContext::default();
+        let mut system_context = ZKsyncOSEVMContext::default();
 
         system_context.block_number = self.env.current_number.try_into().unwrap();
         system_context.block_timestamp = self.env.current_timestamp.try_into().unwrap();

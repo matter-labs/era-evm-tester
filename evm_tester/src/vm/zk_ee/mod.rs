@@ -15,16 +15,16 @@ use zk_ee::execution_environment_type::ExecutionEnvironmentType;
 use zk_ee::system::errors::InternalError;
 use zk_ee::system::metadata::BlockHashes;
 use zk_ee::utils::Bytes32;
-use zk_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
-use zk_os_basic_bootloader::bootloader::errors::InvalidTransaction;
-use zk_os_basic_system::system_implementation::io::address_into_special_storage_key;
-use zk_os_basic_system::system_implementation::io::AccountProperties;
-use zk_os_basic_system::system_implementation::io::TestingTree;
-use zk_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
-use zk_os_forward_system::run::test_impl::{
+use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
+use zksync_os_basic_bootloader::bootloader::errors::InvalidTransaction;
+use zksync_os_basic_system::system_implementation::io::address_into_special_storage_key;
+use zksync_os_basic_system::system_implementation::io::AccountProperties;
+use zksync_os_basic_system::system_implementation::io::TestingTree;
+use zksync_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
+use zksync_os_forward_system::run::test_impl::{
     InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
 };
-use zk_os_forward_system::run::{
+use zksync_os_forward_system::run::{
     run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, StorageCommitment,
     TxOutput,
 };
@@ -36,7 +36,7 @@ use crate::test::case::transaction::Transaction;
 mod transaction;
 
 #[derive(Clone, Default)]
-pub struct ZkOsEVMContext {
+pub struct ZKsyncOSEVMContext {
     pub chain_id: u64,
     pub coinbase: web3::types::Address,
     pub block_number: u128,
@@ -52,7 +52,7 @@ pub struct ZkOsEVMContext {
 /// The VM execution result.
 ///
 #[derive(Debug, Clone, Default)]
-pub struct ZkOsExecutionResult {
+pub struct ZKsyncOSExecutionResult {
     /// The VM snapshot execution result.
     pub return_data: Vec<u8>,
     pub exception: bool,
@@ -62,15 +62,15 @@ pub struct ZkOsExecutionResult {
 }
 
 ///
-/// The ZK OS interface.
+/// The ZKsync OS interface.
 ///
 #[derive(Clone)]
-pub struct ZkOS {
+pub struct ZKsyncOS {
     tree: InMemoryTree,
     preimage_source: InMemoryPreimageSource,
 }
 
-impl ZkOS {
+impl ZKsyncOS {
     pub fn new() -> Self {
         let tree = InMemoryTree {
             storage_tree: TestingTree::new_in(Global),
@@ -92,10 +92,10 @@ impl ZkOS {
     pub fn execute_transaction(
         &mut self,
         transaction: &Transaction,
-        system_context: ZkOsEVMContext,
+        system_context: ZKsyncOSEVMContext,
         bench: bool,
         test_id: String,
-    ) -> anyhow::Result<ZkOsExecutionResult, String> {
+    ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
         let tx_type = if transaction.max_priority_fee_per_gas.is_some() {
             Some(2.into())
         } else {
@@ -166,11 +166,11 @@ impl ZkOS {
         // Output flamegraphs if on benchmarking mode
         if bench {
             use zk_ee::types_config::EthereumIOTypesConfig;
-            use zk_os_forward_system::run::io_implementer_init_data;
-            use zk_os_forward_system::run::ForwardRunningOracle;
-            use zk_os_oracle_provider::BasicZkEEOracleWrapper;
-            use zk_os_oracle_provider::ReadWitnessSource;
-            use zk_os_oracle_provider::ZkEENonDeterminismSource;
+            use zksync_os_forward_system::run::io_implementer_init_data;
+            use zksync_os_forward_system::run::ForwardRunningOracle;
+            use zksync_os_oracle_provider::BasicZkEEOracleWrapper;
+            use zksync_os_oracle_provider::ReadWitnessSource;
+            use zksync_os_oracle_provider::ZkEENonDeterminismSource;
 
             let oracle: ForwardRunningOracle<InMemoryTree, InMemoryPreimageSource, TxListSource> =
                 ForwardRunningOracle {
@@ -192,7 +192,7 @@ impl ZkOS {
                 .unwrap()
                 .join(format!("{}.svg", test_id));
             let _output =
-                zk_os_runner::run_default_with_flamegraph_path(1 << 25, copy_source, Some(path));
+                zksync_os_runner::run_default_with_flamegraph_path(1 << 25, copy_source, Some(path));
         }
 
         let result = run_batch_with_oracle_dump(
@@ -209,7 +209,7 @@ impl ZkOS {
     fn apply_batch_execution_result(
         &mut self,
         batch_execution_result: Result<BatchOutput, InternalError>,
-    ) -> anyhow::Result<ZkOsExecutionResult, String> {
+    ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
         match batch_execution_result {
             Ok(result) => {
                 for storage_write in result.storage_writes.iter() {
@@ -239,28 +239,28 @@ impl ZkOS {
 
     fn get_transaction_execution_result(
         tx_result: Result<TxOutput, InvalidTransaction>,
-    ) -> anyhow::Result<ZkOsExecutionResult, String> {
+    ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
         match tx_result {
             Ok(tx_output) => {
-                let mut execution_result = ZkOsExecutionResult::default();
+                let mut execution_result = ZKsyncOSExecutionResult::default();
 
                 execution_result.gas = tx_output.gas_used.into();
                 // TODO events
 
                 match &tx_output.execution_result {
-                    zk_os_forward_system::run::ExecutionResult::Success(execution_output) => {
+                    zksync_os_forward_system::run::ExecutionResult::Success(execution_output) => {
                         match execution_output {
-                            zk_os_forward_system::run::ExecutionOutput::Call(data) => {
+                            zksync_os_forward_system::run::ExecutionOutput::Call(data) => {
                                 execution_result.return_data = data.clone();
                             }
-                            zk_os_forward_system::run::ExecutionOutput::Create(data, address) => {
+                            zksync_os_forward_system::run::ExecutionOutput::Create(data, address) => {
                                 let bytes = address.to_be_bytes();
                                 execution_result.return_data = data.clone();
                                 execution_result.address_deployed = Some(Address::from(bytes));
                             }
                         }
                     }
-                    zk_os_forward_system::run::ExecutionResult::Revert(vec) => {
+                    zksync_os_forward_system::run::ExecutionResult::Revert(vec) => {
                         execution_result.exception = true;
                         execution_result.return_data = vec.clone();
                     }
@@ -390,10 +390,10 @@ impl ZkOS {
         address: Address,
         bytecode: &[u8],
     ) -> AccountProperties {
-        use zk_os_basic_system::system_implementation::io::DEFAULT_CODE_VERSION_BYTE;
-        use zk_os_crypto::blake2s::Blake2s256;
-        use zk_os_crypto::sha3::Keccak256;
-        use zk_os_crypto::MiniDigest;
+        use zksync_os_basic_system::system_implementation::io::DEFAULT_CODE_VERSION_BYTE;
+        use zksync_os_crypto::blake2s::Blake2s256;
+        use zksync_os_crypto::sha3::Keccak256;
+        use zksync_os_crypto::MiniDigest;
 
         let observable_bytecode_hash = Bytes32::from_array(Keccak256::digest(bytecode));
         let bytecode_hash = Bytes32::from_array(Blake2s256::digest(bytecode));
