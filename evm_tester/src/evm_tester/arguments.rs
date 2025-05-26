@@ -46,7 +46,7 @@ pub struct Arguments {
 
     /// Choose between `build` to compile tests only without running, `run` to compile and run
     /// or `bench` to also produce flamegraphs.
-    /// Note that you might want to set the ZKsyncOS_DIR env var to point to the directory
+    /// Note that you might want to set the ZKSYNC_OS_DIR env var to point to the directory
     /// containing the app.elf and app.bin from ZKsync OS to run benchmarks.
     #[structopt(long = "workflow", default_value = "run")]
     pub workflow: evm_tester::Workflow,
