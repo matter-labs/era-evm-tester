@@ -720,7 +720,7 @@ checksum = "89e25b6adfb930f02d1981565a6e5d9c547ac15a96606256d3b59040e5cd4ca3"
 [[package]]
 name = "basic_bootloader"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -737,7 +737,7 @@ dependencies = [
 [[package]]
 name = "basic_system"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "arrayvec 0.7.6",
  "cfg-if",
@@ -777,7 +777,7 @@ dependencies = [
 [[package]]
 name = "bigint_with_control"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "prover",
  "serde",
@@ -855,7 +855,7 @@ dependencies = [
 [[package]]
 name = "blake2_with_compression"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "prover",
  "serde",
@@ -896,7 +896,7 @@ dependencies = [
 [[package]]
 name = "blake2s_u32"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "unroll",
 ]
@@ -1030,10 +1030,10 @@ dependencies = [
 [[package]]
 name = "circuit_common"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "fft",
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "worker",
 ]
 
@@ -1288,14 +1288,14 @@ checksum = "43da5946c66ffcc7745f48db692ffbb10a83bfe0afd96235c5c2a4fb23994929"
 [[package]]
 name = "crypto"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "ark-bls12-381",
  "ark-bn254",
  "ark-ec",
  "ark-ff 0.5.0",
  "ark-serialize 0.5.0",
- "ark-std 0.5.0",
+ "ark-std 0.3.0",
  "blake2",
  "cfg-if",
  "const_for",
@@ -1337,16 +1337,16 @@ dependencies = [
 [[package]]
 name = "cs"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "arrayvec 0.7.6",
  "bincode",
- "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "derivative",
  "divrem",
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "itertools 0.13.0",
- "poseidon2 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "poseidon2 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "proc-macro2",
  "quote",
  "seq-macro",
@@ -1370,7 +1370,7 @@ dependencies = [
 [[package]]
 name = "cycle_marker"
 version = "0.0.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 
 [[package]]
 name = "darling"
@@ -1985,11 +1985,11 @@ dependencies = [
  "which",
  "yaml-rust2",
  "zk_ee",
- "zk_os_runner",
  "zkevm_opcode_defs 0.150.6",
  "zkevm_tester",
  "zksync_basic_types",
  "zksync_contracts",
+ "zksync_os_runner",
  "zksync_system_constants",
  "zksync_types",
  "zksync_vm2",
@@ -1998,7 +1998,7 @@ dependencies = [
 [[package]]
 name = "evm_interpreter"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -2011,9 +2011,9 @@ dependencies = [
 [[package]]
 name = "execution_utils"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
- "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "serde",
  "serde_json",
  "trace_and_split",
@@ -2067,9 +2067,9 @@ dependencies = [
 [[package]]
 name = "fft"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "itertools 0.13.0",
  "rayon",
  "seq-macro",
@@ -2091,7 +2091,7 @@ dependencies = [
 [[package]]
 name = "field"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "rand 0.9.1",
  "seq-macro",
@@ -2113,7 +2113,7 @@ dependencies = [
 [[package]]
 name = "final_reduced_risc_v_machine"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "circuit_common",
  "prover",
@@ -2201,7 +2201,7 @@ dependencies = [
 [[package]]
 name = "forward_system"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "arrayvec 0.7.6",
  "basic_bootloader",
@@ -3425,7 +3425,7 @@ dependencies = [
 [[package]]
 name = "modexp"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 
 [[package]]
 name = "multibase"
@@ -3484,7 +3484,7 @@ source = "git+https://github.com/matter-labs/air_compiler?branch=av_bigint_preco
 [[package]]
 name = "non_determinism_source"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 
 [[package]]
 name = "nu-ansi-term"
@@ -3870,10 +3870,10 @@ dependencies = [
 [[package]]
 name = "oracle_provider"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "ringbuffer",
- "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "zk_ee",
 ]
 
@@ -4102,10 +4102,10 @@ dependencies = [
 [[package]]
 name = "poseidon2"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
- "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
+ "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "rand 0.9.1",
  "unroll",
 ]
@@ -4406,21 +4406,21 @@ dependencies = [
 [[package]]
 name = "prover"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "bit-set",
- "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "cs",
  "fft",
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "itertools 0.13.0",
  "lib-rv32-asm",
- "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
- "poseidon2 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
+ "poseidon2 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "proc-macro2",
  "quote",
  "rayon",
- "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "seq-macro",
  "serde",
  "serde_json",
@@ -4434,7 +4434,7 @@ dependencies = [
 [[package]]
 name = "prover_examples"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "bincode",
  "itertools 0.13.0",
@@ -4648,7 +4648,7 @@ dependencies = [
 [[package]]
 name = "reduced_risc_v_machine"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "circuit_common",
  "prover",
@@ -4969,7 +4969,7 @@ dependencies = [
 [[package]]
 name = "risc_v_cycles"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "circuit_common",
  "prover",
@@ -4998,16 +4998,16 @@ dependencies = [
 [[package]]
 name = "risc_v_simulator"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "addr2line 0.22.0",
- "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "cs",
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "inferno",
  "memmap2",
- "object 0.36.7",
- "poseidon2 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "object 0.35.0",
+ "poseidon2 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "rand 0.9.1",
  "ringbuffer",
  "ruint",
@@ -5683,7 +5683,7 @@ dependencies = [
 [[package]]
 name = "setups"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "bigint_with_control",
  "blake2_with_compression",
@@ -5914,7 +5914,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "storage_models"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -6122,7 +6122,7 @@ dependencies = [
 [[package]]
 name = "system_hooks"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "arrayvec 0.7.6",
  "crypto",
@@ -6496,7 +6496,7 @@ checksum = "8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3"
 [[package]]
 name = "trace_and_split"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "prover",
  "serde",
@@ -6508,9 +6508,9 @@ dependencies = [
 [[package]]
 name = "trace_holder"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "worker",
 ]
 
@@ -6620,9 +6620,9 @@ dependencies = [
 [[package]]
 name = "transcript"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
- "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "unroll",
  "worker",
 ]
@@ -6882,13 +6882,13 @@ checksum = "f1bddf1187be692e79c5ffeab891132dfb0f236ed36a43c7ed39f1165ee20191"
 [[package]]
 name = "verifier_common"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
- "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "blake2s_u32 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "cs",
- "field 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
- "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
- "poseidon2 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
+ "field 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
+ "non_determinism_source 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
+ "poseidon2 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
  "prover",
  "serde",
  "transcript",
@@ -6898,7 +6898,7 @@ dependencies = [
 [[package]]
 name = "verifier_generator"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "proc-macro-error2",
  "proc-macro2",
@@ -7510,7 +7510,7 @@ dependencies = [
 [[package]]
 name = "worker"
 version = "0.1.0"
-source = "git+https://github.com/matter-labs/air_compiler#b475cf396d9f6ad8b3ff63c961c6796757f7b245"
+source = "git+https://github.com/matter-labs/zksync-airbender#45e6af70f870817fb8acb4b6eddc381740857cd6"
 dependencies = [
  "num_cpus",
  "rayon",
@@ -7682,7 +7682,7 @@ dependencies = [
 [[package]]
 name = "zk_ee"
 version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
 dependencies = [
  "arrayvec 0.7.6",
  "bitflags 2.9.1",
@@ -7729,18 +7729,6 @@ dependencies = [
  "serde",
  "static_assertions",
  "zkevm_opcode_defs 0.152.3",
-]
-
-[[package]]
-name = "zk_os_runner"
-version = "0.1.0"
-source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=main#421ce1e1f7e6898f0744f29445a2354c1ae6b61f"
-dependencies = [
- "cycle_marker",
- "execution_utils",
- "prover_examples",
- "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/air_compiler)",
- "trace_and_split",
 ]
 
 [[package]]
@@ -7933,6 +7921,18 @@ dependencies = [
  "once_cell",
  "zksync_basic_types",
  "zksync_crypto_primitives",
+]
+
+[[package]]
+name = "zksync_os_runner"
+version = "0.1.0"
+source = "git+ssh://git@github.com/matter-labs/zk_ee.git?branch=vv-renames-and-migration#d32f1c946254101d6848c6c9f23a48e6c2ca54a4"
+dependencies = [
+ "cycle_marker",
+ "execution_utils",
+ "prover_examples",
+ "risc_v_simulator 0.1.0 (git+https://github.com/matter-labs/zksync-airbender)",
+ "trace_and_split",
 ]
 
 [[package]]

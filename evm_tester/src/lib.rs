@@ -38,7 +38,7 @@ pub use crate::vm::eravm::deployers::dummy_deployer::DummyDeployer as EraVMNativ
 pub use crate::vm::eravm::deployers::system_contract_deployer::SystemContractDeployer as EraVMSystemContractDeployer;
 pub use crate::vm::eravm::deployers::EraVMDeployer;
 pub use crate::vm::eravm::EraVM;
-pub use crate::vm::zk_ee::ZkOS;
+pub use crate::vm::zk_ee::ZKsyncOS;
 pub use crate::workflow::Workflow;
 
 ///
@@ -105,10 +105,10 @@ impl EvmTester {
     }
 
     ///
-    /// Runs all tests on ZK OS.
+    /// Runs all tests on ZKsync OS.
     ///
-    pub fn run_zk_os(self, vm: ZkOS, run_mutation_tests: bool) -> anyhow::Result<()> {
-        let tests = self.all_tests(Environment::ZkOS)?;
+    pub fn run_zksync_os(self, vm: ZKsyncOS, run_mutation_tests: bool) -> anyhow::Result<()> {
+        let tests = self.all_tests(Environment::ZKsyncOS)?;
         let vm = Arc::new(vm);
         let _: Vec<()> = tests
             .into_par_iter()
@@ -116,7 +116,7 @@ impl EvmTester {
                 let mutants = test.mutants;
                 test.mutants = vec![];
 
-                test.run_zk_os(
+                test.run_zksync_os(
                     self.summary.clone(),
                     vm.clone(),
                     matches!(self.workflow, Workflow::Bench),
@@ -124,7 +124,7 @@ impl EvmTester {
 
                 if run_mutation_tests {
                     for mutant in mutants {
-                        mutant.run_zk_os(
+                        mutant.run_zksync_os(
                             self.summary.clone(),
                             vm.clone(),
                             matches!(self.workflow, Workflow::Bench),

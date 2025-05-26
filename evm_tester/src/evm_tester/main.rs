@@ -59,7 +59,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     let environment = match arguments.environment {
         Some(environment @ evm_tester::Environment::EVMEmulator) => environment,
-        Some(environment @ evm_tester::Environment::ZkOS) => environment,
+        Some(environment @ evm_tester::Environment::ZKsyncOS) => environment,
         None => evm_tester::Environment::EVMEmulator,
     };
 
@@ -77,9 +77,9 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
             evm_tester.run_evm_interpreter::<evm_tester::EraVMSystemContractDeployer, true>(vm)
         }
 
-        evm_tester::Environment::ZkOS => {
-            let vm = evm_tester::ZkOS::new();
-            evm_tester.run_zk_os(vm, arguments.mutation)
+        evm_tester::Environment::ZKsyncOS => {
+            let vm = evm_tester::ZKsyncOS::new();
+            evm_tester.run_zksync_os(vm, arguments.mutation)
         }
     }?;
 

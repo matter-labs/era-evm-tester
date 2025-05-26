@@ -58,7 +58,7 @@ pub fn gen_l2_tx(
     Ok(tx.into())
 }
 
-// TODO import zkos dev branch
+// TODO import zksync os dev branch
 
 pub(crate) const MAX_GAS_PER_PUBDATA_BYTE: u64 = 50_000;
 
@@ -181,7 +181,7 @@ impl From<Transaction> for TransactionData {
                 }
             }
             ExecuteTransactionCommon::L1(_) => {
-                unimplemented!("l1 transactions are not supported for zk os")
+                unimplemented!("l1 transactions are not supported for ZKsync OS")
             }
             ExecuteTransactionCommon::ProtocolUpgrade(_) => {
                 unreachable!()

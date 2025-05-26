@@ -23,7 +23,7 @@ use crate::test::case::Case;
 use crate::vm::eravm::deployers::EraVMDeployer;
 use crate::vm::eravm::EraVM;
 use crate::Filters;
-use crate::ZkOS;
+use crate::ZKsyncOS;
 
 lazy_static! {
     static ref MUTATION_TESTS_RE: Regex = Regex::new(r"^(.+)_m_[0-9a-fA-F]+\.json").unwrap();
@@ -301,9 +301,9 @@ impl Test {
     }
 
     ///
-    /// Runs the test on ZK OS.
+    /// Runs the test on ZKsync OS.
     ///
-    pub fn run_zk_os(self, summary: Arc<Mutex<Summary>>, vm: Arc<ZkOS>, bench: bool) {
+    pub fn run_zksync_os(self, summary: Arc<Mutex<Summary>>, vm: Arc<ZKsyncOS>, bench: bool) {
         for case in self.cases {
             if let Some(filter_calldata) = self.skipped_calldatas.as_ref() {
                 if filter_calldata.contains(&case.transaction.data) {
@@ -319,8 +319,8 @@ impl Test {
                 }
             }
 
-            let vm = ZkOS::clone(vm.clone());
-            case.run_zk_os(
+            let vm = ZKsyncOS::clone(vm.clone());
+            case.run_zksync_os(
                 summary.clone(),
                 vm,
                 self.name.clone(),
