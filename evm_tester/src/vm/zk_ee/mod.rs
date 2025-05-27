@@ -145,6 +145,7 @@ impl ZKsyncOS {
             //todo: gas
             eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string())
                 .expect("Invalid basefee"),
+            native_price: U256::from(1),
             gas_per_pubdata: Default::default(),
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
@@ -191,17 +192,15 @@ impl ZKsyncOS {
             let path = std::env::current_dir()
                 .unwrap()
                 .join(format!("{}.svg", test_id));
-            let _output =
-                zksync_os_runner::run_default_with_flamegraph_path(1 << 25, copy_source, Some(path));
+            let _output = zksync_os_runner::run_default_with_flamegraph_path(
+                1 << 25,
+                copy_source,
+                Some(path),
+            );
         }
 
-        let result = run_batch_with_oracle_dump(
-            context,
-            tree,
-            preimage_source,
-            tx_source,
-            NoopTxCallback,
-        );
+        let result =
+            run_batch_with_oracle_dump(context, tree, preimage_source, tx_source, NoopTxCallback);
 
         self.apply_batch_execution_result(result)
     }
@@ -253,7 +252,10 @@ impl ZKsyncOS {
                             zksync_os_forward_system::run::ExecutionOutput::Call(data) => {
                                 execution_result.return_data = data.clone();
                             }
-                            zksync_os_forward_system::run::ExecutionOutput::Create(data, address) => {
+                            zksync_os_forward_system::run::ExecutionOutput::Create(
+                                data,
+                                address,
+                            ) => {
                                 let bytes = address.to_be_bytes();
                                 execution_result.return_data = data.clone();
                                 execution_result.address_deployed = Some(Address::from(bytes));
