@@ -58,29 +58,29 @@ zksync_system_constants = { git = "https://github.com/matter-labs/zksync-era", b
 zksync_contracts = { git = "https://github.com/matter-labs/zksync-era", branch = "evm-emulator/testing", package = "zksync_contracts", commit ="fdeea9a44a2653d8f147553b3e18d4f702df5234" }
 zksync_basic_types = { git = "https://github.com/matter-labs/zksync-era", branch = "evm-emulator/testing", package = "zksync_basic_types", commit ="fdeea9a44a2653d8f147553b3e18d4f702df5234" }
 
-zksync_os_forward_system = {package = "forward_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" }
-zk_ee = { package = "zk_ee",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zksync_os_evm_interpreter = { package = "evm_interpreter",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main", features = ["evm-compatibility"]  }
-zksync_os_basic_system = { package = "basic_system",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main", features = ["evm-compatibility"]  }
-zksync_os_basic_bootloader = { package = "basic_bootloader",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main" , features = ["evm-compatibility","resources_for_tester"] }
-zksync_os_system_hooks = { package = "system_hooks",  git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zksync_os_oracle_provider = {package = "oracle_provider", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zksync_os_runner = {package = "zksync_os_runner", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
-zksync_os_crypto = {package = "crypto", git="ssh://git@github.com/matter-labs/zk_ee.git", branch = "main"  }
+zksync_os_forward_system = {package = "forward_system",  git="https://github.com/matter-labs/zksync-os", branch = "main" }
+zk_ee = { package = "zk_ee",  git="https://github.com/matter-labs/zksync-os", branch = "main"  }
+zksync_os_evm_interpreter = { package = "evm_interpreter",  git="https://github.com/matter-labs/zksync-os", branch = "main", features = ["evm-compatibility"]  }
+zksync_os_basic_system = { package = "basic_system",  git="https://github.com/matter-labs/zksync-os", branch = "main", features = ["evm-compatibility"]  }
+zksync_os_basic_bootloader = { package = "basic_bootloader",  git="https://github.com/matter-labs/zksync-os", branch = "main" , features = ["evm-compatibility","resources_for_tester"] }
+zksync_os_system_hooks = { package = "system_hooks",  git="https://github.com/matter-labs/zksync-os", branch = "main"  }
+zksync_os_oracle_provider = {package = "oracle_provider", git="https://github.com/matter-labs/zksync-os", branch = "main"  }
+zksync_os_runner = {package = "zksync_os_runner", git="https://github.com/matter-labs/zksync-os", branch = "main"  }
+zksync_os_crypto = {package = "crypto", git="https://github.com/matter-labs/zksync-os", branch = "main"  }
 
 # Local setup, also used in zk_ee CI
-#zksync_os_forward_system = {package = "forward_system", path = "../../zk_ee/forward_system" }
-#zk_ee = { package = "zk_ee", path = "../../zk_ee/zk_ee" }
-#zksync_os_evm_interpreter = { package = "evm_interpreter", path = "../../zk_ee/evm_interpreter", features = ["evm-compatibility"]  }
-#zksync_os_basic_system = { package = "basic_system", path = "../../zk_ee/basic_system", features = ["evm-compatibility"] }
-#zksync_os_basic_bootloader = { package = "basic_bootloader", path = "../../zk_ee/basic_bootloader", features = ["evm-compatibility", "resources_for_tester"] }
-#zksync_os_system_hooks = { package = "system_hooks", path = "../../zk_ee/system_hooks"}
-#zksync_os_oracle_provider = {package = "oracle_provider", path = "../../zk_ee/oracle_provider"}
-#zksync_os_runner = {package = "zksync_os_runner", path = "../../zk_ee/zksync_os_runner" }
-#zksync_os_crypto = { package = "crypto", path="../../zk_ee/crypto" }
+#zksync_os_forward_system = {package = "forward_system", path = "../../zksync-os/forward_system" }
+#zk_ee = { package = "zk_ee", path = "../../zksync-os/zk_ee" }
+#zksync_os_evm_interpreter = { package = "evm_interpreter", path = "../../zksync-os/evm_interpreter", features = ["evm-compatibility"]  }
+#zksync_os_basic_system = { package = "basic_system", path = "../../zksync-os/basic_system", features = ["evm-compatibility"] }
+#zksync_os_basic_bootloader = { package = "basic_bootloader", path = "../../zksync-os/basic_bootloader", features = ["evm-compatibility", "resources_for_tester"] }
+#zksync_os_system_hooks = { package = "system_hooks", path = "../../zksync-os/system_hooks"}
+#zksync_os_oracle_provider = {package = "oracle_provider", path = "../../zksync-os/oracle_provider"}
+#zksync_os_runner = {package = "zksync_os_runner", path = "../../zksync-os/zksync_os_runner" }
+#zksync_os_crypto = { package = "crypto", path="../../zksync-os/crypto" }
 
 
-risc_v_simulator = { git = "https://github.com/matter-labs/air_compiler", branch = "av_bigint_precompile", features=["delegation", "opcode_stats"]}
+risc_v_simulator = { git = "https://github.com/matter-labs/zksync-airbender", features=["delegation", "opcode_stats"]}
 
 [dependencies.web3]
 version = "=0.19.0"
