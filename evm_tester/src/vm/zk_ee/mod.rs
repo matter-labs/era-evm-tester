@@ -17,10 +17,10 @@ use zk_ee::system::metadata::BlockHashes;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
 use zksync_os_basic_bootloader::bootloader::errors::InvalidTransaction;
-use zksync_os_basic_system::system_implementation::io::address_into_special_storage_key;
-use zksync_os_basic_system::system_implementation::io::AccountProperties;
-use zksync_os_basic_system::system_implementation::io::TestingTree;
-use zksync_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
+use zksync_os_basic_system::system_implementation::flat_storage_model::address_into_special_storage_key;
+use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
+use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTree;
+use zksync_os_basic_system::system_implementation::flat_storage_model::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
 use zksync_os_forward_system::run::test_impl::{
     InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
 };
@@ -289,8 +289,7 @@ impl ZKsyncOS {
                         .preimage_source
                         .get_preimage(*account_hash)
                         .unwrap_or_default();
-                    AccountProperties::decode(encoded.try_into().unwrap())
-                        .expect("Failed to decode account properties")
+                    AccountProperties::decode(&encoded.try_into().unwrap())
                 }
             }
         }
@@ -324,7 +323,7 @@ impl ZKsyncOS {
         let properties = self.get_account_properties(address);
         U256::from_big_endian(
             &properties
-                .nominal_token_balance
+                .balance
                 .to_be_bytes::<{ ruint::aliases::U256::BYTES }>(),
         )
     }
@@ -334,7 +333,7 @@ impl ZKsyncOS {
     ///
     pub fn set_balance(&mut self, address: web3::types::Address, value: web3::types::U256) {
         let mut properties = self.get_account_properties(address);
-        properties.nominal_token_balance = ruint::aliases::U256::from_be_bytes(value.into());
+        properties.balance = ruint::aliases::U256::from_be_bytes(value.into());
         self.set_account_properties(address, properties)
     }
 
@@ -392,7 +391,7 @@ impl ZKsyncOS {
         address: Address,
         bytecode: &[u8],
     ) -> AccountProperties {
-        use zksync_os_basic_system::system_implementation::io::DEFAULT_CODE_VERSION_BYTE;
+        use zksync_os_basic_system::system_implementation::flat_storage_model::DEFAULT_CODE_VERSION_BYTE;
         use zksync_os_crypto::blake2s::Blake2s256;
         use zksync_os_crypto::sha3::Keccak256;
         use zksync_os_crypto::MiniDigest;
