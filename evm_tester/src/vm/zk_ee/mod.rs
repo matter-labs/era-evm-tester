@@ -17,10 +17,10 @@ use zk_ee::system::metadata::BlockHashes;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
 use zksync_os_basic_bootloader::bootloader::errors::InvalidTransaction;
-use zksync_os_basic_system::system_implementation::io::address_into_special_storage_key;
-use zksync_os_basic_system::system_implementation::io::AccountProperties;
-use zksync_os_basic_system::system_implementation::io::TestingTree;
-use zksync_os_basic_system::system_implementation::io::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
+use zksync_os_basic_system::system_implementation::flat_storage_model::address_into_special_storage_key;
+use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
+use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTree;
+use zksync_os_basic_system::system_implementation::flat_storage_model::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
 use zksync_os_forward_system::run::test_impl::{
     InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
 };
@@ -392,7 +392,7 @@ impl ZKsyncOS {
         address: Address,
         bytecode: &[u8],
     ) -> AccountProperties {
-        use zksync_os_basic_system::system_implementation::io::DEFAULT_CODE_VERSION_BYTE;
+        use zksync_os_basic_system::system_implementation::flat_storage_model::DEFAULT_CODE_VERSION_BYTE;
         use zksync_os_crypto::blake2s::Blake2s256;
         use zksync_os_crypto::sha3::Keccak256;
         use zksync_os_crypto::MiniDigest;
