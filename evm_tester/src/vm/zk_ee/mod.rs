@@ -289,8 +289,7 @@ impl ZKsyncOS {
                         .preimage_source
                         .get_preimage(*account_hash)
                         .unwrap_or_default();
-                    AccountProperties::decode(encoded.try_into().unwrap())
-                        .expect("Failed to decode account properties")
+                    AccountProperties::decode(&encoded.try_into().unwrap())
                 }
             }
         }
@@ -324,7 +323,7 @@ impl ZKsyncOS {
         let properties = self.get_account_properties(address);
         U256::from_big_endian(
             &properties
-                .nominal_token_balance
+                .balance
                 .to_be_bytes::<{ ruint::aliases::U256::BYTES }>(),
         )
     }
@@ -334,7 +333,7 @@ impl ZKsyncOS {
     ///
     pub fn set_balance(&mut self, address: web3::types::Address, value: web3::types::U256) {
         let mut properties = self.get_account_properties(address);
-        properties.nominal_token_balance = ruint::aliases::U256::from_be_bytes(value.into());
+        properties.balance = ruint::aliases::U256::from_be_bytes(value.into());
         self.set_account_properties(address, properties)
     }
 
