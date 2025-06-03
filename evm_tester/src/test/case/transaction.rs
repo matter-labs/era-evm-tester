@@ -1,4 +1,5 @@
 use serde::{Deserialize, Deserializer};
+use zksync_types::H160;
 
 #[derive(Debug, Clone, Copy)]
 pub struct FieldTo(pub Option<web3::types::Address>);
@@ -28,6 +29,13 @@ impl<'de> Deserialize<'de> for FieldTo {
     }
 }
 
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AccessListItem {
+    pub address: H160,
+    pub storage_keys: Vec<web3::types::U256>,
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction {
@@ -41,4 +49,5 @@ pub struct Transaction {
     pub to: FieldTo,
     pub sender: Option<web3::types::Address>,
     pub value: web3::types::U256,
+    pub access_list: Option<Vec<AccessListItem>>,
 }

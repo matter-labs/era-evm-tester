@@ -1,6 +1,5 @@
+use crate::test::case::transaction::{AccessListItem, FieldTo};
 use serde::Deserialize;
-
-use crate::test::case::transaction::FieldTo;
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -15,4 +14,5 @@ pub struct TransactionSection {
     pub to: FieldTo,
     pub sender: Option<web3::types::Address>,
     pub value: Vec<web3::types::U256>,
+    pub access_lists: Option<Vec<Option<Vec<AccessListItem>>>>,
 }
