@@ -2619,8 +2619,7 @@ entries:
         hash: '0x336c3d00e544ae5f72b51cb43d11ad07'
         enabled: true
   stEIP2930:
-    enabled: false
-    comment: "We do not support access lists"
+    enabled: true
     entries:
       addressOpcodes.json:
         hash: '0x1efe8cb68bd4729bcd6e482cc259e3f0'
