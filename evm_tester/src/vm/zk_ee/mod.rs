@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use evm::utils::u256_to_h256;
+use itertools::Itertools;
 use revm::primitives::ruint;
 use revm::primitives::ruint::aliases::B160;
 use transaction::{gen_l2_tx, TransactionData};
@@ -31,6 +32,7 @@ use zksync_os_forward_system::run::{
 use zksync_types::fee::Fee;
 use zksync_types::{K256PrivateKey, H256, U256};
 
+use crate::test::case::transaction::AccessListItem;
 use crate::test::case::transaction::Transaction;
 
 mod transaction;
@@ -96,39 +98,73 @@ impl ZKsyncOS {
         bench: bool,
         test_id: String,
     ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
-        let tx_type = if transaction.max_priority_fee_per_gas.is_some() {
-            Some(2.into())
-        } else {
-            None
-        };
-        let fee = Fee {
-            gas_limit: transaction.gas_limit,
+        // let tx_type = if transaction.max_priority_fee_per_gas.is_some() {
+        //     Some(2.into())
+        // } else {
+        //     None
+        // };
+        // use zksync_os_rig::*;
+
+        let alloy_tx = alloy::consensus::TxEip1559 {
+            chain_id: system_context.chain_id,
+            nonce: transaction.nonce.try_into().expect("Nonce overflow"),
             max_fee_per_gas: transaction
                 .max_fee_per_gas
-                .unwrap_or(system_context.gas_price),
+                .unwrap_or(system_context.gas_price)
+                .try_into()
+                .expect("Max fee per gas overflow"),
             max_priority_fee_per_gas: transaction
                 .max_priority_fee_per_gas
-                .unwrap_or(system_context.gas_price),
-            gas_per_pubdata_limit: Default::default(),
+                .unwrap_or(system_context.gas_price)
+                .try_into()
+                .expect("Max priority fee per gas overflow"),
+            gas_limit: transaction
+                .gas_limit
+                .try_into()
+                .expect("gas limit overflow"),
+            to: transaction
+                .to
+                .0
+                .map_or(alloy::primitives::TxKind::Create, |addr| {
+                    alloy::primitives::TxKind::Call(alloy::primitives::Address::from_slice(
+                        addr.as_ref(),
+                    ))
+                }),
+            value: transaction.value.into(),
+            access_list: alloy::eips::eip2930::AccessList(
+                transaction
+                    .access_list
+                    .clone()
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(
+                        |AccessListItem {
+                             address,
+                             storage_keys,
+                         }| {
+                            let storage_keys = storage_keys
+                                .into_iter()
+                                .map(|k| {
+                                    let mut buffer = [0u8; 32];
+                                    k.to_big_endian(&mut buffer);
+                                    alloy::primitives::FixedBytes::from_slice(&buffer)
+                                })
+                                .collect_vec();
+                            alloy::eips::eip2930::AccessListItem {
+                                address: alloy::primitives::Address::from_slice(address.as_ref()),
+                                storage_keys,
+                            }
+                        },
+                    )
+                    .collect_vec(),
+            ),
+            input: transaction.data.0.clone().into(),
         };
-
-        let l2_tx = gen_l2_tx(
-            &K256PrivateKey::from_bytes(transaction.secret_key).expect("Invalid private key"),
-            transaction.to.0,
-            transaction.data.0.clone(),
-            transaction.value,
-            transaction.nonce.try_into().expect("Nonce overflow"),
-            fee,
-            system_context.block_timestamp as u64,
-            system_context.chain_id,
-            tx_type,
+        let wallet = zksync_os_rig::alloy::signers::local::PrivateKeySigner::from_slice(
+            transaction.secret_key.as_bytes(),
         )
-        .context("Gen l2 tx")
         .unwrap();
-
-        let tx = TransactionData::from(l2_tx);
-
-        let encoded_tx = tx.abi_encode();
+        let encoded_tx = zksync_os_rig::utils::sign_and_encode_alloy_tx(alloy_tx, &wallet);
 
         let tx_source = TxListSource {
             transactions: vec![encoded_tx].into(),

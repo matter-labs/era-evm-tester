@@ -154,6 +154,9 @@ impl From<Transaction> for TransactionData {
                     // all other transactions
                     Some(_) => U256::zero(),
                 };
+                // For now, bytes encoding of a list of a single empty list.
+                // Will support access list later.
+                let reserved_dynamic = encode(&[Token::Array(vec![Token::Array(vec![])])]);
 
                 TransactionData {
                     tx_type: (common_data.transaction_type as u32) as u8,
@@ -176,7 +179,7 @@ impl From<Transaction> for TransactionData {
                     signature: common_data.signature,
                     factory_deps: execute_tx.execute.factory_deps,
                     paymaster_input: common_data.paymaster_params.paymaster_input,
-                    reserved_dynamic: vec![],
+                    reserved_dynamic,
                     raw_bytes: execute_tx.raw_bytes.map(|a| a.0),
                 }
             }

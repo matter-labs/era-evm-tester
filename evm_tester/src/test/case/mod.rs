@@ -6,6 +6,7 @@ use std::{
 pub mod post_state_for_case;
 pub mod transaction;
 
+use itertools::Itertools;
 use post_state_for_case::PostStateForCase;
 use transaction::Transaction;
 use zksync_types::U256;
@@ -140,7 +141,26 @@ impl Case {
         }
 
         let mut case_counter = 0;
-        for (data_index, data) in test_definition.transaction.data.iter().enumerate() {
+
+        let data_with_access_lists =
+            if let Some(access_lists) = &test_definition.transaction.access_lists {
+                assert_eq!(access_lists.len(), test_definition.transaction.data.len());
+                test_definition
+                    .transaction
+                    .data
+                    .iter()
+                    .zip(access_lists)
+                    .collect_vec()
+            } else {
+                test_definition
+                    .transaction
+                    .data
+                    .iter()
+                    .zip(std::iter::repeat(&None))
+                    .collect_vec()
+            };
+
+        for (data_index, (data, access_list)) in data_with_access_lists.into_iter().enumerate() {
             for (gas_limit_index, gas_limit) in
                 test_definition.transaction.gas_limit.iter().enumerate()
             {
@@ -170,6 +190,7 @@ impl Case {
                     }
 
                     let prestate = test_definition.pre.clone();
+                    let access_list = access_list.clone();
 
                     let transaction = Transaction {
                         data: data.clone(),
@@ -184,6 +205,7 @@ impl Case {
                         max_priority_fee_per_gas: test_definition
                             .transaction
                             .max_priority_fee_per_gas,
+                        access_list,
                     };
 
                     /*let post_state_for_case = PostStateForCase {
@@ -286,8 +308,25 @@ impl Case {
                 || (label.is_some() && ruleset.contains(label.as_ref().unwrap()))
         }
 
+        let data_with_access_lists =
+            if let Some(access_lists) = &test_definition.transaction.access_lists {
+                assert_eq!(access_lists.len(), test_definition.transaction.data.len());
+                test_definition
+                    .transaction
+                    .data
+                    .iter()
+                    .zip(access_lists)
+                    .collect_vec()
+            } else {
+                test_definition
+                    .transaction
+                    .data
+                    .iter()
+                    .zip(std::iter::repeat(&None))
+                    .collect_vec()
+            };
         let mut case_counter = 0;
-        for (data_index, data) in test_definition.transaction.data.iter().enumerate() {
+        for (data_index, (data, access_list)) in data_with_access_lists.into_iter().enumerate() {
             for (gas_limit_index, gas_limit) in
                 test_definition.transaction.gas_limit.iter().enumerate()
             {
@@ -331,6 +370,7 @@ impl Case {
                         max_priority_fee_per_gas: test_definition
                             .transaction
                             .max_priority_fee_per_gas,
+                        access_list: access_list.clone(),
                     };
 
                     /*let post_state_for_case = PostStateForCase {

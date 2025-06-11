@@ -42,6 +42,8 @@ lazy_static = "=1.5.0"
 bincode = "=1.3.3"
 parity-scale-codec-derive = "=3.6.12"
 
+ruint = {version = "*", features = ["primitive-types"]}
+alloy = { version = "=0.4.0", features = ["full", "eip712"]}
 evm = { git = "https://github.com/rust-ethereum/evm", rev = "f7a23df6c478ca6a151af5f60e62944800529a61" }
 revm = { git = "https://github.com/bluealloy/revm", rev = "fa5650ee8a4d802f4f3557014dd157adfb074460" }
 revme = { git = "https://github.com/bluealloy/revm", rev = "fa5650ee8a4d802f4f3557014dd157adfb074460", package = "revme"}
@@ -67,6 +69,7 @@ zksync_os_system_hooks = { package = "system_hooks",  git="https://github.com/ma
 zksync_os_oracle_provider = {package = "oracle_provider", git="https://github.com/matter-labs/zksync-os", branch = "main"  }
 zksync_os_runner = {package = "zksync_os_runner", git="https://github.com/matter-labs/zksync-os", branch = "main"  }
 zksync_os_crypto = {package = "crypto", git="https://github.com/matter-labs/zksync-os", branch = "main"  }
+zksync_os_rig = {package = "rig", git="https://github.com/matter-labs/zksync-os", branch = "main"  }
 
 # Local setup, also used in zk_ee CI
 #zksync_os_forward_system = {package = "forward_system", path = "../../zksync-os/forward_system" }
@@ -78,7 +81,7 @@ zksync_os_crypto = {package = "crypto", git="https://github.com/matter-labs/zksy
 #zksync_os_oracle_provider = {package = "oracle_provider", path = "../../zksync-os/oracle_provider"}
 #zksync_os_runner = {package = "zksync_os_runner", path = "../../zksync-os/zksync_os_runner" }
 #zksync_os_crypto = { package = "crypto", path="../../zksync-os/crypto" }
-
+#zksync_os_rig = { package = "rig", path="../../zksync-os/tests/rig" }
 
 risc_v_simulator = { git = "https://github.com/matter-labs/zksync-airbender", features=["delegation", "opcode_stats"]}
 
