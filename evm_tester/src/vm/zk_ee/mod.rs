@@ -190,6 +190,7 @@ impl ZKsyncOS {
             coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_bytes())
                 .expect("Invalid coinbase"),
             block_hashes: BlockHashes::default(),
+            mix_hash: ruint::aliases::U256::from(1),
         };
 
         let storage_commitment = StorageCommitment {
