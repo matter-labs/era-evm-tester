@@ -427,30 +427,25 @@ impl ZKsyncOS {
         &mut self,
         address: Address,
         bytecode: &[u8],
-    ) -> AccountProperties {
-        use zksync_os_basic_system::system_implementation::flat_storage_model::DEFAULT_CODE_VERSION_BYTE;
-        use zksync_os_crypto::blake2s::Blake2s256;
-        use zksync_os_crypto::sha3::Keccak256;
-        use zksync_os_crypto::MiniDigest;
-
-        let observable_bytecode_hash = Bytes32::from_array(Keccak256::digest(bytecode));
-        let bytecode_hash = Bytes32::from_array(Blake2s256::digest(bytecode));
+    ) -> (AccountProperties, Vec<u8>) {
         let mut result = self.get_account_properties(address);
+        let (new, full_bytecode) =
+            zksync_os_rig::utils::evm_bytecode_into_account_properties(bytecode);
 
-        result.observable_bytecode_hash = observable_bytecode_hash;
-        result.bytecode_hash = bytecode_hash;
+        result.observable_bytecode_hash = new.observable_bytecode_hash;
+        result.bytecode_hash = new.bytecode_hash;
+        result.artifacts_len = new.artifacts_len;
+        result.unpadded_code_len = new.unpadded_code_len;
+        result.observable_bytecode_len = new.observable_bytecode_len;
         result.versioning_data.set_as_deployed();
         result
             .versioning_data
             .set_ee_version(ExecutionEnvironmentType::EVM as u8);
         result
             .versioning_data
-            .set_code_version(DEFAULT_CODE_VERSION_BYTE);
-        result.bytecode_len = bytecode.len() as u32;
-        result.artifacts_len = 0;
-        result.observable_bytecode_len = bytecode.len() as u32;
+            .set_code_version(zksync_os_evm_interpreter::ARTIFACTS_CACHING_CODE_VERSION_BYTE);
 
-        result
+        (result, full_bytecode)
     }
 
     pub fn set_predeployed_evm_contract(
@@ -459,7 +454,8 @@ impl ZKsyncOS {
         bytecode: Vec<u8>,
         nonce: U256,
     ) {
-        let mut account_data = self.evm_bytecode_into_account_properties(address, &bytecode);
+        let (mut account_data, bytecode) =
+            self.evm_bytecode_into_account_properties(address, &bytecode);
         account_data.nonce = nonce.try_into().expect("nonce overflow");
         let address = address_to_b160(address);
 
@@ -490,11 +486,14 @@ impl ZKsyncOS {
         if bytecode_hash == Bytes32::zero() {
             None
         } else {
-            let preimage = self.preimage_source.get_preimage(bytecode_hash);
+            let mut preimage = self.preimage_source.get_preimage(bytecode_hash);
             assert!(
                 preimage.is_some(),
                 "Unknown bytecode hash: {bytecode_hash:?}"
             );
+            preimage
+                .iter_mut()
+                .for_each(|v| v.truncate(properties.unpadded_code_len as usize));
             preimage
         }
     }
