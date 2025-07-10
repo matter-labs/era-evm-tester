@@ -12,6 +12,7 @@ use colored::Colorize;
 use self::element::outcome::passed_variant::PassedVariant;
 use self::element::outcome::Outcome;
 use self::element::Element;
+use alloy::primitives::*;
 
 ///
 /// The evm tester summary.
@@ -120,7 +121,7 @@ impl Summary {
         group: Option<String>,
         cycles: usize,
         ergs: u64,
-        gas: web3::types::U256,
+        gas: U256,
     ) {
         let passed_variant = PassedVariant::Runtime { cycles, ergs, gas };
         Self::passed(summary, name, group, passed_variant);

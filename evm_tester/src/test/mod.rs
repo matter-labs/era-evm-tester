@@ -12,7 +12,6 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use era_compiler_common::EVMVersion;
 use filler_structure::FillerStructure;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -20,10 +19,9 @@ use test_structure::TestStructure;
 
 use crate::summary::Summary;
 use crate::test::case::Case;
-use crate::vm::eravm::deployers::EraVMDeployer;
-use crate::vm::eravm::EraVM;
 use crate::Filters;
 use crate::ZKsyncOS;
+use alloy::primitives::*;
 
 lazy_static! {
     static ref MUTATION_TESTS_RE: Regex = Regex::new(r"^(.+)_m_[0-9a-fA-F]+\.json").unwrap();
@@ -56,8 +54,8 @@ pub struct Test {
     /// The test group.
     group: Option<String>,
     /// The EVM version.
-    evm_version: Option<EVMVersion>,
-    skipped_calldatas: Option<Vec<web3::types::Bytes>>,
+    // evm_version: Option<EVMVersion>,
+    skipped_calldatas: Option<Vec<Bytes>>,
     skipped_cases: Option<Vec<String>>,
     pub path: PathBuf,
     pub mutants: Vec<Test>,
@@ -71,8 +69,8 @@ impl Test {
         name: String,
         cases: Vec<Case>,
         group: Option<String>,
-        evm_version: Option<EVMVersion>,
-        skipped_calldatas: Option<Vec<web3::types::Bytes>>,
+        // evm_version: Option<EVMVersion>,
+        skipped_calldatas: Option<Vec<Bytes>>,
         skipped_cases: Option<Vec<String>>,
         path: PathBuf,
         mutants: Vec<Test>,
@@ -81,7 +79,7 @@ impl Test {
             name,
             cases,
             group,
-            evm_version,
+            // evm_version,
             skipped_calldatas,
             skipped_cases,
             path,
@@ -94,7 +92,7 @@ impl Test {
         str: &str,
         filler_str: &str,
         is_json: bool,
-        skipped_calldatas: Option<Vec<web3::types::Bytes>>,
+        skipped_calldatas: Option<Vec<Bytes>>,
         skipped_cases: Option<Vec<String>>,
         filters: &Filters,
         path: PathBuf,
@@ -201,7 +199,7 @@ impl Test {
             name,
             cases,
             group: None,
-            evm_version: None,
+            // evm_version: None,
             skipped_calldatas,
             skipped_cases,
             path,
@@ -211,7 +209,7 @@ impl Test {
 
     pub fn from_ethereum_spec_test(
         str: &str,
-        skipped_calldatas: Option<Vec<web3::types::Bytes>>,
+        skipped_calldatas: Option<Vec<Bytes>>,
         skipped_cases: Option<Vec<String>>,
         skipped_names: Option<Vec<String>>,
         filters: &Filters,
@@ -257,7 +255,7 @@ impl Test {
                 name,
                 cases,
                 group: None,
-                evm_version: None,
+                // evm_version: None,
                 skipped_calldatas: skipped_calldatas.clone(), // TODO not convenient
                 skipped_cases: skipped_cases.clone(),         // TODO not convenient
                 path: path.clone(),
@@ -266,38 +264,6 @@ impl Test {
         }
 
         tests
-    }
-
-    ///
-    /// Runs the test on EVM interpreter.
-    ///
-    pub fn run_evm_interpreter<D, const M: bool>(self, summary: Arc<Mutex<Summary>>, vm: Arc<EraVM>)
-    where
-        D: EraVMDeployer,
-    {
-        for case in self.cases {
-            if let Some(filter_calldata) = self.skipped_calldatas.as_ref() {
-                if filter_calldata.contains(&case.transaction.data) {
-                    Summary::ignored(summary.clone(), case.label);
-                    continue;
-                }
-            }
-
-            if let Some(filter_cases) = self.skipped_cases.as_ref() {
-                if filter_cases.contains(&case.label) {
-                    Summary::ignored(summary.clone(), case.label);
-                    continue;
-                }
-            }
-
-            let vm = EraVM::clone_with_contracts(vm.clone(), Default::default(), self.evm_version);
-            case.run_evm_interpreter::<D, M>(
-                summary.clone(),
-                vm,
-                self.name.clone(),
-                self.group.clone(),
-            );
-        }
     }
 
     ///

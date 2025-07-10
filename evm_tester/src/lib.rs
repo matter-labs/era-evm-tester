@@ -34,10 +34,6 @@ pub use crate::filters::Filters;
 pub use crate::summary::Summary;
 pub use crate::test_suits::ethereum_general_state::EthereumGeneralStateTestsDirectory;
 pub use crate::test_suits::Collection;
-pub use crate::vm::eravm::deployers::dummy_deployer::DummyDeployer as EraVMNativeDeployer;
-pub use crate::vm::eravm::deployers::system_contract_deployer::SystemContractDeployer as EraVMSystemContractDeployer;
-pub use crate::vm::eravm::deployers::EraVMDeployer;
-pub use crate::vm::eravm::EraVM;
 pub use crate::vm::zk_ee::ZKsyncOS;
 pub use crate::workflow::Workflow;
 
@@ -82,26 +78,6 @@ impl EvmTester {
             mutation_path,
             run_spec_tests,
         })
-    }
-
-    ///
-    /// Runs all tests on EVM interpreter.
-    ///
-    pub fn run_evm_interpreter<D, const M: bool>(self, vm: EraVM) -> anyhow::Result<()>
-    where
-        D: EraVMDeployer,
-    {
-        let tests = self.all_tests(Environment::EVMEmulator)?;
-        let vm = Arc::new(vm);
-
-        let _: Vec<()> = tests
-            .into_par_iter()
-            .map(|test| {
-                test.run_evm_interpreter::<D, M>(self.summary.clone(), vm.clone());
-            })
-            .collect();
-
-        Ok(())
     }
 
     ///

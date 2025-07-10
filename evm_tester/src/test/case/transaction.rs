@@ -1,8 +1,8 @@
+use alloy::primitives::*;
 use serde::{Deserialize, Deserializer};
-use zksync_types::H160;
 
 #[derive(Debug, Clone, Copy)]
-pub struct FieldTo(pub Option<web3::types::Address>);
+pub struct FieldTo(pub Option<Address>);
 
 impl<'de> Deserialize<'de> for FieldTo {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -19,7 +19,7 @@ impl<'de> Deserialize<'de> for FieldTo {
                 let res = if value.is_empty() {
                     None
                 } else {
-                    Some(value.parse::<web3::types::Address>().unwrap())
+                    Some(value.parse::<Address>().unwrap())
                 };
 
                 Ok(FieldTo(res))
@@ -32,22 +32,22 @@ impl<'de> Deserialize<'de> for FieldTo {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct AccessListItem {
-    pub address: H160,
-    pub storage_keys: Vec<web3::types::U256>,
+    pub address: Address,
+    pub storage_keys: Vec<U256>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction {
-    pub data: web3::types::Bytes,
-    pub gas_limit: web3::types::U256,
-    pub gas_price: Option<web3::types::U256>,
-    pub max_fee_per_gas: Option<web3::types::U256>,
-    pub max_priority_fee_per_gas: Option<web3::types::U256>,
-    pub nonce: web3::types::U256,
-    pub secret_key: web3::types::H256,
+    pub data: Bytes,
+    pub gas_limit: U256,
+    pub gas_price: Option<U256>,
+    pub max_fee_per_gas: Option<U256>,
+    pub max_priority_fee_per_gas: Option<U256>,
+    pub nonce: U256,
+    pub secret_key: B256,
     pub to: FieldTo,
-    pub sender: Option<web3::types::Address>,
-    pub value: web3::types::U256,
+    pub sender: Option<Address>,
+    pub value: U256,
     pub access_list: Option<Vec<AccessListItem>>,
 }

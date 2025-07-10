@@ -18,10 +18,10 @@ const RAYON_WORKER_STACK_SIZE: usize = 16 * 1024 * 1024;
 ///
 fn main() {
     let exit_code = match main_inner(Arguments::new()) {
-        Ok(()) => era_compiler_common::EXIT_CODE_SUCCESS,
+        Ok(()) => 0,
         Err(error) => {
             eprintln!("{error:?}");
-            era_compiler_common::EXIT_CODE_FAILURE
+            1
         }
     };
     std::process::exit(exit_code);
@@ -72,9 +72,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     match environment {
         evm_tester::Environment::EVMEmulator => {
-            let vm = evm_tester::EraVM::new(era_compiler_common::Target::EVM)?;
-
-            evm_tester.run_evm_interpreter::<evm_tester::EraVMSystemContractDeployer, true>(vm)
+            panic!("no longer supported");
         }
 
         evm_tester::Environment::ZKsyncOS => {

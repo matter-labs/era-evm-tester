@@ -1,7 +1,3 @@
-[submodule "era-contracts"]
-	path = era-contracts
-	url = https://github.com/matter-labs/era-contracts
-	branch = evm-emulator/fixes-testing
 [submodule "ethereum-tests"]
 	path = ethereum-tests
 	url = https://github.com/ethereum/tests

@@ -2,6 +2,7 @@
 //! The enabled test entity description.
 //!
 
+use alloy::primitives::*;
 use std::path::PathBuf;
 
 ///
@@ -13,7 +14,7 @@ pub struct EnabledTest {
     pub path: PathBuf,
     /// The test group.
     pub group: Option<String>,
-    pub skip_calldatas: Option<Vec<web3::types::Bytes>>,
+    pub skip_calldatas: Option<Vec<Bytes>>,
     pub skip_cases: Option<Vec<String>>,
     pub skip_names: Option<Vec<String>>,
 }
@@ -25,7 +26,7 @@ impl EnabledTest {
     pub fn new(
         path: PathBuf,
         group: Option<String>,
-        skip_calldatas: Option<Vec<web3::types::Bytes>>,
+        skip_calldatas: Option<Vec<Bytes>>,
         skip_cases: Option<Vec<String>>,
         skip_names: Option<Vec<String>>,
     ) -> Self {

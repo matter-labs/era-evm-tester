@@ -21,6 +21,7 @@ use self::changes::Changes;
 use self::directory::Directory;
 use self::enabled::EnabledTest;
 use self::test_file::TestFile;
+use alloy::primitives::*;
 
 ///
 /// The Solidity tests file system entity.
@@ -105,7 +106,7 @@ impl FSEntity {
     /// Returns the enabled test by the path with the `initial` directory prefix (None if not found or test disabled).
     ///
     pub fn into_enabled_test(self, initial: &Path, path: &Path) -> Option<EnabledTest> {
-        let mut skipped_calldatas: Vec<web3::types::Bytes> = vec![];
+        let mut skipped_calldatas: Vec<Bytes> = vec![];
         let mut skipped_cases: Vec<String> = vec![];
         let mut skipped_names: Vec<String> = vec![];
 
@@ -270,7 +271,7 @@ impl FSEntity {
         self,
         current: &Path,
         accumulator: &mut Vec<EnabledTest>,
-        skipped_calldatas: &Vec<web3::types::Bytes>,
+        skipped_calldatas: &Vec<Bytes>,
         skipped_cases: &Vec<String>,
         skipped_names: &Vec<String>,
     ) {

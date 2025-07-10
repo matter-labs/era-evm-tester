@@ -2,6 +2,8 @@
 //! The evm tester summary element passed outcome variant.
 //!
 
+use alloy::primitives::*;
+
 ///
 /// The evm tester summary element passed outcome variant.
 ///
@@ -25,7 +27,7 @@ pub enum PassedVariant {
         /// The number of used ergs.
         ergs: u64,
         /// The number of used gas.
-        gas: web3::types::U256,
+        gas: U256,
     },
     /// The special function call.
     Special,

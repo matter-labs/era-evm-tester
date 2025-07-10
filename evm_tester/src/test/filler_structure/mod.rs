@@ -1,10 +1,10 @@
+use alloy::primitives::*;
 use serde::{Deserialize, Deserializer};
 use std::{collections::HashMap, str::FromStr};
-use web3::types::Address;
 
 #[derive(Debug, Clone, Hash, PartialEq)]
 pub enum U256Parsed {
-    Value(web3::types::U256),
+    Value(U256),
     Any,
 }
 
@@ -18,7 +18,7 @@ impl U256Parsed {
         Self::from_str(&value.as_string())
     }
 
-    pub fn as_value(&self) -> Option<web3::types::U256> {
+    pub fn as_value(&self) -> Option<U256> {
         match self {
             U256Parsed::Value(u256) => Some(*u256),
             U256Parsed::Any => None,
@@ -35,16 +35,21 @@ impl FromStr for U256Parsed {
             return Ok(U256Parsed::Any);
         }
 
-        if value.strip_prefix("0x").is_some() {
-            Ok(U256Parsed::Value(
-                web3::types::U256::from_str_radix(value, 16).unwrap(),
-            ))
+        if let Some(value) = value.strip_prefix("0x") {
+            if let Ok(value) = U256::from_str_radix(value, 16) {
+                Ok(U256Parsed::Value(value))
+            } else {
+                Err(ParseU256Error(format!(
+                    "Failed to parse {} as radix-16",
+                    value
+                )))
+            }
         } else {
-            let res_10 = web3::types::U256::from_str_radix(value, 10);
+            let res_10 = U256::from_str_radix(value, 10);
             if res_10.is_ok() {
                 Ok(U256Parsed::Value(res_10.unwrap()))
             } else {
-                let res_16 = web3::types::U256::from_str_radix(value, 16);
+                let res_16 = U256::from_str_radix(value, 16);
                 if res_16.is_ok() {
                     Ok(U256Parsed::Value(res_16.unwrap()))
                 } else {
@@ -108,7 +113,7 @@ impl<'de> Deserialize<'de> for U256Parsed {
 }
 
 #[derive(Debug, Clone)]
-pub struct AccountCode(pub web3::types::Bytes);
+pub struct AccountCode(pub Bytes);
 
 impl<'de> Deserialize<'de> for AccountCode {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -123,11 +128,11 @@ impl<'de> Deserialize<'de> for AccountCode {
             }
             fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
                 let res = if value.is_empty() {
-                    web3::types::Bytes::default()
+                    Bytes::default()
                 } else {
                     let stripped = value.strip_prefix("0x").unwrap_or(value);
 
-                    web3::types::Bytes(hex::decode(stripped).unwrap())
+                    Bytes::from(hex::decode(stripped).unwrap())
                 };
 
                 Ok(AccountCode(res))
@@ -207,7 +212,7 @@ pub struct ExpectedIndexesStructure {
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq, Hash)]
 #[serde(untagged)]
 pub enum AddressMaybe {
-    Val(web3::types::Address),
+    Val(Address),
     Comment(String),
 }
 
@@ -230,14 +235,14 @@ pub struct ExpectStructure {
 impl ExpectStructure {
     pub fn get_expected_result(
         map: &HashMap<AddressMaybe, AccountFillerStructMaybe>,
-    ) -> HashMap<web3::types::Address, AccountFillerStruct> {
+    ) -> HashMap<Address, AccountFillerStruct> {
         let mut storage = HashMap::new();
 
         for (key, value) in map {
             if let AddressMaybe::Val(addr) = key {
                 match value {
                     AccountFillerStructMaybe::Val(account_struct) => {
-                        let mut account_struct = account_struct.clone();
+                        let account_struct = account_struct.clone();
 
                         storage.insert(*addr, account_struct);
                     }

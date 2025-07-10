@@ -3,6 +3,7 @@
 //!
 
 use super::output::ExecutionOutput;
+use alloy::primitives::*;
 
 ///
 /// The VM execution result.
@@ -16,33 +17,19 @@ pub struct ExecutionResult {
     /// The number of EraVM ergs used.
     pub ergs: u64,
     /// The number of gas used.
-    pub gas: web3::types::U256,
+    pub gas: U256,
 }
 
 impl ExecutionResult {
     ///
     /// A shortcut constructor.
     ///
-    pub fn new(output: ExecutionOutput, cycles: usize, ergs: u64, gas: web3::types::U256) -> Self {
+    pub fn new(output: ExecutionOutput, cycles: usize, ergs: u64, gas: U256) -> Self {
         Self {
             output,
             cycles,
             ergs,
             gas,
-        }
-    }
-}
-
-impl From<zkevm_tester::compiler_tests::VmSnapshot> for ExecutionResult {
-    fn from(snapshot: zkevm_tester::compiler_tests::VmSnapshot) -> Self {
-        let cycles = snapshot.num_cycles_used;
-        let ergs = snapshot.num_ergs_used as u64;
-
-        Self {
-            output: ExecutionOutput::from(snapshot),
-            cycles,
-            ergs,
-            gas: web3::types::U256::zero(),
         }
     }
 }

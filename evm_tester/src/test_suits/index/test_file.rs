@@ -10,6 +10,8 @@ use std::path::Path;
 use serde::Deserialize;
 use serde::Serialize;
 
+use alloy::primitives::*;
+
 ///
 /// The Solidity test file.
 ///
@@ -31,7 +33,7 @@ pub struct TestFile {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skip_calldatas: Option<Vec<web3::types::Bytes>>,
+    pub skip_calldatas: Option<Vec<Bytes>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skip_cases: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
