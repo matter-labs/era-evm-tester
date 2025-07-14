@@ -13,7 +13,6 @@ use transaction::{gen_l2_tx, TransactionData};
 use web3::ethabi::Address;
 use zk_ee::common_structs::derive_flat_storage_key;
 use zk_ee::execution_environment_type::ExecutionEnvironmentType;
-use zk_ee::system::errors::InternalError;
 use zk_ee::system::metadata::BlockHashes;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
@@ -22,6 +21,7 @@ use zksync_os_basic_system::system_implementation::flat_storage_model::address_i
 use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
 use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTree;
 use zksync_os_basic_system::system_implementation::flat_storage_model::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
+use zksync_os_forward_system::run::errors::ForwardSubsystemError;
 use zksync_os_forward_system::run::test_impl::{
     InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
 };
@@ -244,7 +244,7 @@ impl ZKsyncOS {
 
     fn apply_batch_execution_result(
         &mut self,
-        batch_execution_result: Result<BatchOutput, InternalError>,
+        batch_execution_result: Result<BatchOutput, ForwardSubsystemError>,
     ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
         match batch_execution_result {
             Ok(result) => {
