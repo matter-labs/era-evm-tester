@@ -29,6 +29,7 @@ use zksync_os_forward_system::run::{
     run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, StorageCommitment,
     TxOutput,
 };
+use zksync_os_rig::zksync_os_api::helpers;
 use zksync_types::fee::Fee;
 use zksync_types::{K256PrivateKey, H256, U256};
 
@@ -359,9 +360,7 @@ impl ZKsyncOS {
     pub fn get_balance(&mut self, address: web3::types::Address) -> web3::types::U256 {
         let properties = self.get_account_properties(address);
         U256::from_big_endian(
-            &properties
-                .balance
-                .to_be_bytes::<{ ruint::aliases::U256::BYTES }>(),
+            &helpers::get_balance(&properties).to_be_bytes::<{ ruint::aliases::U256::BYTES }>(),
         )
     }
 
@@ -370,7 +369,10 @@ impl ZKsyncOS {
     ///
     pub fn set_balance(&mut self, address: web3::types::Address, value: web3::types::U256) {
         let mut properties = self.get_account_properties(address);
-        properties.balance = ruint::aliases::U256::from_be_bytes(value.into());
+        helpers::set_properties_balance(
+            &mut properties,
+            ruint::aliases::U256::from_be_bytes(value.into()),
+        );
         self.set_account_properties(address, properties)
     }
 
@@ -379,7 +381,7 @@ impl ZKsyncOS {
     ///
     pub fn get_nonce(&mut self, address: web3::types::Address) -> web3::types::U256 {
         let properties = self.get_account_properties(address);
-        properties.nonce.into()
+        helpers::get_nonce(&properties).into()
     }
 
     ///
@@ -387,7 +389,7 @@ impl ZKsyncOS {
     ///
     pub fn set_nonce(&mut self, address: web3::types::Address, value: web3::types::U256) {
         let mut properties = self.get_account_properties(address);
-        properties.nonce = value.try_into().expect("nonce overflow");
+        helpers::set_properties_nonce(&mut properties, value.try_into().expect("nonce overflow"));
         self.set_account_properties(address, properties)
     }
 
@@ -429,21 +431,7 @@ impl ZKsyncOS {
         bytecode: &[u8],
     ) -> (AccountProperties, Vec<u8>) {
         let mut result = self.get_account_properties(address);
-        let (new, full_bytecode) =
-            zksync_os_rig::utils::evm_bytecode_into_account_properties(bytecode);
-
-        result.observable_bytecode_hash = new.observable_bytecode_hash;
-        result.bytecode_hash = new.bytecode_hash;
-        result.artifacts_len = new.artifacts_len;
-        result.unpadded_code_len = new.unpadded_code_len;
-        result.observable_bytecode_len = new.observable_bytecode_len;
-        result.versioning_data.set_as_deployed();
-        result
-            .versioning_data
-            .set_ee_version(ExecutionEnvironmentType::EVM as u8);
-        result
-            .versioning_data
-            .set_code_version(zksync_os_evm_interpreter::ARTIFACTS_CACHING_CODE_VERSION_BYTE);
+        let full_bytecode = helpers::set_properties_code(&mut result, bytecode);
 
         (result, full_bytecode)
     }
@@ -486,15 +474,7 @@ impl ZKsyncOS {
         if bytecode_hash == Bytes32::zero() {
             None
         } else {
-            let mut preimage = self.preimage_source.get_preimage(bytecode_hash);
-            assert!(
-                preimage.is_some(),
-                "Unknown bytecode hash: {bytecode_hash:?}"
-            );
-            preimage
-                .iter_mut()
-                .for_each(|v| v.truncate(properties.unpadded_code_len as usize));
-            preimage
+            Some(helpers::get_code(&mut self.preimage_source, &properties))
         }
     }
 }
