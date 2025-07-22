@@ -614,6 +614,7 @@ entries:
                 enabled: true
       eip7702_set_code_tx:
         enabled: true
+        hardforkOverride: "Prague"
         entries:
           gas:
             enabled: true
@@ -647,7 +648,8 @@ entries:
                 enabled: true
               contract_create.json:
                 hash: '0xc60f5f9fd386b9d978b02a41f10ff0df'
-                enabled: true
+                enabled: false
+                comment: "Framework doesn't let us create a 7702 tx with null to"
               creating_delegation_designation_contract.json:
                 hash: '0x7cea8d7a45cfed3b98a3854d955904c9'
                 enabled: true
