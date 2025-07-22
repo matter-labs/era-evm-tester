@@ -84,6 +84,7 @@ impl Collection for EthereumExecutionSpecsGeneralStateTestsDirectory {
                     relative_path,
                     mutation_path.clone(),
                     None,
+                    test.hardfork_override,
                 ))
             })
             .flatten()

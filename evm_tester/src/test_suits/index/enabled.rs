@@ -17,6 +17,7 @@ pub struct EnabledTest {
     pub skip_calldatas: Option<Vec<Bytes>>,
     pub skip_cases: Option<Vec<String>>,
     pub skip_names: Option<Vec<String>>,
+    pub hardfork_override: Option<String>,
 }
 
 impl EnabledTest {
@@ -29,6 +30,7 @@ impl EnabledTest {
         skip_calldatas: Option<Vec<Bytes>>,
         skip_cases: Option<Vec<String>>,
         skip_names: Option<Vec<String>>,
+        hardfork_override: Option<String>,
     ) -> Self {
         Self {
             path,
@@ -36,6 +38,7 @@ impl EnabledTest {
             skip_calldatas,
             skip_cases,
             skip_names,
+            hardfork_override,
         }
     }
 }

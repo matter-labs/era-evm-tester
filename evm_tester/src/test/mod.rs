@@ -217,12 +217,15 @@ impl Test {
         _relative_path: PathBuf,
         _mutation_path: Option<String>,
         name_override: Option<String>,
+        hardfork_override: Option<String>,
     ) -> Vec<Self> {
         let cleaned_str = str.replace("0x:bigint ", "");
         let test_structure: HashMap<String, TestStructure> =
             serde_json::from_str(&cleaned_str).unwrap();
 
         let mut tests = vec![];
+
+        let hardfork = hardfork_override.unwrap_or("Cancun".to_string());
 
         for (test_name, test_definition) in test_structure {
             if !filters.check_test_name(&test_name) {
@@ -235,7 +238,7 @@ impl Test {
                 }
             }
 
-            let cases = Case::from_ethereum_spec_test(&test_definition, filters, "Cancun");
+            let cases = Case::from_ethereum_spec_test(&test_definition, filters, &hardfork);
 
             // read mutants
             // filter all files in directory by regexp and run

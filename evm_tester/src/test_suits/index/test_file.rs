@@ -38,6 +38,8 @@ pub struct TestFile {
     pub skip_cases: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skip_names: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hardfork_override: Option<String>,
 }
 
 impl TryFrom<&Path> for TestFile {
@@ -62,6 +64,7 @@ impl TryFrom<&Path> for TestFile {
             skip_calldatas: None,
             skip_cases: None,
             skip_names: None,
+            hardfork_override: None,
         })
     }
 }
