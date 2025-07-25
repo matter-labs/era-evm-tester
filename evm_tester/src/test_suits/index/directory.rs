@@ -2,10 +2,10 @@
 //! The Solidity tests directory file system entity.
 //!
 
-use std::collections::BTreeMap;
-
+use alloy::primitives::*;
 use serde::Deserialize;
 use serde::Serialize;
+use std::collections::BTreeMap;
 
 use super::FSEntity;
 
@@ -23,7 +23,7 @@ pub struct Directory {
     /// The directory entries. Is `None` for files.
     pub entries: BTreeMap<String, FSEntity>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skip_calldatas: Option<Vec<web3::types::Bytes>>,
+    pub skip_calldatas: Option<Vec<Bytes>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skip_cases: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]

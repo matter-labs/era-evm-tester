@@ -1,13 +1,13 @@
-use std::collections::HashMap;
-
+use alloy::primitives::*;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct AccountState {
-    pub balance: web3::types::U256,
-    pub code: web3::types::Bytes,
-    pub nonce: web3::types::U256,
-    pub storage: HashMap<web3::types::U256, web3::types::U256>,
+    pub balance: U256,
+    pub code: Bytes,
+    pub nonce: U256,
+    pub storage: HashMap<U256, U256>,
 }
 
-pub type PreState = HashMap<web3::types::Address, AccountState>;
+pub type PreState = HashMap<Address, AccountState>;

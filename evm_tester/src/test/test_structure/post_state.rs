@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-
+use alloy::primitives::*;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 use crate::test::filler_structure::{AccountFillerStructMaybe, AddressMaybe};
 
@@ -15,9 +15,9 @@ pub struct PostStateIndexes {
 #[serde(rename_all = "camelCase")]
 pub struct PostState {
     pub indexes: PostStateIndexes,
-    pub hash: web3::types::H256,
-    pub logs: web3::types::H256,
-    pub txbytes: web3::types::Bytes,
+    pub hash: B256,
+    pub logs: B256,
+    pub txbytes: Bytes,
     pub expect_exception: Option<String>,
     pub state: Option<HashMap<AddressMaybe, AccountFillerStructMaybe>>,
 }

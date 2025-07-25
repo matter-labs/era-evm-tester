@@ -1,4 +1,4 @@
-use super::value::Value;
+use alloy::primitives::*;
 
 ///
 /// The compiler test outcome event.
@@ -6,61 +6,20 @@ use super::value::Value;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct Event {
     /// The event address.
-    address: Option<web3::types::Address>,
+    address: Option<Address>,
     /// The event topics.
-    topics: Vec<Value>,
+    topics: Vec<U256>,
     /// The event values.
-    values: Vec<Value>,
+    values: Vec<U256>,
 }
 
 impl Event {
     ///
     /// A shortcut constructor.
     ///
-    pub fn new(
-        address: Option<web3::types::Address>,
-        topics: Vec<Value>,
-        values: Vec<Value>,
-    ) -> Self {
+    pub fn new(address: Option<Address>, topics: Vec<U256>, values: Vec<U256>) -> Self {
         Self {
             address,
-            topics,
-            values,
-        }
-    }
-}
-
-impl From<zkevm_tester::events::SolidityLikeEvent> for Event {
-    fn from(event: zkevm_tester::events::SolidityLikeEvent) -> Self {
-        let mut topics: Vec<Value> = event
-            .topics
-            .into_iter()
-            .map(|topic| web3::types::U256::from_big_endian(topic.as_slice()))
-            .collect();
-
-        // Event are written by the system contract, and the first topic is the `msg.sender`
-        let address = crate::utils::u256_to_address(&topics.remove(0));
-
-        let values: Vec<Value> = event
-            .data
-            .chunks(era_compiler_common::BYTE_LENGTH_FIELD)
-            .map(|word| {
-                let value = if word.len() != era_compiler_common::BYTE_LENGTH_FIELD {
-                    let mut word_padded = word.to_vec();
-                    word_padded.extend(vec![
-                        0u8;
-                        era_compiler_common::BYTE_LENGTH_FIELD - word.len()
-                    ]);
-                    web3::types::U256::from_big_endian(word_padded.as_slice())
-                } else {
-                    web3::types::U256::from_big_endian(word)
-                };
-                value
-            })
-            .collect();
-
-        Self {
-            address: Some(address),
             topics,
             values,
         }

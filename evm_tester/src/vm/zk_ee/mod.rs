@@ -4,13 +4,9 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
 
-use anyhow::Context;
-use evm::utils::u256_to_h256;
+use crate::utils::*;
+use alloy::primitives::*;
 use itertools::Itertools;
-use revm::primitives::ruint;
-use revm::primitives::ruint::aliases::B160;
-use transaction::{gen_l2_tx, TransactionData};
-use web3::ethabi::Address;
 use zk_ee::common_structs::derive_flat_storage_key;
 use zk_ee::execution_environment_type::ExecutionEnvironmentType;
 use zk_ee::system::metadata::BlockHashes;
@@ -30,25 +26,23 @@ use zksync_os_forward_system::run::{
     TxOutput,
 };
 use zksync_os_rig::zksync_os_api::helpers;
-use zksync_types::fee::Fee;
-use zksync_types::{K256PrivateKey, H256, U256};
 
 use crate::test::case::transaction::AccessListItem;
 use crate::test::case::transaction::Transaction;
 
-mod transaction;
+// mod transaction;
 
 #[derive(Clone, Default)]
 pub struct ZKsyncOSEVMContext {
     pub chain_id: u64,
-    pub coinbase: web3::types::Address,
+    pub coinbase: Address,
     pub block_number: u128,
     pub block_timestamp: u128,
-    pub block_gas_limit: web3::types::U256,
-    pub block_difficulty: web3::types::H256,
-    pub base_fee: web3::types::U256,
-    pub gas_price: web3::types::U256,
-    pub tx_origin: web3::types::Address,
+    pub block_gas_limit: U256,
+    pub block_difficulty: B256,
+    pub base_fee: U256,
+    pub gas_price: U256,
+    pub tx_origin: Address,
 }
 
 ///
@@ -60,7 +54,7 @@ pub struct ZKsyncOSExecutionResult {
     pub return_data: Vec<u8>,
     pub exception: bool,
     /// The number of gas used.
-    pub gas: web3::types::U256,
+    pub gas: U256,
     pub address_deployed: Option<Address>,
 }
 
@@ -146,8 +140,7 @@ impl ZKsyncOS {
                             let storage_keys = storage_keys
                                 .into_iter()
                                 .map(|k| {
-                                    let mut buffer = [0u8; 32];
-                                    k.to_big_endian(&mut buffer);
+                                    let buffer: [u8; 32] = k.to_be_bytes();
                                     alloy::primitives::FixedBytes::from_slice(&buffer)
                                 })
                                 .collect_vec();
@@ -162,7 +155,7 @@ impl ZKsyncOS {
             input: transaction.data.0.clone().into(),
         };
         let wallet = zksync_os_rig::alloy::signers::local::PrivateKeySigner::from_slice(
-            transaction.secret_key.as_bytes(),
+            transaction.secret_key.as_slice(),
         )
         .unwrap();
         let encoded_tx = zksync_os_rig::utils::sign_and_encode_alloy_tx(alloy_tx, &wallet);
@@ -188,7 +181,7 @@ impl ZKsyncOS {
             timestamp: system_context.block_timestamp as u64,
             chain_id: system_context.chain_id,
             gas_limit,
-            coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_bytes())
+            coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_slice())
                 .expect("Invalid coinbase"),
             block_hashes: BlockHashes::default(),
             mix_hash: ruint::aliases::U256::from(1),
@@ -281,7 +274,7 @@ impl ZKsyncOS {
             Ok(tx_output) => {
                 let mut execution_result = ZKsyncOSExecutionResult::default();
 
-                execution_result.gas = tx_output.gas_used.into();
+                execution_result.gas = U256::from(tx_output.gas_used);
                 // TODO events
 
                 match &tx_output.execution_result {
@@ -311,9 +304,9 @@ impl ZKsyncOS {
         }
     }
 
-    fn get_account_properties(&mut self, address: web3::types::Address) -> AccountProperties {
-        let address = address_to_b160(address);
-        let key = address_into_special_storage_key(&address);
+    fn get_account_properties(&mut self, address: Address) -> AccountProperties {
+        let key =
+            address_into_special_storage_key(&ruint::aliases::B160::from_be_bytes(address.0 .0));
         let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
         match self.tree.cold_storage.get(&flat_key) {
             None => AccountProperties::default(),
@@ -333,13 +326,10 @@ impl ZKsyncOS {
         }
     }
 
-    fn set_account_properties(
-        &mut self,
-        address: web3::types::Address,
-        properties: AccountProperties,
-    ) {
+    fn set_account_properties(&mut self, address: Address, properties: AccountProperties) {
         let encoding = properties.encoding();
         let properties_hash = properties.compute_hash();
+        let address = address_to_b160(address);
 
         // Save preimage
         self.preimage_source
@@ -347,7 +337,6 @@ impl ZKsyncOS {
             .insert(properties_hash, encoding.to_vec());
 
         // Save account hash
-        let address = address_to_b160(address);
         let key = address_into_special_storage_key(&address);
         let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
         self.tree.cold_storage.insert(flat_key, properties_hash);
@@ -357,70 +346,56 @@ impl ZKsyncOS {
     ///
     /// Returns the balance of the specified address.
     ///
-    pub fn get_balance(&mut self, address: web3::types::Address) -> web3::types::U256 {
+    pub fn get_balance(&mut self, address: Address) -> U256 {
         let properties = self.get_account_properties(address);
-        U256::from_big_endian(
-            &helpers::get_balance(&properties).to_be_bytes::<{ ruint::aliases::U256::BYTES }>(),
-        )
+        helpers::get_balance(&properties)
     }
 
     ///
     /// Changes the balance of the specified address.
     ///
-    pub fn set_balance(&mut self, address: web3::types::Address, value: web3::types::U256) {
+    pub fn set_balance(&mut self, address: Address, value: U256) {
         let mut properties = self.get_account_properties(address);
-        helpers::set_properties_balance(
-            &mut properties,
-            ruint::aliases::U256::from_be_bytes(value.into()),
-        );
+        helpers::set_properties_balance(&mut properties, value);
         self.set_account_properties(address, properties)
     }
 
     ///
     /// Returns the nonce of the specified address.
     ///
-    pub fn get_nonce(&mut self, address: web3::types::Address) -> web3::types::U256 {
+    pub fn get_nonce(&mut self, address: Address) -> U256 {
         let properties = self.get_account_properties(address);
-        helpers::get_nonce(&properties).into()
+        U256::from(helpers::get_nonce(&properties))
     }
 
     ///
     /// Changes the nonce of the specified address.
     ///
-    pub fn set_nonce(&mut self, address: web3::types::Address, value: web3::types::U256) {
+    pub fn set_nonce(&mut self, address: Address, value: U256) {
         let mut properties = self.get_account_properties(address);
         helpers::set_properties_nonce(&mut properties, value.try_into().expect("nonce overflow"));
         self.set_account_properties(address, properties)
     }
 
-    pub fn get_storage_slot(
-        &mut self,
-        address: Address,
-        key: web3::types::U256,
-    ) -> Option<web3::types::H256> {
+    pub fn get_storage_slot(&mut self, address: Address, key: U256) -> Option<B256> {
         let address = address_to_b160(address);
-        let key = h256_to_bytes32(u256_to_h256(key));
+        let key = u256_to_bytes32(key);
         let flat_key = derive_flat_storage_key(&address, &key);
 
         let value = self.tree.cold_storage.get(&flat_key);
         if let Some(res) = value {
-            Some(bytes32_to_h256(*res))
+            Some(bytes32_to_b256(*res))
         } else {
             None
         }
     }
 
-    pub fn set_storage_slot(
-        &mut self,
-        address: Address,
-        key: web3::types::U256,
-        value: web3::types::H256,
-    ) {
+    pub fn set_storage_slot(&mut self, address: Address, key: U256, value: B256) {
         let address = address_to_b160(address);
-        let key = h256_to_bytes32(u256_to_h256(key));
+        let key = u256_to_bytes32(key);
         let flat_key = derive_flat_storage_key(&address, &key);
 
-        let value = h256_to_bytes32(value);
+        let value = b256_to_bytes32(value);
         self.tree.cold_storage.insert(flat_key, value);
         self.tree.storage_tree.insert(&flat_key, &value);
     }
@@ -436,23 +411,17 @@ impl ZKsyncOS {
         (result, full_bytecode)
     }
 
-    pub fn set_predeployed_evm_contract(
-        &mut self,
-        address: web3::types::Address,
-        bytecode: Vec<u8>,
-        nonce: U256,
-    ) {
+    pub fn set_predeployed_evm_contract(&mut self, address: Address, bytecode: Bytes, nonce: U256) {
         let (mut account_data, bytecode) =
             self.evm_bytecode_into_account_properties(address, &bytecode);
         account_data.nonce = nonce.try_into().expect("nonce overflow");
-        let address = address_to_b160(address);
 
         // Now we have to do 2 things:
         // * mark that this account has this bytecode hash deployed
         // * update account state - to say that this is EVM bytecode and nonce is 0.
 
         // We are updating both cold storage (hash map) and our storage tree.
-
+        let address = address_to_b160(address);
         let key = address_into_special_storage_key(&address);
 
         let data_hash = account_data.compute_hash();
@@ -479,16 +448,14 @@ impl ZKsyncOS {
     }
 }
 
-pub fn h256_to_bytes32(input: H256) -> Bytes32 {
-    let mut new = Bytes32::zero();
-    new.as_u8_array_mut().copy_from_slice(input.as_bytes());
-    new
+pub fn b256_to_bytes32(input: B256) -> Bytes32 {
+    Bytes32::from_array(input.0)
 }
 
-pub fn bytes32_to_h256(input: Bytes32) -> H256 {
-    H256::from_slice(&input.as_u8_array())
+pub fn u256_to_bytes32(input: U256) -> Bytes32 {
+    Bytes32::from_array(input.to_be_bytes())
 }
 
-pub fn address_to_b160(input: Address) -> B160 {
-    B160::from_be_bytes(input.to_fixed_bytes())
+pub fn bytes32_to_b256(input: Bytes32) -> B256 {
+    B256::from_slice(&input.as_u8_array())
 }
