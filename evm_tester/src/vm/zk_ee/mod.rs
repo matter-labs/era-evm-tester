@@ -9,7 +9,6 @@ use alloy::primitives::*;
 use itertools::Itertools;
 use zk_ee::common_structs::derive_flat_storage_key;
 use zk_ee::execution_environment_type::ExecutionEnvironmentType;
-use zk_ee::system::errors::InternalError;
 use zk_ee::system::metadata::BlockHashes;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
@@ -18,6 +17,7 @@ use zksync_os_basic_system::system_implementation::flat_storage_model::address_i
 use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
 use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTree;
 use zksync_os_basic_system::system_implementation::flat_storage_model::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
+use zksync_os_forward_system::run::errors::ForwardSubsystemError;
 use zksync_os_forward_system::run::test_impl::{
     InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
 };
@@ -25,6 +25,7 @@ use zksync_os_forward_system::run::{
     run_batch_with_oracle_dump, BatchContext, BatchOutput, PreimageSource, StorageCommitment,
     TxOutput,
 };
+use zksync_os_rig::zksync_os_api::helpers;
 
 use crate::test::case::transaction::AccessListItem;
 use crate::test::case::transaction::Transaction;
@@ -237,7 +238,7 @@ impl ZKsyncOS {
 
     fn apply_batch_execution_result(
         &mut self,
-        batch_execution_result: Result<BatchOutput, InternalError>,
+        batch_execution_result: Result<BatchOutput, ForwardSubsystemError>,
     ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
         match batch_execution_result {
             Ok(result) => {
@@ -347,7 +348,7 @@ impl ZKsyncOS {
     ///
     pub fn get_balance(&mut self, address: Address) -> U256 {
         let properties = self.get_account_properties(address);
-        properties.balance
+        helpers::get_balance(&properties)
     }
 
     ///
@@ -355,7 +356,7 @@ impl ZKsyncOS {
     ///
     pub fn set_balance(&mut self, address: Address, value: U256) {
         let mut properties = self.get_account_properties(address);
-        properties.balance = value;
+        helpers::set_properties_balance(&mut properties, value);
         self.set_account_properties(address, properties)
     }
 
@@ -364,7 +365,7 @@ impl ZKsyncOS {
     ///
     pub fn get_nonce(&mut self, address: Address) -> U256 {
         let properties = self.get_account_properties(address);
-        U256::from(properties.nonce)
+        U256::from(helpers::get_nonce(&properties))
     }
 
     ///
@@ -372,7 +373,7 @@ impl ZKsyncOS {
     ///
     pub fn set_nonce(&mut self, address: Address, value: U256) {
         let mut properties = self.get_account_properties(address);
-        properties.nonce = value.try_into().expect("nonce overflow");
+        helpers::set_properties_nonce(&mut properties, value.try_into().expect("nonce overflow"));
         self.set_account_properties(address, properties)
     }
 
@@ -403,34 +404,16 @@ impl ZKsyncOS {
         &mut self,
         address: Address,
         bytecode: &[u8],
-    ) -> AccountProperties {
-        use zksync_os_basic_system::system_implementation::flat_storage_model::DEFAULT_CODE_VERSION_BYTE;
-        use zksync_os_crypto::blake2s::Blake2s256;
-        use zksync_os_crypto::sha3::Keccak256;
-        use zksync_os_crypto::MiniDigest;
-
-        let observable_bytecode_hash = Bytes32::from_array(Keccak256::digest(bytecode));
-        let bytecode_hash = Bytes32::from_array(Blake2s256::digest(bytecode));
+    ) -> (AccountProperties, Vec<u8>) {
         let mut result = self.get_account_properties(address);
+        let full_bytecode = helpers::set_properties_code(&mut result, bytecode);
 
-        result.observable_bytecode_hash = observable_bytecode_hash;
-        result.bytecode_hash = bytecode_hash;
-        result.versioning_data.set_as_deployed();
-        result
-            .versioning_data
-            .set_ee_version(ExecutionEnvironmentType::EVM as u8);
-        result
-            .versioning_data
-            .set_code_version(DEFAULT_CODE_VERSION_BYTE);
-        result.bytecode_len = bytecode.len() as u32;
-        result.artifacts_len = 0;
-        result.observable_bytecode_len = bytecode.len() as u32;
-
-        result
+        (result, full_bytecode)
     }
 
     pub fn set_predeployed_evm_contract(&mut self, address: Address, bytecode: Bytes, nonce: U256) {
-        let mut account_data = self.evm_bytecode_into_account_properties(address, &bytecode);
+        let (mut account_data, bytecode) =
+            self.evm_bytecode_into_account_properties(address, &bytecode);
         account_data.nonce = nonce.try_into().expect("nonce overflow");
 
         // Now we have to do 2 things:
@@ -460,12 +443,7 @@ impl ZKsyncOS {
         if bytecode_hash == Bytes32::zero() {
             None
         } else {
-            let preimage = self.preimage_source.get_preimage(bytecode_hash);
-            assert!(
-                preimage.is_some(),
-                "Unknown bytecode hash: {bytecode_hash:?}"
-            );
-            preimage
+            Some(helpers::get_code(&mut self.preimage_source, &properties))
         }
     }
 }
