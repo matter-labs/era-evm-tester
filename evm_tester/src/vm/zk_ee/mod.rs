@@ -238,7 +238,7 @@ impl ZKsyncOS {
             preimage_source,
             tx_source,
             NoopTxCallback,
-            &mut NopTracer {},
+            &mut NopTracer::default(),
         );
 
         self.apply_batch_execution_result(result)
