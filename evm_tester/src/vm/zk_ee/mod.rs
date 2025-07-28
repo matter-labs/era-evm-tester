@@ -198,7 +198,7 @@ impl ZKsyncOS {
         // Output flamegraphs if on benchmarking mode
         if bench {
             use zk_ee::types_config::EthereumIOTypesConfig;
-            use zksync_os_forward_system::run::io_implementer_init_data;
+            use zk_ee::common_structs::ProofData;
             use zksync_os_forward_system::run::ForwardRunningOracle;
             use zksync_os_oracle_provider::BasicZkEEOracleWrapper;
             use zksync_os_oracle_provider::ReadWitnessSource;
@@ -206,9 +206,10 @@ impl ZKsyncOS {
 
             let oracle: ForwardRunningOracle<InMemoryTree, InMemoryPreimageSource, TxListSource> =
                 ForwardRunningOracle {
-                    io_implementer_init_data: Some(io_implementer_init_data(Some(
-                        storage_commitment,
-                    ))),
+                    proof_data: Some(ProofData {
+                        state_root_view: storage_commitment,
+                        last_block_timestamp: 0,
+                    }),
                     block_metadata: context,
                     tree: tree.clone(),
                     preimage_source: preimage_source.clone(),
