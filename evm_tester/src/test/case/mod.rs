@@ -200,6 +200,7 @@ impl Case {
                             .transaction
                             .max_priority_fee_per_gas,
                         access_list,
+                        authorization_list: test_definition.transaction.authorization_list.clone(),
                     };
 
                     /*let post_state_for_case = PostStateForCase {
@@ -363,6 +364,7 @@ impl Case {
                             .transaction
                             .max_priority_fee_per_gas,
                         access_list: access_list.clone(),
+                        authorization_list: test_definition.transaction.authorization_list.clone(),
                     };
 
                     /*let post_state_for_case = PostStateForCase {

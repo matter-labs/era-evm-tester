@@ -1,4 +1,4 @@
-use crate::test::case::transaction::{AccessListItem, FieldTo};
+use crate::test::case::transaction::{AccessListItem, AuthorizationListItem, FieldTo};
 use alloy::primitives::*;
 use serde::Deserialize;
 
@@ -16,4 +16,5 @@ pub struct TransactionSection {
     pub sender: Option<Address>,
     pub value: Vec<U256>,
     pub access_lists: Option<Vec<Option<Vec<AccessListItem>>>>,
+    pub authorization_list: Option<Vec<AuthorizationListItem>>,
 }

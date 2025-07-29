@@ -97,7 +97,14 @@ impl FSEntity {
     ///
     pub fn into_enabled_list(self, initial: &Path) -> Vec<EnabledTest> {
         let mut accumulator = Vec::with_capacity(16384);
-        self.into_enabled_list_recursive(initial, &mut accumulator, &vec![], &vec![], &vec![]);
+        self.into_enabled_list_recursive(
+            initial,
+            &mut accumulator,
+            &vec![],
+            &vec![],
+            &vec![],
+            &None,
+        );
         accumulator.sort_by_key(|test| test.path.to_owned());
         accumulator
     }
@@ -109,6 +116,7 @@ impl FSEntity {
         let mut skipped_calldatas: Vec<Bytes> = vec![];
         let mut skipped_cases: Vec<String> = vec![];
         let mut skipped_names: Vec<String> = vec![];
+        let mut hardfork_override: Option<String> = None;
 
         let mut current_entity = self;
         for path_part in path.iter() {
@@ -124,6 +132,10 @@ impl FSEntity {
 
                     if let Some(additional_skipped_names) = directory.skip_names {
                         skipped_names.extend(additional_skipped_names);
+                    }
+
+                    if let Some(hardfork) = directory.hardfork_override {
+                        hardfork_override = Some(hardfork);
                     }
 
                     current_entity = match directory
@@ -151,6 +163,7 @@ impl FSEntity {
                     Some(skipped_calldatas),
                     Some(skipped_cases),
                     Some(skipped_names),
+                    hardfork_override,
                 ))
             }
         }
@@ -209,6 +222,7 @@ impl FSEntity {
                     skip_calldatas: old_skip_calldatas,
                     skip_cases: old_skip_cases,
                     skip_names: old_skip_names,
+                    hardfork_override: old_hardfork_override,
                 }),
                 Self::Directory(Directory {
                     enabled: new_enabled,
@@ -217,6 +231,7 @@ impl FSEntity {
                     skip_calldatas: new_skip_calldatas,
                     skip_cases: new_skip_cases,
                     skip_names: new_skip_names,
+                    hardfork_override: new_hardfork_override,
                 }),
             ) => {
                 *new_enabled = *old_enabled;
@@ -224,6 +239,7 @@ impl FSEntity {
                 *new_skip_calldatas = old_skip_calldatas.clone();
                 *new_skip_cases = old_skip_cases.clone();
                 *new_skip_names = old_skip_names.clone();
+                *new_hardfork_override = old_hardfork_override.clone();
 
                 (old_entities, new_entities)
             }
@@ -274,10 +290,12 @@ impl FSEntity {
         skipped_calldatas: &Vec<Bytes>,
         skipped_cases: &Vec<String>,
         skipped_names: &Vec<String>,
+        hardfork_override: &Option<String>,
     ) {
         let mut skipped_calldatas_new = skipped_calldatas.clone();
         let mut skipped_cases_new = skipped_cases.clone();
         let mut skipped_names_new = skipped_names.clone();
+        let mut hardfork_override = hardfork_override.clone();
 
         let entries = match self {
             Self::File(file) => {
@@ -296,6 +314,9 @@ impl FSEntity {
                 if let Some(additional_skipped_names) = file.skip_names {
                     skipped_names_new.extend(additional_skipped_names);
                 }
+                if let Some(hardfork) = file.hardfork_override {
+                    hardfork_override = Some(hardfork);
+                }
 
                 accumulator.push(EnabledTest::new(
                     current.to_owned(),
@@ -303,6 +324,7 @@ impl FSEntity {
                     Some(skipped_calldatas_new),
                     Some(skipped_cases_new),
                     Some(skipped_names_new),
+                    hardfork_override,
                 ));
                 return;
             }
@@ -319,6 +341,10 @@ impl FSEntity {
                     skipped_cases_new.extend(additional_skipped_cases);
                 }
 
+                if let Some(hardfork) = directory.hardfork_override {
+                    hardfork_override = Some(hardfork);
+                }
+
                 directory.entries
             }
         };
@@ -332,6 +358,7 @@ impl FSEntity {
                 &skipped_calldatas_new,
                 &skipped_cases_new,
                 &skipped_names_new,
+                &hardfork_override,
             );
         }
     }

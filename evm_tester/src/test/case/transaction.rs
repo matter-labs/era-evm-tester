@@ -36,6 +36,19 @@ pub struct AccessListItem {
     pub storage_keys: Vec<U256>,
 }
 
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthorizationListItem {
+    pub chain_id: web3::types::U256,
+    pub address: Address,
+    pub nonce: web3::types::U256,
+    pub v: Option<web3::types::U256>,
+    pub r: web3::types::U256,
+    pub s: web3::types::U256,
+    pub signer: Option<Address>,
+    pub y_parity: web3::types::U256,
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction {
@@ -50,4 +63,5 @@ pub struct Transaction {
     pub sender: Option<Address>,
     pub value: U256,
     pub access_list: Option<Vec<AccessListItem>>,
+    pub authorization_list: Option<Vec<AuthorizationListItem>>,
 }
