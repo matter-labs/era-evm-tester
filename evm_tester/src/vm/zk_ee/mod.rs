@@ -193,7 +193,7 @@ impl ZKsyncOS {
                     }),
             ),
             value: Some(transaction.value.into()),
-            input: transaction.data.into(),
+            input: transaction.data.clone().into(),
             access_list,
             authorization_list,
             ..Default::default()
