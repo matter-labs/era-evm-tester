@@ -226,6 +226,7 @@ impl ZKsyncOS {
             timestamp: system_context.block_timestamp as u64,
             chain_id: system_context.chain_id,
             gas_limit,
+            pubdata_limit: u64::MAX,
             coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_slice())
                 .expect("Invalid coinbase"),
             block_hashes: BlockHashes::default(),
