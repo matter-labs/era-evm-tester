@@ -23,7 +23,7 @@ use zksync_os_forward_system::run::test_impl::{
     InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
 };
 use zksync_os_forward_system::run::{
-    run_batch_with_oracle_dump, BlockContext, BlockOutput, PreimageSource, StorageCommitment,
+    run_block_with_oracle_dump, BlockContext, BlockOutput, PreimageSource, StorageCommitment,
     TxOutput,
 };
 use zksync_os_rig::zksync_os_api::helpers;
@@ -277,7 +277,7 @@ impl ZKsyncOS {
             );
         }
 
-        let result = run_batch_with_oracle_dump(
+        let result = run_block_with_oracle_dump(
             context,
             tree,
             preimage_source,
