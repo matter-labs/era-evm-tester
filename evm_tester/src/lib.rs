@@ -26,12 +26,11 @@ use std::sync::Mutex;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use test::Test;
-use test_suits::ethereum_execution_specs_general_state::EthereumExecutionSpecsGeneralStateTestsDirectory;
+use test_suits::state_tests::EthereumExecutionSpecsGeneralStateTestsDirectory;
 
 pub use crate::environment::Environment;
 pub use crate::filters::Filters;
 pub use crate::summary::Summary;
-pub use crate::test_suits::ethereum_general_state::EthereumGeneralStateTestsDirectory;
 pub use crate::test_suits::Collection;
 pub use crate::vm::zk_ee::ZKsyncOS;
 pub use crate::workflow::Workflow;
@@ -52,11 +51,14 @@ pub struct EvmTester {
 }
 
 impl EvmTester {
-    /// The General state transition tests directory.
-    const GENERAL_STATE_TESTS: &'static str = "ethereum-tests/GeneralStateTests";
-    const GENERAL_STATE_TESTS_FILLER: &'static str = "ethereum-tests/src/GeneralStateTestsFiller";
+    const DEVELOP_STATE_TESTS: &'static str = "ethereum-fixtures/develop/state_tests";
+    pub const DEVELOP_STATE_TESTS_INDEX_PATH: &'static str = "indexes/develop-state-tests.yaml";
 
-    const EXECUTION_SPECS_GENERAL_STATE_TESTS: &'static str = "ethereum-fixtures/state_tests";
+    const STABLE_STATE_TESTS: &'static str = "ethereum-fixtures/stable/state_tests";
+    pub const STABLE_STATE_TESTS_INDEX_PATH: &'static str = "indexes/stable-state-tests.yaml";
+
+    const STATIC_STATE_TESTS: &'static str = "ethereum-fixtures/static/state_tests";
+    pub const STATIC_STATE_TESTS_INDEX_PATH: &'static str = "indexes/static-state-tests.yaml";
 }
 
 impl EvmTester {
@@ -117,21 +119,29 @@ impl EvmTester {
     fn all_tests(&self, environment: Environment) -> anyhow::Result<Vec<Test>> {
         let mut tests = Vec::with_capacity(16384);
 
-        tests.extend(self.directory::<EthereumGeneralStateTestsDirectory>(
-            Self::GENERAL_STATE_TESTS,
-            Self::GENERAL_STATE_TESTS_FILLER,
-            environment,
-        )?);
+        tests.extend(
+            self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
+                Self::DEVELOP_STATE_TESTS,
+                environment,
+                Self::DEVELOP_STATE_TESTS_INDEX_PATH,
+            )?,
+        );
 
-        if self.run_spec_tests {
-            tests.extend(
-                self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
-                    Self::EXECUTION_SPECS_GENERAL_STATE_TESTS,
-                    "", // don't need fillers here
-                    environment,
-                )?,
-            );
-        }
+        tests.extend(
+            self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
+                Self::STABLE_STATE_TESTS,
+                environment,
+                Self::STABLE_STATE_TESTS_INDEX_PATH,
+            )?,
+        );
+
+        tests.extend(
+            self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
+                Self::STATIC_STATE_TESTS,
+                environment,
+                Self::STATIC_STATE_TESTS_INDEX_PATH,
+            )?,
+        );
 
         Ok(tests)
     }
@@ -142,18 +152,18 @@ impl EvmTester {
     fn directory<T>(
         &self,
         path: &str,
-        filler_path: &str,
         environment: Environment,
+        index_path: &str,
     ) -> anyhow::Result<Vec<Test>>
     where
         T: Collection,
     {
         T::read_all(
             Path::new(path),
-            Path::new(filler_path),
             &self.filters,
             environment,
             self.mutation_path.clone(),
+            Path::new(index_path),
         )
         .map_err(|error| anyhow::anyhow!("Failed to read the tests directory `{path}`: {error}"))
     }

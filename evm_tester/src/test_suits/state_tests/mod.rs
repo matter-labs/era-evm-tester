@@ -5,10 +5,6 @@
 use std::path::Path;
 use std::path::PathBuf;
 
-pub mod platforms;
-
-use platforms::index_for_environment;
-
 use crate::filters::Filters;
 use crate::test::Test;
 use crate::test_suits::Collection;
@@ -30,26 +26,50 @@ impl EthereumExecutionSpecsGeneralStateTestsDirectory {
         let index: index::FSEntity = serde_yaml::from_str(index_data.as_str())?;
         Ok(index)
     }
+
+    pub fn create_index(index_path: &Path, directory_path: &Path) -> anyhow::Result<()> {
+        let index = index::FSEntity::index(directory_path)?;
+        let _ = std::fs::write(index_path, serde_yaml::to_string(&index)?.as_bytes());
+
+        Ok(())
+    }
+
+    pub fn update_index(index_path: &Path, directory_path: &Path) -> anyhow::Result<()> {
+        let old_index = Self::read_index(index_path)?;
+
+        let mut new_index = index::FSEntity::index(directory_path)?;
+
+        let changes = old_index.update(&mut new_index, directory_path, true)?;
+
+        println!("Index updated\n {}", changes);
+
+        let _ = std::fs::write(
+            "updated_index.yaml",
+            serde_yaml::to_string(&new_index)?.as_bytes(),
+        );
+
+        Ok(())
+    }
 }
-
-/*fn update_index(index_path: &Path, directory_path: &Path) -> anyhow::Result<()> {
-    let index = index::FSEntity::index(directory_path)?;
-    let _ = std::fs::write(index_path, serde_yaml::to_string(&index)?.as_bytes());
-
-    Ok(())
-}*/
 
 impl Collection for EthereumExecutionSpecsGeneralStateTestsDirectory {
     fn read_all(
         directory_path: &Path,
-        _filler_path: &Path,
         filters: &Filters,
         environment: Environment,
         mutation_path: Option<String>,
+        index_path: &Path,
     ) -> anyhow::Result<Vec<Test>> {
-        let index_path = PathBuf::from(index_for_environment(environment));
+        let index_maybe = Self::read_index(index_path);
 
-        Ok(Self::read_index(index_path.as_path())?
+        if index_maybe.is_err() {
+            Self::create_index(&index_path, directory_path)?;
+            return Ok(vec![]);
+        }
+
+        //Self::update_index(index_path, directory_path)?;
+
+        Ok(index_maybe?
             .into_enabled_list(directory_path)
             .into_iter()
             .filter_map(|test| {

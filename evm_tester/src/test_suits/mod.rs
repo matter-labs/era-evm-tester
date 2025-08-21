@@ -2,9 +2,8 @@
 //! The buildable compiler test trait.
 //!
 
-pub mod ethereum_execution_specs_general_state;
-pub mod ethereum_general_state;
 pub mod index;
+pub mod state_tests;
 
 use crate::filters::Filters;
 use crate::test::Test;
@@ -20,9 +19,9 @@ pub trait Collection {
     ///
     fn read_all(
         directory_path: &Path,
-        filler_path: &Path,
         filters: &Filters,
         environment: Environment,
         mutation_path: Option<String>,
+        index_path: &Path,
     ) -> anyhow::Result<Vec<Test>>;
 }

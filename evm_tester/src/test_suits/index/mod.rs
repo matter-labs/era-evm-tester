@@ -159,7 +159,6 @@ impl FSEntity {
                 file_path.push(path);
                 Some(EnabledTest::new(
                     file_path,
-                    file.group,
                     Some(skipped_calldatas),
                     Some(skipped_cases),
                     Some(skipped_names),
@@ -184,6 +183,10 @@ impl FSEntity {
                 new_file.enabled = old_file.enabled;
                 new_file.group = old_file.group.clone();
                 new_file.comment = old_file.comment.clone();
+                new_file.skip_cases = old_file.skip_cases.clone();
+                new_file.skip_names = old_file.skip_names.clone();
+                new_file.skip_calldatas = old_file.skip_calldatas.clone();
+                new_file.hardfork_override = old_file.hardfork_override.clone();
 
                 let new_hash = new_file
                     .hash
@@ -320,7 +323,6 @@ impl FSEntity {
 
                 accumulator.push(EnabledTest::new(
                     current.to_owned(),
-                    file.group,
                     Some(skipped_calldatas_new),
                     Some(skipped_cases_new),
                     Some(skipped_names_new),

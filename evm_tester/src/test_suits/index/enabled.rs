@@ -12,8 +12,6 @@ use std::path::PathBuf;
 pub struct EnabledTest {
     /// The test path.
     pub path: PathBuf,
-    /// The test group.
-    pub group: Option<String>,
     pub skip_calldatas: Option<Vec<Bytes>>,
     pub skip_cases: Option<Vec<String>>,
     pub skip_names: Option<Vec<String>>,
@@ -26,7 +24,6 @@ impl EnabledTest {
     ///
     pub fn new(
         path: PathBuf,
-        group: Option<String>,
         skip_calldatas: Option<Vec<Bytes>>,
         skip_cases: Option<Vec<String>>,
         skip_names: Option<Vec<String>>,
@@ -34,7 +31,6 @@ impl EnabledTest {
     ) -> Self {
         Self {
             path,
-            group,
             skip_calldatas,
             skip_cases,
             skip_names,
