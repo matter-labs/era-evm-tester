@@ -42,25 +42,14 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     let summary = evm_tester::Summary::new(arguments.verbosity, arguments.quiet).wrap();
 
-    let filters = evm_tester::Filters::new(
-        arguments.paths,
-        arguments.groups,
-        arguments.labels,
-        arguments.names,
-    );
+    let filters = evm_tester::Filters::new(arguments.paths, arguments.labels, arguments.names);
 
     let evm_tester = evm_tester::EvmTester::new(
         summary.clone(),
         filters,
         arguments.workflow,
         arguments.mutation_path,
-        arguments.run_ethereum_spec_tests,
     )?;
-
-    let environment = match arguments.environment {
-        Some(environment @ evm_tester::Environment::ZKsyncOS) => environment,
-        None => evm_tester::Environment::ZKsyncOS,
-    };
 
     let run_time_start = Instant::now();
     println!(
@@ -69,12 +58,8 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
         rayon::current_num_threads(),
     );
 
-    match environment {
-        evm_tester::Environment::ZKsyncOS => {
-            let vm = evm_tester::ZKsyncOS::new();
-            evm_tester.run_zksync_os(vm, arguments.mutation)
-        }
-    }?;
+    let vm = evm_tester::ZKsyncOS::new();
+    evm_tester.run_zksync_os(vm, arguments.mutation)?;
 
     let summary = evm_tester::Summary::unwrap_arc(summary);
     print!("{summary}");
@@ -106,14 +91,11 @@ mod tests {
             quiet: false,
             paths: vec!["tests/solidity/simple/default.sol".to_owned()],
             names: vec![],
-            groups: vec![],
             labels: vec![],
             threads: Some(1),
-            environment: None,
             workflow: evm_tester::Workflow::BuildAndRun,
             mutation: false,
             mutation_path: None,
-            run_ethereum_spec_tests: false,
         };
 
         crate::main_inner(arguments).expect("Manual testing failed");

@@ -15,8 +15,6 @@ pub enum Outcome {
     Passed {
         /// The outcome variant.
         variant: PassedVariant,
-        /// The test group name.
-        group: Option<String>,
     },
     /// The `failed` outcome. The output result is incorrect.
     Failed {
@@ -46,8 +44,8 @@ impl Outcome {
     ///
     /// A shortcut constructor.
     ///
-    pub fn passed(group: Option<String>, variant: PassedVariant) -> Self {
-        Self::Passed { group, variant }
+    pub fn passed(variant: PassedVariant) -> Self {
+        Self::Passed { variant }
     }
 
     ///

@@ -419,13 +419,12 @@ impl Case {
         summary: Arc<Mutex<Summary>>,
         vm: ZKsyncOS,
         test_name: String,
-        test_group: Option<String>,
         bench: bool,
     ) {
         let calldata = self.transaction.data.0.clone();
         let name = self.label.clone();
         let result = std::panic::catch_unwind(|| {
-            self.run_zksync_os_inner(summary.clone(), vm, test_name.clone(), test_group, bench)
+            self.run_zksync_os_inner(summary.clone(), vm, test_name.clone(), bench)
         });
         if let Err(e) = result {
             Summary::panicked(
@@ -442,7 +441,6 @@ impl Case {
         summary: Arc<Mutex<Summary>>,
         mut vm: ZKsyncOS,
         test_name: String,
-        test_group: Option<String>,
         bench: bool,
     ) {
         let name = self.label;
@@ -609,14 +607,7 @@ impl Case {
             // Note that not all reverting tests have an expected
             // exception declared.
             if check_successful && (!self.expect_exception || res.exception) {
-                Summary::passed_runtime(
-                    summary,
-                    format!("{test_name}: {name}"),
-                    test_group,
-                    0,
-                    0,
-                    res.gas,
-                );
+                Summary::passed_runtime(summary, format!("{test_name}: {name}"), 0, 0, res.gas);
             } else {
                 Summary::failed(
                     summary,
@@ -631,14 +622,7 @@ impl Case {
         } else {
             // Test case was invalid, we check if this was expected
             if self.expect_exception && check_successful {
-                Summary::passed_runtime(
-                    summary,
-                    format!("{test_name}: {name}"),
-                    test_group,
-                    0,
-                    0,
-                    U256::ZERO,
-                );
+                Summary::passed_runtime(summary, format!("{test_name}: {name}"), 0, 0, U256::ZERO);
             } else {
                 Summary::invalid(
                     summary,

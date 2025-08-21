@@ -59,10 +59,6 @@ impl Collection for EthereumExecutionSpecsGeneralStateTestsDirectory {
                     return None;
                 }
 
-                if !filters.check_group(&test.group) {
-                    return None;
-                }
-
                 let file = std::fs::read_to_string(test.path.clone())
                     .unwrap_or_else(|_| panic!("Test not found: {:?}", test.path));
 

@@ -11,8 +11,6 @@ use std::collections::HashSet;
 pub struct Filters {
     /// The path filters.
     path_filters: HashSet<String>,
-    /// The group filters.
-    group_filters: HashSet<String>,
     /// The label filters.
     label_filters: HashSet<String>,
     /// The name filters.
@@ -25,13 +23,11 @@ impl Filters {
     ///
     pub fn new(
         path_filters: Vec<String>,
-        group_filters: Vec<String>,
         label_filters: Vec<String>,
         name_filters: Vec<String>,
     ) -> Self {
         Self {
             path_filters: path_filters.into_iter().collect(),
-            group_filters: group_filters.into_iter().collect(),
             label_filters: label_filters.into_iter().collect(),
             name_filters: name_filters.into_iter().collect(),
         }
@@ -69,20 +65,5 @@ impl Filters {
     ///
     pub fn check_test_name(&self, name: &str) -> bool {
         self.name_filters.is_empty() || self.name_filters.contains(name)
-    }
-
-    ///
-    /// Check if the test group is compatible with the filters.
-    ///
-    pub fn check_group(&self, group: &Option<String>) -> bool {
-        if self.group_filters.is_empty() {
-            return true;
-        }
-
-        if let Some(group) = group {
-            !self.group_filters.contains(group)
-        } else {
-            false
-        }
     }
 }

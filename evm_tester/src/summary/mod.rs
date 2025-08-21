@@ -97,7 +97,6 @@ impl Summary {
     pub fn passed_deploy(
         summary: Arc<Mutex<Self>>,
         name: String,
-        group: Option<String>,
         size: usize,
         cycles: usize,
         ergs: u64,
@@ -109,7 +108,7 @@ impl Summary {
             ergs,
             _gas: gas,
         };
-        Self::passed(summary, name, group, passed_variant);
+        Self::passed(summary, name, passed_variant);
     }
 
     ///
@@ -118,21 +117,20 @@ impl Summary {
     pub fn passed_runtime(
         summary: Arc<Mutex<Self>>,
         name: String,
-        group: Option<String>,
         cycles: usize,
         ergs: u64,
         gas: U256,
     ) {
         let passed_variant = PassedVariant::Runtime { cycles, ergs, gas };
-        Self::passed(summary, name, group, passed_variant);
+        Self::passed(summary, name, passed_variant);
     }
 
     ///
     /// Adds a passed outcome of a special call, like `storageEmpty` or `balance`.
     ///
-    pub fn passed_special(summary: Arc<Mutex<Self>>, name: String, group: Option<String>) {
+    pub fn passed_special(summary: Arc<Mutex<Self>>, name: String) {
         let passed_variant = PassedVariant::Special;
-        Self::passed(summary, name, group, passed_variant);
+        Self::passed(summary, name, passed_variant);
     }
 
     ///
@@ -183,13 +181,8 @@ impl Summary {
     ///
     /// The unified function for passed outcomes.
     ///
-    fn passed(
-        summary: Arc<Mutex<Self>>,
-        name: String,
-        group: Option<String>,
-        passed_variant: PassedVariant,
-    ) {
-        let element = Element::new(name, Outcome::passed(group, passed_variant));
+    fn passed(summary: Arc<Mutex<Self>>, name: String, passed_variant: PassedVariant) {
+        let element = Element::new(name, Outcome::passed(passed_variant));
         summary.lock().expect("Sync").push_element(element);
     }
 

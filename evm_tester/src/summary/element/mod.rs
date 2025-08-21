@@ -47,10 +47,7 @@ impl Element {
         };
 
         let details = match self.outcome {
-            Outcome::Passed {
-                ref variant,
-                ref group,
-            } => {
+            Outcome::Passed { ref variant } => {
                 let mut details = Vec::new();
                 if let PassedVariant::Deploy { size, .. } = variant {
                     details.push(format!("size {size}").bright_white().to_string())
@@ -66,9 +63,6 @@ impl Element {
                         details.push(format!("gas {gas}").bright_white().to_string());
                     }
                     _ => {}
-                };
-                if let Some(group) = group {
-                    details.push(format!("group '{group}'").bright_white().to_string())
                 };
                 if details.is_empty() {
                     "".to_string()

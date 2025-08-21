@@ -68,14 +68,13 @@ impl EvmTester {
         filters: Filters,
         workflow: Workflow,
         mutation_path: Option<String>,
-        run_spec_tests: bool,
     ) -> anyhow::Result<Self> {
         Ok(Self {
             summary,
             filters,
             workflow,
             mutation_path,
-            run_spec_tests,
+            run_spec_tests: true,
         })
     }
 

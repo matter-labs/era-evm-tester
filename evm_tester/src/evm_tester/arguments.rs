@@ -26,10 +26,6 @@ pub struct Arguments {
     #[structopt(short = "n", long = "name")]
     pub names: Vec<String>,
 
-    /// Runs only tests from the specified groups.
-    #[structopt(short = "g", long = "group")]
-    pub groups: Vec<String>,
-
     /// Runs only tests with the specified labels.
     #[structopt(short = "l", long = "label")]
     pub labels: Vec<String>,
@@ -37,12 +33,6 @@ pub struct Arguments {
     /// Sets the number of threads, which execute the tests concurrently.
     #[structopt(short = "t", long = "threads")]
     pub threads: Option<usize>,
-
-    /// Specify the environment to run tests on.
-    /// Available arguments: `EVMEmulator`, `ZKsyncOS`.
-    /// The default value is EVMEmulator
-    #[structopt(long = "environment")]
-    pub environment: Option<evm_tester::Environment>,
 
     /// Choose between `build` to compile tests only without running, `run` to compile and run
     /// or `bench` to also produce flamegraphs.
@@ -58,10 +48,6 @@ pub struct Arguments {
     /// The path to the mutated tests directory
     #[structopt(long = "mutation_path")]
     pub mutation_path: Option<String>,
-
-    /// Temp, until we debug spec tests
-    #[structopt(long = "spec_tests")]
-    pub run_ethereum_spec_tests: bool,
 }
 
 impl Arguments {

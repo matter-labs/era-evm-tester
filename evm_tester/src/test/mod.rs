@@ -51,8 +51,6 @@ pub struct Test {
     pub name: String,
     /// The test cases.
     pub cases: Vec<Case>,
-    /// The test group.
-    group: Option<String>,
     /// The EVM version.
     // evm_version: Option<EVMVersion>,
     skipped_calldatas: Option<Vec<Bytes>>,
@@ -68,8 +66,6 @@ impl Test {
     pub fn new(
         name: String,
         cases: Vec<Case>,
-        group: Option<String>,
-        // evm_version: Option<EVMVersion>,
         skipped_calldatas: Option<Vec<Bytes>>,
         skipped_cases: Option<Vec<String>>,
         path: PathBuf,
@@ -78,8 +74,6 @@ impl Test {
         Self {
             name,
             cases,
-            group,
-            // evm_version,
             skipped_calldatas,
             skipped_cases,
             path,
@@ -198,8 +192,6 @@ impl Test {
         Self {
             name,
             cases,
-            group: None,
-            // evm_version: None,
             skipped_calldatas,
             skipped_cases,
             path,
@@ -257,8 +249,6 @@ impl Test {
             tests.push(Self {
                 name,
                 cases,
-                group: None,
-                // evm_version: None,
                 skipped_calldatas: skipped_calldatas.clone(), // TODO not convenient
                 skipped_cases: skipped_cases.clone(),         // TODO not convenient
                 path: path.clone(),
@@ -289,13 +279,7 @@ impl Test {
             }
 
             let vm = ZKsyncOS::clone(vm.clone());
-            case.run_zksync_os(
-                summary.clone(),
-                vm,
-                self.name.clone(),
-                self.group.clone(),
-                bench,
-            );
+            case.run_zksync_os(summary.clone(), vm, self.name.clone(), bench);
         }
     }
 }
