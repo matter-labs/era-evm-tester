@@ -58,9 +58,8 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
     )?;
 
     let environment = match arguments.environment {
-        Some(environment @ evm_tester::Environment::EVMEmulator) => environment,
         Some(environment @ evm_tester::Environment::ZKsyncOS) => environment,
-        None => evm_tester::Environment::EVMEmulator,
+        None => evm_tester::Environment::ZKsyncOS,
     };
 
     let run_time_start = Instant::now();
@@ -71,10 +70,6 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
     );
 
     match environment {
-        evm_tester::Environment::EVMEmulator => {
-            panic!("no longer supported");
-        }
-
         evm_tester::Environment::ZKsyncOS => {
             let vm = evm_tester::ZKsyncOS::new();
             evm_tester.run_zksync_os(vm, arguments.mutation)

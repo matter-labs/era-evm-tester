@@ -25,7 +25,6 @@ use std::sync::Mutex;
 
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
-use regex::Regex;
 use test::Test;
 use test_suits::ethereum_execution_specs_general_state::EthereumExecutionSpecsGeneralStateTestsDirectory;
 
