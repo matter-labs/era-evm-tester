@@ -26,12 +26,10 @@ use std::sync::Mutex;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 use test::Test;
-use test_suits::state_tests::EthereumExecutionSpecsGeneralStateTestsDirectory;
 
 pub use crate::environment::Environment;
 pub use crate::filters::Filters;
 pub use crate::summary::Summary;
-pub use crate::test_suits::Collection;
 pub use crate::vm::zk_ee::ZKsyncOS;
 pub use crate::workflow::Workflow;
 
@@ -119,29 +117,23 @@ impl EvmTester {
     fn all_tests(&self, environment: Environment) -> anyhow::Result<Vec<Test>> {
         let mut tests = Vec::with_capacity(16384);
 
-        tests.extend(
-            self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
-                Self::DEVELOP_STATE_TESTS,
-                environment,
-                Self::DEVELOP_STATE_TESTS_INDEX_PATH,
-            )?,
-        );
+        tests.extend(self.directory(
+            Self::DEVELOP_STATE_TESTS,
+            environment,
+            Self::DEVELOP_STATE_TESTS_INDEX_PATH,
+        )?);
 
-        tests.extend(
-            self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
-                Self::STABLE_STATE_TESTS,
-                environment,
-                Self::STABLE_STATE_TESTS_INDEX_PATH,
-            )?,
-        );
+        tests.extend(self.directory(
+            Self::STABLE_STATE_TESTS,
+            environment,
+            Self::STABLE_STATE_TESTS_INDEX_PATH,
+        )?);
 
-        tests.extend(
-            self.directory::<EthereumExecutionSpecsGeneralStateTestsDirectory>(
-                Self::STATIC_STATE_TESTS,
-                environment,
-                Self::STATIC_STATE_TESTS_INDEX_PATH,
-            )?,
-        );
+        tests.extend(self.directory(
+            Self::STATIC_STATE_TESTS,
+            environment,
+            Self::STATIC_STATE_TESTS_INDEX_PATH,
+        )?);
 
         Ok(tests)
     }
@@ -149,16 +141,14 @@ impl EvmTester {
     ///
     /// Returns all tests from the specified directory.
     ///
-    fn directory<T>(
+    fn directory(
         &self,
         path: &str,
         environment: Environment,
         index_path: &str,
     ) -> anyhow::Result<Vec<Test>>
-    where
-        T: Collection,
-    {
-        T::read_all(
+where {
+        crate::test_suits::read_all(
             Path::new(path),
             &self.filters,
             environment,
