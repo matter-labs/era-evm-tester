@@ -57,6 +57,18 @@ impl EvmTester {
 
     const STATIC_STATE_TESTS: &'static str = "ethereum-fixtures/static/state_tests";
     pub const STATIC_STATE_TESTS_INDEX_PATH: &'static str = "indexes/static-state-tests.yaml";
+
+    const DEVELOP_BLOCKCHAIN_TESTS: &'static str = "ethereum-fixtures/develop/blockchain_tests";
+    pub const DEVELOP_BLOCKCHAIN_TESTS_INDEX_PATH: &'static str =
+        "indexes/develop-blockchain-tests.yaml";
+
+    const STABLE_BLOCKCHAIN_TESTS: &'static str = "ethereum-fixtures/stable/blockchain_tests";
+    pub const STABLE_BLOCKCHAIN_TESTS_INDEX_PATH: &'static str =
+        "indexes/stable-blockchain-tests.yaml";
+
+    const STATIC_BLOCKCHAIN_TESTS: &'static str = "ethereum-fixtures/static/blockchain_tests";
+    pub const STATIC_BLOCKCHAIN_TESTS_INDEX_PATH: &'static str =
+        "indexes/static-blockchain-tests.yaml";
 }
 
 impl EvmTester {
@@ -133,6 +145,24 @@ impl EvmTester {
             Self::STATIC_STATE_TESTS,
             environment,
             Self::STATIC_STATE_TESTS_INDEX_PATH,
+        )?);
+
+        tests.extend(self.directory(
+            Self::DEVELOP_BLOCKCHAIN_TESTS,
+            environment,
+            Self::DEVELOP_BLOCKCHAIN_TESTS_INDEX_PATH,
+        )?);
+
+        tests.extend(self.directory(
+            Self::STABLE_BLOCKCHAIN_TESTS,
+            environment,
+            Self::STABLE_BLOCKCHAIN_TESTS_INDEX_PATH,
+        )?);
+
+        tests.extend(self.directory(
+            Self::STATIC_BLOCKCHAIN_TESTS,
+            environment,
+            Self::STATIC_BLOCKCHAIN_TESTS_INDEX_PATH,
         )?);
 
         Ok(tests)
