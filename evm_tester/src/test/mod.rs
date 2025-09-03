@@ -265,7 +265,7 @@ impl Test {
     pub fn run_zksync_os(self, summary: Arc<Mutex<Summary>>, vm: Arc<ZKsyncOS>, bench: bool) {
         for case in self.cases {
             if let Some(filter_calldata) = self.skipped_calldatas.as_ref() {
-                if filter_calldata.contains(&case.transaction.data) {
+                if filter_calldata.contains(&case.transaction.common().data) {
                     Summary::ignored(summary.clone(), case.label);
                     continue;
                 }

@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
 
+use crate::test::case::transaction::encode_transaction;
 use crate::utils::*;
 use alloy::primitives::*;
 use itertools::Itertools;
@@ -94,115 +95,7 @@ impl ZKsyncOS {
         bench: bool,
         test_id: String,
     ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
-        let access_list = transaction.access_list.clone().map(|v| {
-            alloy::eips::eip2930::AccessList(
-                v.into_iter()
-                    .map(
-                        |AccessListItem {
-                             address,
-                             storage_keys,
-                         }| {
-                            let storage_keys = storage_keys
-                                .into_iter()
-                                .map(|k| {
-                                    let buffer: [u8; 32] = k.to_be_bytes();
-                                    alloy::primitives::FixedBytes::from_slice(&buffer)
-                                })
-                                .collect_vec();
-                            alloy::eips::eip2930::AccessListItem {
-                                address: alloy::primitives::Address::from_slice(address.as_ref()),
-                                storage_keys,
-                            }
-                        },
-                    )
-                    .collect_vec(),
-            )
-        });
-
-        #[allow(deprecated)]
-        use alloy::primitives::Signature;
-
-        let authorization_list = transaction.authorization_list.clone().map(|v| {
-            v.into_iter()
-                .map(
-                    |AuthorizationListItem {
-                         nonce,
-                         chain_id,
-                         address,
-                         v: _,
-                         r,
-                         s,
-                         signer: _,
-                         y_parity,
-                     }| {
-                        let mut r_buf = [0u8; 32];
-                        r.to_big_endian(&mut r_buf);
-                        let mut s_buf = [0u8; 32];
-                        s.to_big_endian(&mut s_buf);
-                        let y_parity = !y_parity.is_zero();
-
-                        #[allow(deprecated)]
-                        let signature = Signature::from_scalars_and_parity(
-                            alloy::primitives::FixedBytes::from_slice(&r_buf),
-                            alloy::primitives::FixedBytes::from_slice(&s_buf),
-                            y_parity,
-                        );
-                        alloy::eips::eip7702::Authorization {
-                            chain_id: chain_id.into(),
-                            nonce: nonce.as_u64(),
-                            address: alloy::primitives::Address::from_slice(address.as_ref()),
-                        }
-                        .into_signed(signature)
-                    },
-                )
-                .collect_vec()
-        });
-
-        let request = alloy::rpc::types::TransactionRequest {
-            chain_id: Some(system_context.chain_id),
-            nonce: Some(transaction.nonce.try_into().expect("Nonce overflow")),
-            max_fee_per_gas: Some(
-                transaction
-                    .max_fee_per_gas
-                    .unwrap_or(system_context.gas_price)
-                    .try_into()
-                    .expect("Max fee per gas overflow"),
-            ),
-            max_priority_fee_per_gas: Some(
-                transaction
-                    .max_priority_fee_per_gas
-                    .unwrap_or(system_context.gas_price)
-                    .try_into()
-                    .expect("Max priority fee per gas overflow"),
-            ),
-            gas: Some(
-                transaction
-                    .gas_limit
-                    .try_into()
-                    .expect("gas limit overflow"),
-            ),
-            to: Some(
-                transaction
-                    .to
-                    .0
-                    .map_or(alloy::primitives::TxKind::Create, |addr| {
-                        alloy::primitives::TxKind::Call(alloy::primitives::Address::from_slice(
-                            addr.as_ref(),
-                        ))
-                    }),
-            ),
-            value: Some(transaction.value.into()),
-            input: transaction.data.clone().into(),
-            access_list,
-            authorization_list,
-            ..Default::default()
-        };
-
-        let wallet = zksync_os_rig::alloy::signers::local::PrivateKeySigner::from_slice(
-            transaction.secret_key.as_slice(),
-        )
-        .unwrap();
-        let encoded_tx = helpers::sign_and_encode_transaction_request(request, &wallet);
+        let encoded_tx = encode_transaction(transaction, &system_context);
 
         let tx_source = TxListSource {
             transactions: vec![encoded_tx].into(),

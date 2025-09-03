@@ -9,7 +9,7 @@ pub mod transaction;
 use alloy::primitives::*;
 use itertools::Itertools;
 use post_state_for_case::PostStateForCase;
-use transaction::Transaction;
+use transaction::{transaction_from_tx_section, Transaction};
 
 use crate::{
     test::filler_structure::{AccountFillerStruct, Labels},
@@ -28,7 +28,6 @@ pub struct Case {
     pub label: String,
     pub prestate: PreState,
     pub transaction: Transaction,
-    pub post_state: Option<PostStateForCase>,
     pub expected_state: HashMap<Address, AccountFillerStruct>,
     pub expect_exception: bool,
     pub env: EnvSection,
@@ -86,6 +85,7 @@ impl Case {
         filters: &Filters,
     ) -> Vec<Self> {
         let mut cases = vec![];
+        let test_definition = test_definition.state();
 
         let mut indexes_for_expected_results = vec![];
         // The boolean represents if the expectException flag is set.
@@ -186,22 +186,13 @@ impl Case {
                     let prestate = test_definition.pre.clone();
                     let access_list = access_list.clone();
 
-                    let transaction = Transaction {
-                        data: data.clone(),
-                        gas_limit: *gas_limit,
-                        gas_price: test_definition.transaction.gas_price,
-                        nonce: test_definition.transaction.nonce,
-                        secret_key: test_definition.transaction.secret_key,
-                        to: test_definition.transaction.to,
-                        sender: test_definition.transaction.sender,
-                        value: *value,
-                        max_fee_per_gas: test_definition.transaction.max_fee_per_gas,
-                        max_priority_fee_per_gas: test_definition
-                            .transaction
-                            .max_priority_fee_per_gas,
+                    let transaction = transaction_from_tx_section(
+                        &test_definition.transaction,
+                        *value,
+                        data,
+                        *gas_limit,
                         access_list,
-                        authorization_list: test_definition.transaction.authorization_list.clone(),
-                    };
+                    );
 
                     /*let post_state_for_case = PostStateForCase {
                         hash: expected_result.hash,
@@ -233,7 +224,6 @@ impl Case {
                         label: final_label,
                         prestate,
                         transaction,
-                        post_state: None,
                         expected_state: expected_state.clone(),
                         env: test_definition.env.clone(),
                         expect_exception: *expect_exception,
@@ -253,6 +243,7 @@ impl Case {
         hardfork_version: &str,
     ) -> Vec<Self> {
         let mut cases = vec![];
+        let test_definition = test_definition.state();
 
         let mut indexes_for_expected_results = vec![];
         // The boolean represents if the expectException flag is set.
@@ -350,22 +341,13 @@ impl Case {
 
                     let prestate = test_definition.pre.clone();
 
-                    let transaction = Transaction {
-                        data: data.clone(),
-                        gas_limit: *gas_limit,
-                        gas_price: test_definition.transaction.gas_price,
-                        nonce: test_definition.transaction.nonce,
-                        secret_key: test_definition.transaction.secret_key,
-                        to: test_definition.transaction.to,
-                        sender: test_definition.transaction.sender,
-                        value: *value,
-                        max_fee_per_gas: test_definition.transaction.max_fee_per_gas,
-                        max_priority_fee_per_gas: test_definition
-                            .transaction
-                            .max_priority_fee_per_gas,
-                        access_list: access_list.clone(),
-                        authorization_list: test_definition.transaction.authorization_list.clone(),
-                    };
+                    let transaction = transaction_from_tx_section(
+                        &test_definition.transaction,
+                        *value,
+                        data,
+                        *gas_limit,
+                        access_list.clone(),
+                    );
 
                     /*let post_state_for_case = PostStateForCase {
                         hash: expected_result.hash,
@@ -397,7 +379,6 @@ impl Case {
                         label: final_label,
                         prestate,
                         transaction,
-                        post_state: None,
                         expected_state: expected_state.clone(),
                         env: test_definition.env.clone(),
                         expect_exception: *expect_exception,
@@ -421,7 +402,7 @@ impl Case {
         test_name: String,
         bench: bool,
     ) {
-        let calldata = self.transaction.data.0.clone();
+        let calldata = self.transaction.common().data.0.clone();
         let name = self.label.clone();
         let result = std::panic::catch_unwind(|| {
             self.run_zksync_os_inner(summary.clone(), vm, test_name.clone(), bench)
@@ -475,12 +456,12 @@ impl Case {
         system_context.block_gas_limit = self.env.current_gas_limit;
         system_context.chain_id = 1; // Tests expect it to be 1
 
-        if let Some(gas_price) = self.transaction.gas_price {
+        if let Some(gas_price) = self.transaction.common().gas_price {
             system_context.gas_price = gas_price;
         } else if let Some(base_fee) = self.env.current_base_fee {
             let mut gas_price = base_fee;
 
-            if let Some(max_priority_fee) = self.transaction.max_priority_fee_per_gas {
+            if let Some(max_priority_fee) = self.transaction.common().max_priority_fee_per_gas {
                 gas_price += max_priority_fee;
             }
 
@@ -508,7 +489,7 @@ impl Case {
         for (address, filler_struct) in self.expected_state {
             if filler_struct.balance.is_some() {
                 // We do not have equivalent gas refunds, so balances will be different
-                if address != self.transaction.sender.unwrap()
+                if address != self.transaction.common().sender.unwrap()
                     && address != self.env.current_coinbase
                 {
                     let expected_balance = filler_struct.balance.as_ref().unwrap();
@@ -615,7 +596,7 @@ impl Case {
                     res.exception,
                     expected,
                     actual,
-                    self.transaction.data.to_vec(),
+                    self.transaction.common().data.to_vec(),
                 );
             }
             //}
@@ -628,7 +609,7 @@ impl Case {
                     summary,
                     format!("{test_name}: {name}"),
                     run_result.err().unwrap(),
-                    self.transaction.data.to_vec(),
+                    self.transaction.common().data.to_vec(),
                 );
             }
         }
