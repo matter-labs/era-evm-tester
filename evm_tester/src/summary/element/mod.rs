@@ -57,11 +57,7 @@ impl Element {
                         details.push(format!("cycles {cycles}").bright_white().to_string());
                         details.push(format!("ergs {ergs}").bright_white().to_string());
                     }
-                    PassedVariant::Runtime { cycles, ergs, gas } => {
-                        details.push(format!("cycles {cycles}").bright_white().to_string());
-                        details.push(format!("ergs {ergs}").bright_white().to_string());
-                        details.push(format!("gas {gas}").bright_white().to_string());
-                    }
+                    PassedVariant::Runtime => {}
                     _ => {}
                 };
                 if details.is_empty() {
@@ -71,8 +67,6 @@ impl Element {
                 }
             }
             Outcome::Failed {
-                ref calldata,
-                ref exception,
                 ref expected,
                 ref actual,
             } => {
@@ -82,19 +76,12 @@ impl Element {
                     "".to_string()
                 };
                 if expected.is_some() {
-                    format!(
-                        "\n Exception: {exception}\n Expected: {}{actual_line} \n (calldata {})",
-                        expected.as_ref().unwrap(),
-                        calldata,
-                    )
+                    format!("Expected: {}{actual_line}", expected.as_ref().unwrap(),)
                 } else {
-                    format!("(calldata {})", calldata,)
+                    "".to_string()
                 }
             }
-            Outcome::Invalid {
-                ref error,
-                ref calldata,
-            } => format!("{} (calldata {})", error, calldata),
+            Outcome::Invalid { ref error } => format!("{}", error),
             _ => String::new(),
         };
 

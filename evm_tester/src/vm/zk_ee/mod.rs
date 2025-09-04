@@ -1,35 +1,18 @@
-use std::alloc::Global;
-use std::cmp::min;
-use std::collections::HashMap;
-use std::str::FromStr;
-use std::sync::Arc;
-
 use crate::test::case::transaction::encode_transaction;
 use crate::utils::*;
 use alloy::primitives::*;
-use itertools::Itertools;
-use zk_ee::common_structs::derive_flat_storage_key;
-use zk_ee::system::metadata::BlockHashes;
-use zk_ee::system::tracer::NopTracer;
+use std::cmp::min;
+use std::str::FromStr;
+use zk_ee::utils::u256_to_u64_saturated;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
+use zksync_os_basic_bootloader::bootloader::errors::BootloaderSubsystemError;
 use zksync_os_basic_bootloader::bootloader::errors::InvalidTransaction;
-use zksync_os_basic_system::system_implementation::flat_storage_model::address_into_special_storage_key;
-use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
-use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTree;
-use zksync_os_basic_system::system_implementation::flat_storage_model::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
-use zksync_os_forward_system::run::errors::ForwardSubsystemError;
-use zksync_os_forward_system::run::test_impl::{
-    InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
-};
-use zksync_os_forward_system::run::{
-    run_block_with_oracle_dump, BlockContext, BlockOutput, PreimageSource, StorageCommitment,
-    TxOutput,
-};
+use zksync_os_forward_system::run::{BlockOutput, TxOutput};
 use zksync_os_rig::zksync_os_api::helpers;
+use zksync_os_rig::BlockContext;
+use zksync_os_rig::Chain;
 
-use crate::test::case::transaction::AccessListItem;
-use crate::test::case::transaction::AuthorizationListItem;
 use crate::test::case::transaction::Transaction;
 
 // mod transaction;
@@ -51,7 +34,7 @@ pub struct ZKsyncOSEVMContext {
 /// The VM execution result.
 ///
 #[derive(Debug, Clone, Default)]
-pub struct ZKsyncOSExecutionResult {
+pub struct ZKsyncOSTxExecutionResult {
     /// The VM snapshot execution result.
     pub return_data: Vec<u8>,
     pub exception: bool,
@@ -63,43 +46,25 @@ pub struct ZKsyncOSExecutionResult {
 ///
 /// The ZKsync OS interface.
 ///
-#[derive(Clone)]
 pub struct ZKsyncOS {
-    tree: InMemoryTree,
-    preimage_source: InMemoryPreimageSource,
+    pub chain: Chain,
 }
 
 impl ZKsyncOS {
     pub fn new() -> Self {
-        let tree = InMemoryTree {
-            storage_tree: TestingTree::new_in(Global),
-            cold_storage: HashMap::new(),
-        };
-        let preimage_source = InMemoryPreimageSource {
-            inner: Default::default(),
-        };
-        Self {
-            tree,
-            preimage_source,
-        }
+        let chain = Chain::empty(Some(1));
+        Self { chain }
     }
 
-    pub fn clone(vm: Arc<Self>) -> Self {
-        (*vm).clone()
-    }
-
-    pub fn execute_transaction(
+    pub fn execute_transactions(
         &mut self,
-        transaction: &Transaction,
+        transactions: Vec<Transaction>,
         system_context: ZKsyncOSEVMContext,
-        bench: bool,
-        test_id: String,
-    ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
-        let encoded_tx = encode_transaction(transaction, &system_context);
-
-        let tx_source = TxListSource {
-            transactions: vec![encoded_tx].into(),
-        };
+    ) -> anyhow::Result<Vec<ZKsyncOSTxExecutionResult>, String> {
+        let encoded_txs: Vec<Vec<u8>> = transactions
+            .iter()
+            .map(|transaction| encode_transaction(transaction, &system_context))
+            .collect();
 
         let block_gas_limit: u64 = system_context
             .block_gas_limit
@@ -108,105 +73,43 @@ impl ZKsyncOS {
         // Override block gas limit
         let gas_limit = min(block_gas_limit, MAX_BLOCK_GAS_LIMIT);
 
+        if system_context.block_number > 0 {
+            self.chain
+                .set_last_block_number(system_context.block_number as u64 - 1)
+        }
+
         let context = BlockContext {
-            //todo: gas
             eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string())
                 .expect("Invalid basefee"),
             native_price: ruint::aliases::U256::from(1),
             gas_per_pubdata: Default::default(),
-            block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
-            chain_id: system_context.chain_id,
             gas_limit,
             pubdata_limit: u64::MAX,
             coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_slice())
                 .expect("Invalid coinbase"),
-            block_hashes: BlockHashes::default(),
             mix_hash: ruint::aliases::U256::from(1),
         };
 
-        let storage_commitment = StorageCommitment {
-            root: self.tree.storage_tree.root().clone(),
-            next_free_slot: self.tree.storage_tree.next_free_slot,
-        };
+        let result = self
+            .chain
+            .run_block_no_panic(encoded_txs, Some(context), None, true);
 
-        let tree = self.tree.clone();
-        let preimage_source = self.preimage_source.clone();
-
-        // Output flamegraphs if on benchmarking mode
-        if bench {
-            use zk_ee::common_structs::ProofData;
-            use zk_ee::types_config::EthereumIOTypesConfig;
-            use zksync_os_forward_system::run::ForwardRunningOracle;
-            use zksync_os_oracle_provider::BasicZkEEOracleWrapper;
-            use zksync_os_oracle_provider::ReadWitnessSource;
-            use zksync_os_oracle_provider::ZkEENonDeterminismSource;
-
-            let oracle: ForwardRunningOracle<InMemoryTree, InMemoryPreimageSource, TxListSource> =
-                ForwardRunningOracle {
-                    proof_data: Some(ProofData {
-                        state_root_view: storage_commitment,
-                        last_block_timestamp: 0,
-                    }),
-                    block_metadata: context,
-                    tree: tree.clone(),
-                    preimage_source: preimage_source.clone(),
-                    tx_source: tx_source.clone(),
-                    next_tx: None,
-                };
-            let oracle_wrapper =
-                BasicZkEEOracleWrapper::<EthereumIOTypesConfig, _>::new(oracle.clone());
-            let mut non_determinism_source = ZkEENonDeterminismSource::default();
-            non_determinism_source.add_external_processor(oracle_wrapper);
-            let copy_source = ReadWitnessSource::new(non_determinism_source);
-            let path = std::env::current_dir()
-                .unwrap()
-                .join(format!("{}.svg", test_id));
-            let _output = zksync_os_runner::run_default_with_flamegraph_path(
-                1 << 25,
-                copy_source,
-                Some(path),
-            );
-        }
-
-        let result = run_block_with_oracle_dump(
-            context,
-            tree,
-            preimage_source,
-            tx_source,
-            NoopTxCallback,
-            &mut NopTracer::default(),
-        );
-
-        self.apply_batch_execution_result(result)
+        self.get_block_execution_result(result)
     }
 
-    fn apply_batch_execution_result(
+    fn get_block_execution_result(
         &mut self,
-        batch_execution_result: Result<BlockOutput, ForwardSubsystemError>,
-    ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
-        match batch_execution_result {
+        result: Result<BlockOutput, BootloaderSubsystemError>,
+    ) -> anyhow::Result<Vec<ZKsyncOSTxExecutionResult>, String> {
+        match result {
             Ok(result) => {
-                for storage_write in result.storage_writes.iter() {
-                    self.tree
-                        .cold_storage
-                        .insert(storage_write.key, storage_write.value);
-                    self.tree
-                        .storage_tree
-                        .insert(&storage_write.key, &storage_write.value);
+                let mut results = vec![];
+                for tx_result in result.tx_results {
+                    let r = Self::get_transaction_execution_result(tx_result)?;
+                    results.push(r)
                 }
-
-                for (hash, preimage, _) in result.published_preimages.iter() {
-                    self.preimage_source.inner.insert(*hash, preimage.clone());
-                }
-
-                let tx_result = result
-                    .tx_results
-                    .get(0)
-                    .expect("Do not have tx output")
-                    .clone();
-
-                Self::get_transaction_execution_result(tx_result)
+                Ok(results)
             }
             Err(err) => Err(format!("{err:?}")),
         }
@@ -214,10 +117,10 @@ impl ZKsyncOS {
 
     fn get_transaction_execution_result(
         tx_result: Result<TxOutput, InvalidTransaction>,
-    ) -> anyhow::Result<ZKsyncOSExecutionResult, String> {
+    ) -> anyhow::Result<ZKsyncOSTxExecutionResult, String> {
         match tx_result {
             Ok(tx_output) => {
-                let mut execution_result = ZKsyncOSExecutionResult::default();
+                let mut execution_result = ZKsyncOSTxExecutionResult::default();
 
                 execution_result.gas = U256::from(tx_output.gas_used);
                 // TODO events
@@ -249,50 +152,11 @@ impl ZKsyncOS {
         }
     }
 
-    fn get_account_properties(&mut self, address: Address) -> AccountProperties {
-        let key =
-            address_into_special_storage_key(&ruint::aliases::B160::from_be_bytes(address.0 .0));
-        let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
-        match self.tree.cold_storage.get(&flat_key) {
-            None => AccountProperties::default(),
-            Some(account_hash) => {
-                if account_hash.is_zero() {
-                    // Empty (default) account
-                    AccountProperties::default()
-                } else {
-                    // Get from preimage:
-                    let encoded = self
-                        .preimage_source
-                        .get_preimage(*account_hash)
-                        .unwrap_or_default();
-                    AccountProperties::decode(&encoded.try_into().unwrap())
-                }
-            }
-        }
-    }
-
-    fn set_account_properties(&mut self, address: Address, properties: AccountProperties) {
-        let encoding = properties.encoding();
-        let properties_hash = properties.compute_hash();
-        let address = address_to_b160(address);
-
-        // Save preimage
-        self.preimage_source
-            .inner
-            .insert(properties_hash, encoding.to_vec());
-
-        // Save account hash
-        let key = address_into_special_storage_key(&address);
-        let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
-        self.tree.cold_storage.insert(flat_key, properties_hash);
-        self.tree.storage_tree.insert(&flat_key, &properties_hash);
-    }
-
     ///
     /// Returns the balance of the specified address.
     ///
     pub fn get_balance(&mut self, address: Address) -> U256 {
-        let properties = self.get_account_properties(address);
+        let properties = self.chain.get_account_properties(&address_to_b160(address));
         helpers::get_balance(&properties)
     }
 
@@ -300,95 +164,57 @@ impl ZKsyncOS {
     /// Changes the balance of the specified address.
     ///
     pub fn set_balance(&mut self, address: Address, value: U256) {
-        let mut properties = self.get_account_properties(address);
-        helpers::set_properties_balance(&mut properties, value);
-        self.set_account_properties(address, properties)
+        self.chain.set_balance(address_to_b160(address), value);
     }
 
     ///
     /// Returns the nonce of the specified address.
     ///
     pub fn get_nonce(&mut self, address: Address) -> U256 {
-        let properties = self.get_account_properties(address);
+        let properties = self.chain.get_account_properties(&address_to_b160(address));
         U256::from(helpers::get_nonce(&properties))
     }
 
     ///
     /// Changes the nonce of the specified address.
     ///
-    pub fn set_nonce(&mut self, address: Address, value: U256) {
-        let mut properties = self.get_account_properties(address);
-        helpers::set_properties_nonce(&mut properties, value.try_into().expect("nonce overflow"));
-        self.set_account_properties(address, properties)
+    pub fn set_nonce(&mut self, address: Address, nonce: U256) {
+        let nonce = u256_to_u64_saturated(&nonce);
+        self.chain
+            .set_account_properties(address_to_b160(address), None, Some(nonce), None)
     }
 
     pub fn get_storage_slot(&mut self, address: Address, key: U256) -> Option<B256> {
-        let address = address_to_b160(address);
-        let key = u256_to_bytes32(key);
-        let flat_key = derive_flat_storage_key(&address, &key);
-
-        let value = self.tree.cold_storage.get(&flat_key);
-        if let Some(res) = value {
-            Some(bytes32_to_b256(*res))
-        } else {
-            None
-        }
+        self.chain
+            .get_storage_slot(address_to_b160(address), key)
+            .map(|v| bytes32_to_b256(v.clone()))
     }
 
     pub fn set_storage_slot(&mut self, address: Address, key: U256, value: B256) {
         let address = address_to_b160(address);
-        let key = u256_to_bytes32(key);
-        let flat_key = derive_flat_storage_key(&address, &key);
-
-        let value = b256_to_bytes32(value);
-        self.tree.cold_storage.insert(flat_key, value);
-        self.tree.storage_tree.insert(&flat_key, &value);
-    }
-
-    pub fn evm_bytecode_into_account_properties(
-        &mut self,
-        address: Address,
-        bytecode: &[u8],
-    ) -> (AccountProperties, Vec<u8>) {
-        let mut result = self.get_account_properties(address);
-        let full_bytecode = helpers::set_properties_code(&mut result, bytecode);
-
-        (result, full_bytecode)
+        let value = ruint::aliases::B256::from_be_bytes(value.0);
+        self.chain.set_storage_slot(address, key, value);
     }
 
     pub fn set_predeployed_evm_contract(&mut self, address: Address, bytecode: Bytes, nonce: U256) {
-        let (mut account_data, bytecode) =
-            self.evm_bytecode_into_account_properties(address, &bytecode);
-        account_data.nonce = nonce.try_into().expect("nonce overflow");
-
-        // Now we have to do 2 things:
-        // * mark that this account has this bytecode hash deployed
-        // * update account state - to say that this is EVM bytecode and nonce is 0.
-
-        // We are updating both cold storage (hash map) and our storage tree.
-        let address = address_to_b160(address);
-        let key = address_into_special_storage_key(&address);
-
-        let data_hash = account_data.compute_hash();
-        let flat_key = derive_flat_storage_key(&ACCOUNT_PROPERTIES_STORAGE_ADDRESS, &key);
-        self.tree.cold_storage.insert(flat_key, data_hash);
-        self.tree.storage_tree.insert(&flat_key, &data_hash);
-        self.preimage_source
-            .inner
-            .insert(account_data.bytecode_hash, bytecode.to_vec());
-        self.preimage_source
-            .inner
-            .insert(data_hash, account_data.encoding().to_vec());
+        self.chain.set_account_properties(
+            address_to_b160(address),
+            None,
+            Some(u256_to_u64_saturated(&nonce)),
+            Some(bytecode.0.to_vec()),
+        )
     }
 
     pub fn get_code(&mut self, address: Address) -> Option<Vec<u8>> {
-        let properties = self.get_account_properties(address);
-        let bytecode_hash = properties.bytecode_hash;
+        let properties = self.chain.get_account_properties(&address_to_b160(address));
 
-        if bytecode_hash == Bytes32::zero() {
+        if properties.bytecode_hash == Bytes32::zero() {
             None
         } else {
-            Some(helpers::get_code(&mut self.preimage_source, &properties))
+            Some(helpers::get_code(
+                &mut self.chain.preimage_source,
+                &properties,
+            ))
         }
     }
 }

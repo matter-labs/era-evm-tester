@@ -54,7 +54,7 @@ pub struct AuthorizationListItem {
     pub y_parity: web3::types::U256,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TxCommon {
     pub data: Bytes,
     pub gas_limit: U256,
@@ -69,13 +69,13 @@ pub struct TxCommon {
     pub authorization_list: Option<Vec<AuthorizationListItem>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransactionReq {
     pub common: TxCommon,
     pub secret_key: B256,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SignedTransaction {
     pub common: TxCommon,
     pub ty: u8,
@@ -84,7 +84,7 @@ pub struct SignedTransaction {
     pub s: U256,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Transaction {
     Request(TransactionReq),
     Signed(SignedTransaction),

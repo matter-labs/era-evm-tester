@@ -4,22 +4,24 @@ use std::{
 };
 
 pub mod post_state_for_case;
+pub mod pre_block;
 pub mod transaction;
 
-use alloy::primitives::*;
+use alloy::{primitives::*, serde::quantity::vec};
 use itertools::Itertools;
-use post_state_for_case::PostStateForCase;
+use map::hash_set::HashSet;
+use pre_block::PreBlock;
 use transaction::{transaction_from_tx_section, Transaction};
 
 use crate::{
     test::filler_structure::{AccountFillerStruct, Labels},
-    vm::zk_ee::{ZKsyncOS, ZKsyncOSEVMContext},
+    vm::zk_ee::{ZKsyncOS, ZKsyncOSEVMContext, ZKsyncOSTxExecutionResult},
     Filters, Summary,
 };
 
 use super::{
     filler_structure::{ExpectStructure, FillerStructure, LabelValue, U256Parsed},
-    test_structure::{env_section::EnvSection, pre_state::PreState, TestStructure},
+    test_structure::{pre_state::PreState, TestStructure},
 };
 
 #[derive(Debug)]
@@ -27,10 +29,9 @@ pub struct Case {
     /// The case label.
     pub label: String,
     pub prestate: PreState,
-    pub transaction: Transaction,
+    pub pre_blocks: Vec<PreBlock>,
     pub expected_state: HashMap<Address, AccountFillerStruct>,
     pub expect_exception: bool,
-    pub env: EnvSection,
 }
 
 fn parse_label(val: &LabelValue) -> Vec<String> {
@@ -193,13 +194,10 @@ impl Case {
                         *gas_limit,
                         access_list,
                     );
-
-                    /*let post_state_for_case = PostStateForCase {
-                        hash: expected_result.hash,
-                        logs: expected_result.logs,
-                        txbytes: expected_result.txbytes.clone(),
-                        expect_exception: expected_result.expect_exception.clone(),
-                    };*/
+                    let pre_block = PreBlock {
+                        env: test_definition.env.clone(),
+                        transactions: vec![transaction],
+                    };
 
                     let mut expected_state_index: isize = -1;
 
@@ -223,9 +221,8 @@ impl Case {
                     cases.push(Case {
                         label: final_label,
                         prestate,
-                        transaction,
+                        pre_blocks: vec![pre_block],
                         expected_state: expected_state.clone(),
-                        env: test_definition.env.clone(),
                         expect_exception: *expect_exception,
                     });
 
@@ -348,13 +345,10 @@ impl Case {
                         *gas_limit,
                         access_list.clone(),
                     );
-
-                    /*let post_state_for_case = PostStateForCase {
-                        hash: expected_result.hash,
-                        logs: expected_result.logs,
-                        txbytes: expected_result.txbytes.clone(),
-                        expect_exception: expected_result.expect_exception.clone(),
-                    };*/
+                    let pre_block = PreBlock {
+                        env: test_definition.env.clone(),
+                        transactions: vec![transaction],
+                    };
 
                     let mut expected_state_index: isize = -1;
 
@@ -378,9 +372,8 @@ impl Case {
                     cases.push(Case {
                         label: final_label,
                         prestate,
-                        transaction,
+                        pre_blocks: vec![pre_block],
                         expected_state: expected_state.clone(),
-                        env: test_definition.env.clone(),
                         expect_exception: *expect_exception,
                     });
 
@@ -402,18 +395,12 @@ impl Case {
         test_name: String,
         bench: bool,
     ) {
-        let calldata = self.transaction.common().data.0.clone();
         let name = self.label.clone();
         let result = std::panic::catch_unwind(|| {
             self.run_zksync_os_inner(summary.clone(), vm, test_name.clone(), bench)
         });
         if let Err(e) = result {
-            Summary::panicked(
-                summary,
-                format!("{test_name}: {name}"),
-                format!("{:?}", e),
-                calldata.to_vec(),
-            )
+            Summary::panicked(summary, format!("{test_name}: {name}"), format!("{:?}", e))
         }
     }
 
@@ -447,51 +434,26 @@ impl Case {
                     );
                 });
         }
+        // Collect coinbase and sender address to filter out in balance check
+        let mut coinbase_and_sender_addresses = HashSet::new();
+        self.pre_blocks.iter().for_each(|pre_block| {
+            coinbase_and_sender_addresses.insert(pre_block.env.current_coinbase);
+            pre_block.transactions.iter().for_each(|tx| {
+                coinbase_and_sender_addresses.insert(tx.common().sender.unwrap());
+            })
+        });
 
-        let mut system_context = ZKsyncOSEVMContext::default();
-
-        system_context.block_number = self.env.current_number.try_into().unwrap();
-        system_context.block_timestamp = self.env.current_timestamp.try_into().unwrap();
-        system_context.coinbase = self.env.current_coinbase;
-        system_context.block_gas_limit = self.env.current_gas_limit;
-        system_context.chain_id = 1; // Tests expect it to be 1
-
-        if let Some(gas_price) = self.transaction.common().gas_price {
-            system_context.gas_price = gas_price;
-        } else if let Some(base_fee) = self.env.current_base_fee {
-            let mut gas_price = base_fee;
-
-            if let Some(max_priority_fee) = self.transaction.common().max_priority_fee_per_gas {
-                gas_price += max_priority_fee;
-            }
-
-            system_context.gas_price = gas_price;
-        }
-
-        if let Some(base_fee) = self.env.current_base_fee {
-            system_context.base_fee = base_fee;
-        }
-
-        if let Some(current_difficulty) = self.env.current_difficulty {
-            system_context.block_difficulty = B256::from(current_difficulty.to_be_bytes());
-        }
-
-        if let Some(random) = self.env.current_random {
-            system_context.block_difficulty = B256::from(random.to_be_bytes());
-        }
-        let test_id = format!("{}-{}", test_name, name);
-        let run_result = vm.execute_transaction(&self.transaction, system_context, bench, test_id);
+        let run_result = Self::run_zksync_os_blocks(self.pre_blocks, &mut vm);
 
         let mut check_successful = true;
         let mut expected: Option<String> = None;
         let mut actual: Option<String> = None;
+
         // TODO merge with prestate!
         for (address, filler_struct) in self.expected_state {
             if filler_struct.balance.is_some() {
                 // We do not have equivalent gas refunds, so balances will be different
-                if address != self.transaction.common().sender.unwrap()
-                    && address != self.env.current_coinbase
-                {
+                if !coinbase_and_sender_addresses.contains(&address) {
                     let expected_balance = filler_struct.balance.as_ref().unwrap();
                     if let Some(expected_balance_value) = expected_balance.as_value() {
                         if vm.get_balance(address) != expected_balance_value {
@@ -506,7 +468,6 @@ impl Case {
                     }
                 }
             }
-
             if filler_struct.nonce.is_some() {
                 let expected_nonce = filler_struct.nonce.as_ref().unwrap();
                 if let Some(expected_nonce_value) = expected_nonce.as_value() {
@@ -587,31 +548,82 @@ impl Case {
             // * expect_exception => exception
             // Note that not all reverting tests have an expected
             // exception declared.
-            if check_successful && (!self.expect_exception || res.exception) {
-                Summary::passed_runtime(summary, format!("{test_name}: {name}"), 0, 0, res.gas);
+            // TODO: add res.exception
+            if check_successful {
+                Summary::passed_runtime(summary, format!("{test_name}: {name}"));
             } else {
                 Summary::failed(
                     summary,
                     format!("{test_name}: {name}"),
-                    res.exception,
+                    // res.exception,
                     expected,
                     actual,
-                    self.transaction.common().data.to_vec(),
                 );
             }
             //}
         } else {
             // Test case was invalid, we check if this was expected
             if self.expect_exception && check_successful {
-                Summary::passed_runtime(summary, format!("{test_name}: {name}"), 0, 0, U256::ZERO);
+                Summary::passed_runtime(summary, format!("{test_name}: {name}"));
             } else {
                 Summary::invalid(
                     summary,
                     format!("{test_name}: {name}"),
                     run_result.err().unwrap(),
-                    self.transaction.common().data.to_vec(),
                 );
             }
         }
+    }
+
+    fn run_zksync_os_blocks(
+        pre_blocks: Vec<PreBlock>,
+        vm: &mut ZKsyncOS,
+    ) -> Result<Vec<Vec<ZKsyncOSTxExecutionResult>>, String> {
+        let mut results = vec![];
+        for pre_block in pre_blocks.clone() {
+            let r = Self::run_zksync_os_block(vm, pre_block)?;
+            results.push(r)
+        }
+        Ok(results)
+    }
+
+    fn run_zksync_os_block(
+        vm: &mut ZKsyncOS,
+        pre_block: PreBlock,
+    ) -> Result<Vec<ZKsyncOSTxExecutionResult>, String> {
+        let mut system_context = ZKsyncOSEVMContext::default();
+
+        system_context.chain_id = 1;
+        system_context.block_number = pre_block.env.current_number.try_into().unwrap();
+        system_context.block_timestamp = pre_block.env.current_timestamp.try_into().unwrap();
+        system_context.coinbase = pre_block.env.current_coinbase;
+        system_context.block_gas_limit = pre_block.env.current_gas_limit;
+
+        if let Some(base_fee) = pre_block.env.current_base_fee {
+            system_context.gas_price = base_fee;
+        } else if let Some(fee) = pre_block.transactions.first().unwrap().common().gas_price {
+            system_context.gas_price = fee
+        } else if let Some(fee) = pre_block
+            .transactions
+            .get(0)
+            .unwrap()
+            .common()
+            .max_fee_per_gas
+        {
+            system_context.gas_price = fee
+        }
+
+        if let Some(base_fee) = pre_block.env.current_base_fee {
+            system_context.base_fee = base_fee;
+        }
+
+        if let Some(current_difficulty) = pre_block.env.current_difficulty {
+            system_context.block_difficulty = B256::from(current_difficulty.to_be_bytes());
+        }
+
+        if let Some(random) = pre_block.env.current_random {
+            system_context.block_difficulty = B256::from(random.to_be_bytes());
+        }
+        vm.execute_transactions(pre_block.transactions, system_context)
     }
 }

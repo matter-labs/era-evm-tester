@@ -114,14 +114,8 @@ impl Summary {
     ///
     /// Adds a passed outcome of an ordinary call.
     ///
-    pub fn passed_runtime(
-        summary: Arc<Mutex<Self>>,
-        name: String,
-        cycles: usize,
-        ergs: u64,
-        gas: U256,
-    ) {
-        let passed_variant = PassedVariant::Runtime { cycles, ergs, gas };
+    pub fn passed_runtime(summary: Arc<Mutex<Self>>, name: String) {
+        let passed_variant = PassedVariant::Runtime;
         Self::passed(summary, name, passed_variant);
     }
 
@@ -139,34 +133,33 @@ impl Summary {
     pub fn failed(
         summary: Arc<Mutex<Self>>,
         name: String,
-        exception: bool,
+        // exception: bool,
         expected: Option<String>,
         actual: Option<String>,
-        calldata: Vec<u8>,
     ) {
-        let element = Element::new(name, Outcome::failed(calldata, exception, expected, actual));
+        let element = Element::new(name, Outcome::failed(expected, actual));
         summary.lock().expect("Sync").push_element(element);
     }
 
     ///
     /// Adds an invalid outcome.
     ///
-    pub fn invalid<S>(summary: Arc<Mutex<Self>>, name: String, error: S, calldata: Vec<u8>)
+    pub fn invalid<S>(summary: Arc<Mutex<Self>>, name: String, error: S)
     where
         S: ToString,
     {
-        let element = Element::new(name, Outcome::invalid(error, calldata));
+        let element = Element::new(name, Outcome::invalid(error));
         summary.lock().expect("Sync").push_element(element);
     }
 
     ///
     /// Adds a panicked outcome.
     ///
-    pub fn panicked<S>(summary: Arc<Mutex<Self>>, name: String, error: S, calldata: Vec<u8>)
+    pub fn panicked<S>(summary: Arc<Mutex<Self>>, name: String, error: S)
     where
         S: ToString,
     {
-        let element = Element::new(name, Outcome::panicked(error, calldata));
+        let element = Element::new(name, Outcome::panicked(error));
         summary.lock().expect("Sync").push_element(element);
     }
 

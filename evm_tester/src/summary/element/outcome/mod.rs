@@ -18,9 +18,7 @@ pub enum Outcome {
     },
     /// The `failed` outcome. The output result is incorrect.
     Failed {
-        /// The calldata.
-        calldata: String,
-        exception: bool,
+        // exception: bool,
         expected: Option<String>,
         actual: Option<String>,
     },
@@ -28,13 +26,11 @@ pub enum Outcome {
     Invalid {
         /// The building error description.
         error: String,
-        calldata: String,
     },
     /// The `panicked` outcome. The test execution raised a panic.
     Panicked {
         /// The building error description.
         error: String,
-        calldata: String,
     },
     /// The `ignored` outcome. The test is ignored.
     Ignored,
@@ -51,15 +47,9 @@ impl Outcome {
     ///
     /// A shortcut constructor.
     ///
-    pub fn failed(
-        calldata: Vec<u8>,
-        exception: bool,
-        expected: Option<String>,
-        actual: Option<String>,
-    ) -> Self {
+    pub fn failed(expected: Option<String>, actual: Option<String>) -> Self {
         Self::Failed {
-            calldata: hex::encode(calldata.as_slice()),
-            exception,
+            // exception,
             expected,
             actual,
         }
@@ -68,26 +58,24 @@ impl Outcome {
     ///
     /// A shortcut constructor.
     ///
-    pub fn invalid<S>(error: S, calldata: Vec<u8>) -> Self
+    pub fn invalid<S>(error: S) -> Self
     where
         S: ToString,
     {
         Self::Invalid {
             error: error.to_string(),
-            calldata: hex::encode(calldata.as_slice()),
         }
     }
 
     ///
     /// A shortcut constructor.
     ///
-    pub fn panicked<S>(error: S, calldata: Vec<u8>) -> Self
+    pub fn panicked<S>(error: S) -> Self
     where
         S: ToString,
     {
         Self::Panicked {
             error: error.to_string(),
-            calldata: hex::encode(calldata.as_slice()),
         }
     }
 

@@ -262,10 +262,20 @@ impl Test {
     ///
     /// Runs the test on ZKsync OS.
     ///
-    pub fn run_zksync_os(self, summary: Arc<Mutex<Summary>>, vm: Arc<ZKsyncOS>, bench: bool) {
+    pub fn run_zksync_os(self, summary: Arc<Mutex<Summary>>, bench: bool) {
         for case in self.cases {
             if let Some(filter_calldata) = self.skipped_calldatas.as_ref() {
-                if filter_calldata.contains(&case.transaction.common().data) {
+                if filter_calldata.contains(
+                    &case
+                        .pre_blocks
+                        .get(0)
+                        .unwrap()
+                        .transactions
+                        .get(0)
+                        .unwrap()
+                        .common()
+                        .data,
+                ) {
                     Summary::ignored(summary.clone(), case.label);
                     continue;
                 }
@@ -278,7 +288,7 @@ impl Test {
                 }
             }
 
-            let vm = ZKsyncOS::clone(vm.clone());
+            let vm = ZKsyncOS::new();
             case.run_zksync_os(summary.clone(), vm, self.name.clone(), bench);
         }
     }

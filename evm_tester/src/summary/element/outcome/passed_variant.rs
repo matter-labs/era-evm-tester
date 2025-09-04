@@ -21,14 +21,7 @@ pub enum PassedVariant {
         _gas: u64,
     },
     /// The contract call.
-    Runtime {
-        /// The number of execution cycles.
-        cycles: usize,
-        /// The number of used ergs.
-        ergs: u64,
-        /// The number of used gas.
-        gas: U256,
-    },
+    Runtime,
     /// The special function call.
     Special,
 }

@@ -7,7 +7,7 @@ use pre_state::PreState;
 use serde::{de::IgnoredAny, Deserialize};
 use transaction_section::TransactionSection;
 
-pub mod block;
+pub mod block_section;
 pub mod env_section;
 pub mod info_section;
 pub mod post_state;

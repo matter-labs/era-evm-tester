@@ -58,8 +58,7 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
         rayon::current_num_threads(),
     );
 
-    let vm = evm_tester::ZKsyncOS::new();
-    evm_tester.run_zksync_os(vm, arguments.mutation)?;
+    evm_tester.run_zksync_os(arguments.mutation)?;
 
     let summary = evm_tester::Summary::unwrap_arc(summary);
     print!("{summary}");

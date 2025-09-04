@@ -93,9 +93,8 @@ impl EvmTester {
     ///
     /// Runs all tests on ZKsync OS.
     ///
-    pub fn run_zksync_os(self, vm: ZKsyncOS, run_mutation_tests: bool) -> anyhow::Result<()> {
+    pub fn run_zksync_os(self, run_mutation_tests: bool) -> anyhow::Result<()> {
         let tests = self.all_tests(Environment::ZKsyncOS)?;
-        let vm = Arc::new(vm);
         let _: Vec<()> = tests
             .into_par_iter()
             .map(|mut test| {
@@ -104,7 +103,6 @@ impl EvmTester {
 
                 test.run_zksync_os(
                     self.summary.clone(),
-                    vm.clone(),
                     matches!(self.workflow, Workflow::Bench),
                 );
 
@@ -112,7 +110,6 @@ impl EvmTester {
                     for mutant in mutants {
                         mutant.run_zksync_os(
                             self.summary.clone(),
-                            vm.clone(),
                             matches!(self.workflow, Workflow::Bench),
                         );
                     }
