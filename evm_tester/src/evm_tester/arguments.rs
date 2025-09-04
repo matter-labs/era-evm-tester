@@ -26,6 +26,10 @@ pub struct Arguments {
     #[structopt(short = "n", long = "name")]
     pub names: Vec<String>,
 
+    /// Runs only tests with specified hashes.
+    #[structopt(short = "h", long = "hash")]
+    pub hashes: Vec<String>,
+
     /// Runs only tests with the specified labels.
     #[structopt(short = "l", long = "label")]
     pub labels: Vec<String>,

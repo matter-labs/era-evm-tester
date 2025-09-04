@@ -14,4 +14,5 @@ pub struct InfoSection {
     pub source: Option<String>,
     pub source_hash: Option<String>,
     pub labels: Option<HashMap<usize, String>>,
+    pub hash: Option<String>,
 }

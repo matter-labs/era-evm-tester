@@ -15,6 +15,8 @@ pub struct Filters {
     label_filters: HashSet<String>,
     /// The name filters.
     name_filters: HashSet<String>,
+    /// Hash filters.
+    hash_filters: HashSet<String>,
 }
 
 impl Filters {
@@ -25,11 +27,13 @@ impl Filters {
         path_filters: Vec<String>,
         label_filters: Vec<String>,
         name_filters: Vec<String>,
+        hash_filters: Vec<String>,
     ) -> Self {
         Self {
             path_filters: path_filters.into_iter().collect(),
             label_filters: label_filters.into_iter().collect(),
             name_filters: name_filters.into_iter().collect(),
+            hash_filters: hash_filters.into_iter().collect(),
         }
     }
 
@@ -65,5 +69,12 @@ impl Filters {
     ///
     pub fn check_test_name(&self, name: &str) -> bool {
         self.name_filters.is_empty() || self.name_filters.contains(name)
+    }
+
+    ///
+    /// Check if the test case hash is compatible with the filters.
+    ///
+    pub fn check_case_hash(&self, hash: &str) -> bool {
+        self.hash_filters.is_empty() || self.hash_filters.contains(hash)
     }
 }

@@ -42,7 +42,12 @@ fn main_inner(arguments: Arguments) -> anyhow::Result<()> {
 
     let summary = evm_tester::Summary::new(arguments.verbosity, arguments.quiet).wrap();
 
-    let filters = evm_tester::Filters::new(arguments.paths, arguments.labels, arguments.names);
+    let filters = evm_tester::Filters::new(
+        arguments.paths,
+        arguments.labels,
+        arguments.names,
+        arguments.hashes,
+    );
 
     let evm_tester = evm_tester::EvmTester::new(
         summary.clone(),
@@ -91,6 +96,7 @@ mod tests {
             paths: vec!["tests/solidity/simple/default.sol".to_owned()],
             names: vec![],
             labels: vec![],
+            hashes: vec![],
             threads: Some(1),
             workflow: evm_tester::Workflow::BuildAndRun,
             mutation: false,

@@ -336,6 +336,18 @@ impl Case {
                         continue;
                     }
 
+                    // Apply hash-based filter
+                    if test_definition
+                        ._info
+                        .hash
+                        .as_ref()
+                        .is_some_and(|hash| !Filters::check_case_hash(filters, hash))
+                    {
+                        case_counter += 1;
+
+                        continue;
+                    }
+
                     let prestate = test_definition.pre.clone();
 
                     let transaction = transaction_from_tx_section(
