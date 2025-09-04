@@ -205,20 +205,18 @@ pub fn encode_transaction(
             let request = alloy::rpc::types::TransactionRequest {
                 chain_id: Some(system_context.chain_id),
                 nonce: Some(tx.common.nonce.try_into().expect("Nonce overflow")),
-                max_fee_per_gas: Some(
-                    tx.common
-                        .max_fee_per_gas
-                        .unwrap_or(system_context.gas_price)
-                        .try_into()
-                        .expect("Max fee per gas overflow"),
-                ),
-                max_priority_fee_per_gas: Some(
-                    tx.common
-                        .max_priority_fee_per_gas
-                        .unwrap_or(system_context.gas_price)
-                        .try_into()
-                        .expect("Max priority fee per gas overflow"),
-                ),
+                max_fee_per_gas: tx
+                    .common
+                    .max_fee_per_gas
+                    .map(|v| v.try_into().expect("Max fee per gas overflow")),
+                max_priority_fee_per_gas: tx
+                    .common
+                    .max_priority_fee_per_gas
+                    .map(|v| v.try_into().expect("Max priority fee per gas overflow")),
+                gas_price: tx
+                    .common
+                    .gas_price
+                    .map(|v| v.try_into().expect("gas price overflow")),
                 gas: Some(tx.common.gas_limit.try_into().expect("gas limit overflow")),
                 to: Some(
                     tx.common

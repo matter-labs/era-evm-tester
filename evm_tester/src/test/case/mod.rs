@@ -612,20 +612,6 @@ impl Case {
         system_context.block_gas_limit = pre_block.env.current_gas_limit;
 
         if let Some(base_fee) = pre_block.env.current_base_fee {
-            system_context.gas_price = base_fee;
-        } else if let Some(fee) = pre_block.transactions.first().unwrap().common().gas_price {
-            system_context.gas_price = fee
-        } else if let Some(fee) = pre_block
-            .transactions
-            .get(0)
-            .unwrap()
-            .common()
-            .max_fee_per_gas
-        {
-            system_context.gas_price = fee
-        }
-
-        if let Some(base_fee) = pre_block.env.current_base_fee {
             system_context.base_fee = base_fee;
         }
 

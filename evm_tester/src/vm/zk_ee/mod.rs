@@ -26,7 +26,6 @@ pub struct ZKsyncOSEVMContext {
     pub block_gas_limit: U256,
     pub block_difficulty: B256,
     pub base_fee: U256,
-    pub gas_price: U256,
     pub tx_origin: Address,
 }
 
