@@ -44,7 +44,7 @@ pub struct BlockchainTestStructure {
     pub post_state: HashMap<AddressMaybe, AccountFillerStructMaybe>,
     #[serde(rename = "genesisRLP")]
     genesis_rlp: Option<IgnoredAny>,
-    blocks: Vec<BlockSection>,
+    pub blocks: Vec<BlockSection>,
     seal_engine: Option<IgnoredAny>,
     #[serde(rename = "_info")]
     pub _info: InfoSection,

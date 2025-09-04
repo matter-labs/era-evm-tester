@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    fmt::Debug,
     sync::{Arc, Mutex},
 };
 
@@ -14,14 +15,21 @@ use pre_block::PreBlock;
 use transaction::{transaction_from_tx_section, Transaction};
 
 use crate::{
-    test::filler_structure::{AccountFillerStruct, Labels},
+    test::{
+        filler_structure::{AccountFillerStruct, Labels},
+        test_structure::pre_state::AccountState,
+    },
     vm::zk_ee::{ZKsyncOS, ZKsyncOSEVMContext, ZKsyncOSTxExecutionResult},
     Filters, Summary,
 };
 
 use super::{
     filler_structure::{ExpectStructure, FillerStructure, LabelValue, U256Parsed},
-    test_structure::{pre_state::PreState, TestStructure},
+    test_structure::{
+        env_section::EnvSection,
+        pre_state::{self, PreState},
+        BlockchainTestStructure, StateTestStructure, TestStructure,
+    },
 };
 
 #[derive(Debug)]
@@ -234,13 +242,12 @@ impl Case {
         cases
     }
 
-    pub fn from_ethereum_spec_test(
-        test_definition: &TestStructure,
+    fn from_ethereum_spec_state_test(
+        test_definition: &StateTestStructure,
         filters: &Filters,
         hardfork_version: &str,
     ) -> Vec<Self> {
         let mut cases = vec![];
-        let test_definition = test_definition.state();
 
         let mut indexes_for_expected_results = vec![];
         // The boolean represents if the expectException flag is set.
@@ -395,6 +402,76 @@ impl Case {
         }
 
         cases
+    }
+
+    fn from_ethereum_spec_blockchain_test(
+        test_definition: &BlockchainTestStructure,
+        filters: &Filters,
+        hardfork_version: &str,
+    ) -> Vec<Self> {
+        let prestate = test_definition.pre.clone();
+        let expected_state = ExpectStructure::get_expected_result(&test_definition.post_state);
+
+        // Apply hash-based filter
+        if test_definition
+            ._info
+            .hash
+            .as_ref()
+            .is_some_and(|hash| !Filters::check_case_hash(filters, hash))
+        {
+            return vec![];
+        }
+        let mut pre_blocks = vec![];
+        for block in test_definition.blocks.clone() {
+            let transactions = block
+                .transactions
+                .into_iter()
+                .map(|tx| {
+                    let value = tx.value.first().cloned().unwrap_or_default();
+                    let data = tx.data.first().unwrap_or_default();
+                    let gas_limit = tx.gas_limit.first().cloned().unwrap_or_default();
+                    let access_list = tx
+                        .access_lists
+                        .clone()
+                        .map(|v| v.first().cloned().unwrap().unwrap());
+                    transaction_from_tx_section(&tx, value, data, gas_limit, access_list)
+                })
+                .collect_vec();
+            let env = EnvSection {
+                current_coinbase: block.block_header.coinbase,
+                current_difficulty: block.block_header.difficulty,
+                current_gas_limit: block.block_header.gas_limit,
+                current_base_fee: block.block_header.base_fee_per_gas,
+                current_number: block.block_header.number,
+                current_random: block.block_header.mix_hash,
+                current_timestamp: block.block_header.timestamp,
+                previous_hash: block.block_header.parent_hash,
+            };
+            pre_blocks.push(PreBlock { env, transactions })
+        }
+
+        vec![Case {
+            label: "".to_string(),
+            prestate,
+            pre_blocks,
+            expected_state,
+            expect_exception: false,
+        }]
+    }
+
+    pub fn from_ethereum_spec_test(
+        test_definition: &TestStructure,
+        filters: &Filters,
+        hardfork_version: &str,
+    ) -> Vec<Self> {
+        match test_definition {
+            TestStructure::State(test) => {
+                Self::from_ethereum_spec_state_test(test, filters, hardfork_version)
+            }
+            TestStructure::Blockchain(test) => {
+                Self::from_ethereum_spec_blockchain_test(test, filters, hardfork_version)
+            }
+        }
     }
 
     ///
