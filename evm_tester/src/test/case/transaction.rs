@@ -126,8 +126,16 @@ pub fn transaction_from_tx_section(
         }),
         None => Transaction::Signed(SignedTransaction {
             common,
-            ty: tx.ty.expect("Signed txs should have type field"),
-            v: tx.v.expect("Signed txs should have signature fields"),
+            ty: tx
+                .ty
+                .expect("Signed txs should have type field")
+                .try_into()
+                .expect("tx type overflow"),
+            v: tx
+                .v
+                .expect("Signed txs should have signature fields")
+                .try_into()
+                .expect("tx v overflow"),
             r: tx.r.expect("Signed txs should have signature fields"),
             s: tx.s.expect("Signed txs should have signature fields"),
         }),
