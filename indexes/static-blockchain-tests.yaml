@@ -37,7 +37,8 @@ entries:
                     hash: '0x13ba64781171c527670fe580ebd0b84b'
                     enabled: true
               stEIP4844_blobtransactions:
-                enabled: true
+                enabled: false
+                comment: "Blobs not supported"
                 entries:
                   createBlobhashTx.json:
                     hash: '0x52f73e7d07a64c7ba4e4cbb0d23175e4'

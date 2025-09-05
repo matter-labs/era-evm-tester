@@ -175,7 +175,8 @@ entries:
                 hash: '0x93f53ae2c1e0481a2457f14c0210013c'
                 enabled: true
       eip4844_blobs:
-        enabled: true
+        enabled: false
+        comment: "Blobs not supported"
         entries:
           blob_txs:
             enabled: true
@@ -436,7 +437,8 @@ entries:
                 hash: '0x2cf2820b6cde10665ce8b14edcbbf439'
                 enabled: true
       eip7516_blobgasfee:
-        enabled: true
+        enabled: false
+        comment: "Blobs not supported"
         entries:
           blobgasfee_opcode:
             enabled: true
