@@ -32,6 +32,8 @@ use super::{
     },
 };
 
+const BEACON_ROOTS: Address = address!("0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02");
+
 #[derive(Debug)]
 pub struct Case {
     /// The case label.
@@ -494,7 +496,7 @@ impl Case {
     }
 
     fn run_zksync_os_inner(
-        self,
+        mut self,
         summary: Arc<Mutex<Summary>>,
         mut vm: ZKsyncOS,
         test_name: String,
@@ -537,6 +539,9 @@ impl Case {
         let mut check_successful = true;
         let mut expected: Option<String> = None;
         let mut actual: Option<String> = None;
+
+        // Ignore beacon roots address
+        self.expected_state.remove(&BEACON_ROOTS);
 
         // TODO merge with prestate!
         for (address, filler_struct) in self.expected_state {
