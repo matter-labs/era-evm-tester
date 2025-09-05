@@ -712,7 +712,7 @@ impl Case {
         }
 
         if let Some(random) = pre_block.env.current_random {
-            system_context.block_difficulty = B256::from(random.to_be_bytes());
+            system_context.mix_hash = random;
         }
         vm.execute_transactions(pre_block.transactions, system_context)
     }

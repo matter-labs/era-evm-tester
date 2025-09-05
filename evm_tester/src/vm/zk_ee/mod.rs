@@ -27,6 +27,7 @@ pub struct ZKsyncOSEVMContext {
     pub block_difficulty: B256,
     pub base_fee: U256,
     pub tx_origin: Address,
+    pub mix_hash: U256,
 }
 
 ///
@@ -87,7 +88,7 @@ impl ZKsyncOS {
             pubdata_limit: u64::MAX,
             coinbase: ruint::Bits::try_from_be_slice(system_context.coinbase.as_slice())
                 .expect("Invalid coinbase"),
-            mix_hash: ruint::aliases::U256::from(1),
+            mix_hash: system_context.mix_hash,
         };
 
         let result = self
