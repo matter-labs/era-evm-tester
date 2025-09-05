@@ -456,12 +456,18 @@ impl Case {
             pre_blocks.push(PreBlock { env, transactions })
         }
 
+        // TODO: this probably needs to be a vec (one per block)
+        let expect_exception = test_definition
+            .blocks
+            .iter()
+            .any(|block| block.expect_exception.is_some());
+
         vec![Case {
             label: "".to_string(),
             prestate,
             pre_blocks,
             expected_state,
-            expect_exception: false,
+            expect_exception,
         }]
     }
 
