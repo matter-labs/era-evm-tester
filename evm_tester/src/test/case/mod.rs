@@ -41,7 +41,6 @@ pub struct Case {
     pub prestate: PreState,
     pub pre_blocks: Vec<PreBlock>,
     pub expected_state: HashMap<Address, AccountFillerStruct>,
-    pub expect_exception: bool,
 }
 
 fn parse_label(val: &LabelValue) -> Vec<String> {
@@ -204,10 +203,6 @@ impl Case {
                         *gas_limit,
                         access_list,
                     );
-                    let pre_block = PreBlock {
-                        env: test_definition.env.clone(),
-                        transactions: vec![transaction],
-                    };
 
                     let mut expected_state_index: isize = -1;
 
@@ -228,12 +223,17 @@ impl Case {
                     let index: usize = expected_state_index.try_into().unwrap();
                     let (expected_state, expect_exception) = &expected_results_states[index];
 
+                    let pre_block = PreBlock {
+                        env: test_definition.env.clone(),
+                        transactions: vec![transaction],
+                        expect_exception: *expect_exception,
+                    };
+
                     cases.push(Case {
                         label: final_label,
                         prestate,
                         pre_blocks: vec![pre_block],
                         expected_state: expected_state.clone(),
-                        expect_exception: *expect_exception,
                     });
 
                     case_counter += 1;
@@ -366,10 +366,6 @@ impl Case {
                         *gas_limit,
                         access_list.clone(),
                     );
-                    let pre_block = PreBlock {
-                        env: test_definition.env.clone(),
-                        transactions: vec![transaction],
-                    };
 
                     let mut expected_state_index: isize = -1;
 
@@ -389,13 +385,17 @@ impl Case {
 
                     let index: usize = expected_state_index.try_into().unwrap();
                     let (expected_state, expect_exception) = &expected_results_states[index];
+                    let pre_block = PreBlock {
+                        env: test_definition.env.clone(),
+                        transactions: vec![transaction],
+                        expect_exception: *expect_exception,
+                    };
 
                     cases.push(Case {
                         label: final_label,
                         prestate,
                         pre_blocks: vec![pre_block],
                         expected_state: expected_state.clone(),
-                        expect_exception: *expect_exception,
                     });
 
                     case_counter += 1;
@@ -453,21 +453,19 @@ impl Case {
                 current_timestamp: block.block_header.timestamp,
                 previous_hash: block.block_header.parent_hash,
             };
-            pre_blocks.push(PreBlock { env, transactions })
+            let expect_exception = block.expect_exception.is_some();
+            pre_blocks.push(PreBlock {
+                env,
+                transactions,
+                expect_exception,
+            })
         }
-
-        // TODO: this probably needs to be a vec (one per block)
-        let expect_exception = test_definition
-            .blocks
-            .iter()
-            .any(|block| block.expect_exception.is_some());
 
         vec![Case {
             label: "".to_string(),
             prestate,
             pre_blocks,
             expected_state,
-            expect_exception,
         }]
     }
 
@@ -543,6 +541,12 @@ impl Case {
                 coinbase_and_sender_addresses.insert(tx.common().sender.unwrap());
             })
         });
+
+        let expect_exceptions = self
+            .pre_blocks
+            .iter()
+            .map(|pb| pb.expect_exception)
+            .collect_vec();
 
         let run_result = Self::run_zksync_os_blocks(self.pre_blocks, &mut vm);
 
@@ -646,49 +650,47 @@ impl Case {
             }
         }
 
-        if let Ok(res) = run_result {
-            // For the test to pass, we need:
-            // * successful state changes
-            // * expect_exception => exception
-            // Note that not all reverting tests have an expected
-            // exception declared.
-            // TODO: add res.exception
-            if check_successful {
-                Summary::passed_runtime(summary, format!("{test_name}: {name}"));
-            } else {
-                Summary::failed(
-                    summary,
-                    format!("{test_name}: {name}"),
-                    // res.exception,
-                    expected,
-                    actual,
-                );
+        // For the test to pass, we need:
+        // * successful state changes
+        // * expect_exception <=> exception for every block in the test
+
+        let exception_check = run_result
+            .iter()
+            .zip(expect_exceptions)
+            .find_map(|(res, expect_exception)| match (expect_exception, res) {
+                (true, Ok(_)) => Some(ExceptionCheckResult::ExpectedExceptionFailure),
+                (false, Err(e)) => Some(ExceptionCheckResult::UnexpectedException(e.clone())),
+                _ => None,
+            })
+            .unwrap_or(ExceptionCheckResult::Passed);
+
+        match exception_check {
+            ExceptionCheckResult::Passed => {
+                if check_successful {
+                    Summary::passed_runtime(summary, format!("{test_name}: {name}"));
+                } else {
+                    Summary::failed(summary, format!("{test_name}: {name}"), expected, actual);
+                }
             }
-            //}
-        } else {
-            // Test case was invalid, we check if this was expected
-            if self.expect_exception && check_successful {
-                Summary::passed_runtime(summary, format!("{test_name}: {name}"));
-            } else {
-                Summary::invalid(
-                    summary,
-                    format!("{test_name}: {name}"),
-                    run_result.err().unwrap(),
-                );
+            ExceptionCheckResult::UnexpectedException(e) => {
+                Summary::invalid(summary, format!("{test_name}: {name}"), e)
             }
-        }
+            ExceptionCheckResult::ExpectedExceptionFailure => Summary::invalid(
+                summary,
+                format!("{test_name}: {name}"),
+                "Should have reached an exception".to_string(),
+            ),
+        };
     }
 
     fn run_zksync_os_blocks(
         pre_blocks: Vec<PreBlock>,
         vm: &mut ZKsyncOS,
-    ) -> Result<Vec<Vec<ZKsyncOSTxExecutionResult>>, String> {
-        let mut results = vec![];
-        for pre_block in pre_blocks.clone() {
-            let r = Self::run_zksync_os_block(vm, pre_block)?;
-            results.push(r)
-        }
-        Ok(results)
+    ) -> Vec<Result<Vec<ZKsyncOSTxExecutionResult>, String>> {
+        pre_blocks
+            .into_iter()
+            .map(|pre_block| Self::run_zksync_os_block(vm, pre_block))
+            .collect_vec()
     }
 
     fn run_zksync_os_block(
@@ -716,4 +718,10 @@ impl Case {
         }
         vm.execute_transactions(pre_block.transactions, system_context)
     }
+}
+
+enum ExceptionCheckResult {
+    Passed,
+    ExpectedExceptionFailure,
+    UnexpectedException(String),
 }
