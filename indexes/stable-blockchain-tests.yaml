@@ -136,7 +136,8 @@ entries:
                 hash: '0x960aba84d4029f2dafad8f47b43d29fe'
                 enabled: true
       eip4788_beacon_root:
-        enabled: true
+        enabled: false
+        comment: EIP 4788 not supported
         entries:
           beacon_root_contract:
             enabled: true
@@ -597,7 +598,8 @@ entries:
                 hash: '0xc6ed4f2267f4faec138be6cc0b54b447'
                 enabled: true
       eip152_blake2:
-        enabled: true
+        enabled: false
+        comment: Blake2b not supported
         entries:
           blake2:
             enabled: true
@@ -681,7 +683,8 @@ entries:
                 hash: '0xddcbdffadfdf5059a2c086341305d8a2'
                 enabled: true
       eip4895_withdrawals:
-        enabled: true
+        enabled: false
+        comment: Withdrawals not supported
         entries:
           withdrawals:
             enabled: true
