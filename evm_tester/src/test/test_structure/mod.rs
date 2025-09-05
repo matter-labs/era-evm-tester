@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::test::filler_structure::AccountFillerStructMaybe;
 use crate::test::filler_structure::AddressMaybe;
+use crate::test::test_structure::block_section::blocks_from_plain_or_wrapped;
 use crate::test::test_structure::pre_state::AccountState;
 use alloy::primitives::*;
 use block_section::BlockSection;
@@ -44,6 +45,7 @@ pub struct BlockchainTestStructure {
     pub post_state: HashMap<AddressMaybe, AccountFillerStructMaybe>,
     #[serde(rename = "genesisRLP")]
     genesis_rlp: Option<IgnoredAny>,
+    #[serde(default, deserialize_with = "blocks_from_plain_or_wrapped")]
     pub blocks: Vec<BlockSection>,
     seal_engine: Option<IgnoredAny>,
     #[serde(rename = "_info")]

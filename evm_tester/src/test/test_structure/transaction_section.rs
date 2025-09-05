@@ -60,7 +60,11 @@ pub struct TransactionSection {
     pub sender: Option<Address>,
     #[serde(deserialize_with = "vec_from_one_or_many")]
     pub value: Vec<U256>,
-    #[serde(alias = "accessList", deserialize_with = "opt_vec_from_one_or_many")]
+    #[serde(
+        default,
+        alias = "accessList",
+        deserialize_with = "opt_vec_from_one_or_many"
+    )]
     pub access_lists: Option<Vec<Option<Vec<AccessListItem>>>>,
     pub authorization_list: Option<Vec<AuthorizationListItem>>,
     #[serde(rename = "type")]
