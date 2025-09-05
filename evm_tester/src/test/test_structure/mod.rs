@@ -37,7 +37,7 @@ pub struct StateTestStructure {
 #[serde(rename_all = "camelCase")]
 #[serde(deny_unknown_fields)]
 pub struct BlockchainTestStructure {
-    network: Option<IgnoredAny>,
+    pub network: String,
     config: Option<IgnoredAny>,
     genesis_block_header: Option<IgnoredAny>,
     lastblockhash: Option<IgnoredAny>,

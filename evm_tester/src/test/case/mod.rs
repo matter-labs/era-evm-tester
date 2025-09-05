@@ -413,6 +413,10 @@ impl Case {
     ) -> Vec<Self> {
         let prestate = test_definition.pre.clone();
         let expected_state = ExpectStructure::get_expected_result(&test_definition.post_state);
+        // Filter hardfork
+        if test_definition.network != hardfork_version {
+            return vec![];
+        }
 
         // Apply hash-based filter
         if test_definition
