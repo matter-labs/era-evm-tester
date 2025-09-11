@@ -8,12 +8,11 @@ use crate::utils::*;
 use alloy::primitives::*;
 use itertools::Itertools;
 use zk_ee::common_structs::derive_flat_storage_key;
-use zk_ee::execution_environment_type::ExecutionEnvironmentType;
 use zk_ee::system::metadata::BlockHashes;
 use zk_ee::system::tracer::NopTracer;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
-use zksync_os_basic_bootloader::bootloader::errors::InvalidTransaction;
+use zksync_os_interface::error::InvalidTransaction;
 use zksync_os_basic_system::system_implementation::flat_storage_model::address_into_special_storage_key;
 use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
 use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTree;
@@ -23,9 +22,9 @@ use zksync_os_forward_system::run::test_impl::{
     InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
 };
 use zksync_os_forward_system::run::{
-    run_block_with_oracle_dump, BlockContext, BlockOutput, PreimageSource, StorageCommitment,
-    TxOutput,
+    run_block_with_oracle_dump, BlockContext, PreimageSource, StorageCommitment,
 };
+use zksync_os_interface::types::{BlockOutput, TxOutput};
 use zksync_os_rig::zksync_os_api::helpers;
 
 use crate::test::case::transaction::AccessListItem;
@@ -298,14 +297,14 @@ impl ZKsyncOS {
                 for storage_write in result.storage_writes.iter() {
                     self.tree
                         .cold_storage
-                        .insert(storage_write.key, storage_write.value);
+                        .insert(storage_write.key.0.into(), storage_write.value.0.into());
                     self.tree
                         .storage_tree
-                        .insert(&storage_write.key, &storage_write.value);
+                        .insert(&storage_write.key.0.into(), &storage_write.value.0.into());
                 }
 
-                for (hash, preimage, _) in result.published_preimages.iter() {
-                    self.preimage_source.inner.insert(*hash, preimage.clone());
+                for (hash, preimage) in result.published_preimages.iter() {
+                    self.preimage_source.inner.insert(hash.0.into(), preimage.clone());
                 }
 
                 let tx_result = result
@@ -331,22 +330,21 @@ impl ZKsyncOS {
                 // TODO events
 
                 match &tx_output.execution_result {
-                    zksync_os_forward_system::run::ExecutionResult::Success(execution_output) => {
+                    zksync_os_interface::types::ExecutionResult::Success(execution_output) => {
                         match execution_output {
-                            zksync_os_forward_system::run::ExecutionOutput::Call(data) => {
+                            zksync_os_interface::types::ExecutionOutput::Call(data) => {
                                 execution_result.return_data = data.clone();
                             }
-                            zksync_os_forward_system::run::ExecutionOutput::Create(
+                            zksync_os_interface::types::ExecutionOutput::Create(
                                 data,
                                 address,
                             ) => {
-                                let bytes = address.to_be_bytes();
                                 execution_result.return_data = data.clone();
-                                execution_result.address_deployed = Some(Address::from(bytes));
+                                execution_result.address_deployed = Some(*address);
                             }
                         }
                     }
-                    zksync_os_forward_system::run::ExecutionResult::Revert(vec) => {
+                    zksync_os_interface::types::ExecutionResult::Revert(vec) => {
                         execution_result.exception = true;
                         execution_result.return_data = vec.clone();
                     }

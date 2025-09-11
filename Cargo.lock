@@ -3228,6 +3228,7 @@ dependencies = [
  "which",
  "yaml-rust2",
  "zk_ee",
+ "zksync_os_interface",
  "zksync_os_runner",
 ]
 
@@ -8776,6 +8777,16 @@ dependencies = [
  "ruint",
  "zk_ee",
  "zksync_os_runner",
+]
+
+[[package]]
+name = "zksync_os_interface"
+version = "0.0.2"
+source = "git+https://github.com/matter-labs/zksync-os-interface?tag=v0.0.2#598bc713a2b87996ac2b6d8d01c3ef5bcbcd2ff8"
+dependencies = [
+ "alloy-consensus",
+ "alloy-primitives",
+ "serde",
 ]
 
 [[package]]
