@@ -21,7 +21,7 @@ anyhow = "=1.0.89"
 which = "=6.0.3"
 colored = "=2.1.0"
 
-serde = { version = "=1.0.210", features = ["derive"] }
+serde = { version = "=1.0.219", features = ["derive"] }
 serde_json = { version = "=1.0.128", features = ["arbitrary_precision"] }
 serde_yaml = "=0.9.34"
 serde_yml = "0.0.12"
@@ -44,6 +44,9 @@ parity-scale-codec-derive = "=3.6.12"
 
 ruint = {version = "*", features = ["primitive-types"]}
 alloy = { version = "1", features = ["full", "eip712"]}
+
+zksync_os_interface = { git = "https://github.com/matter-labs/zksync-os-interface", tag = "v0.0.2" }
+#zksync_os_interface = { git = "https://github.com/matter-labs/zksync-os-interface", tag = "v0.0.2" }
 
 zksync_os_forward_system = {package = "forward_system",  git="https://github.com/matter-labs/zksync-os", branch = "main" }
 zk_ee = { package = "zk_ee",  git="https://github.com/matter-labs/zksync-os", branch = "main"  }
