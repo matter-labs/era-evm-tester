@@ -12,7 +12,6 @@ use zk_ee::system::metadata::BlockHashes;
 use zk_ee::system::tracer::NopTracer;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
-use zksync_os_interface::error::InvalidTransaction;
 use zksync_os_basic_system::system_implementation::flat_storage_model::address_into_special_storage_key;
 use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
 use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTree;
@@ -24,6 +23,7 @@ use zksync_os_forward_system::run::test_impl::{
 use zksync_os_forward_system::run::{
     run_block_with_oracle_dump, BlockContext, PreimageSource, StorageCommitment,
 };
+use zksync_os_interface::error::InvalidTransaction;
 use zksync_os_interface::types::{BlockOutput, TxOutput};
 use zksync_os_rig::zksync_os_api::helpers;
 
@@ -220,7 +220,7 @@ impl ZKsyncOS {
             eip1559_basefee: ruint::Uint::from_str(&system_context.base_fee.to_string())
                 .expect("Invalid basefee"),
             native_price: ruint::aliases::U256::from(1),
-            gas_per_pubdata: Default::default(),
+            pubdata_price: Default::default(),
             block_number: system_context.block_number as u64,
             timestamp: system_context.block_timestamp as u64,
             chain_id: system_context.chain_id,
@@ -304,7 +304,9 @@ impl ZKsyncOS {
                 }
 
                 for (hash, preimage) in result.published_preimages.iter() {
-                    self.preimage_source.inner.insert(hash.0.into(), preimage.clone());
+                    self.preimage_source
+                        .inner
+                        .insert(hash.0.into(), preimage.clone());
                 }
 
                 let tx_result = result
@@ -335,10 +337,7 @@ impl ZKsyncOS {
                             zksync_os_interface::types::ExecutionOutput::Call(data) => {
                                 execution_result.return_data = data.clone();
                             }
-                            zksync_os_interface::types::ExecutionOutput::Create(
-                                data,
-                                address,
-                            ) => {
+                            zksync_os_interface::types::ExecutionOutput::Create(data, address) => {
                                 execution_result.return_data = data.clone();
                                 execution_result.address_deployed = Some(*address);
                             }
