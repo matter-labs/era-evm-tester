@@ -8,7 +8,7 @@ use crate::utils::*;
 use alloy::primitives::*;
 use itertools::Itertools;
 use zk_ee::common_structs::derive_flat_storage_key;
-use zk_ee::system::metadata::BlockHashes;
+use zk_ee::system::metadata::zk_metadata::BlockHashes;
 use zk_ee::system::tracer::NopTracer;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::config::BasicBootloaderCallSimulationConfig;
