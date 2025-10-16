@@ -19,12 +19,11 @@ use zksync_os_basic_system::system_implementation::flat_storage_model::TestingTr
 use zksync_os_basic_system::system_implementation::flat_storage_model::ACCOUNT_PROPERTIES_STORAGE_ADDRESS;
 use zksync_os_forward_system::run::errors::ForwardSubsystemError;
 use zksync_os_forward_system::run::test_impl::{
-    InMemoryPreimageSource, InMemoryTree, NoopTxCallback, TxListSource,
+    InMemoryPreimageSource, InMemoryTree, NoopTxCallback,
 };
-use zksync_os_forward_system::run::{
-    BlockContext, PreimageSource,
-};
+use zksync_os_forward_system::run::{BlockContext, PreimageSource};
 use zksync_os_interface::error::InvalidTransaction;
+use zksync_os_interface::traits::TxListSource;
 use zksync_os_interface::types::{BlockOutput, TxOutput};
 use zksync_os_rig::zksync_os_api::helpers;
 
