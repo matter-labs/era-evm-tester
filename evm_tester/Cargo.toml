@@ -46,7 +46,7 @@ ruint = {version = "*", features = ["primitive-types"]}
 alloy = { version = "=1.0.31", features = ["full", "eip712", "consensus"]}
 
 zksync_os_interface = { git = "https://github.com/matter-labs/zksync-os-interface", tag = "v0.0.8"}
-# zksync_os_interface = { git = "https://github.com/matter-labs/zksync-os-interface", tag = "v0.0.8"}
+#zksync_os_interface = { git = "https://github.com/matter-labs/zksync-os-interface", tag = "v0.0.8"}
 
 zksync_os_forward_system = {package = "forward_system",  git="https://github.com/matter-labs/zksync-os", branch = "main" }
 zk_ee = { package = "zk_ee",  git="https://github.com/matter-labs/zksync-os", branch = "main"  }
