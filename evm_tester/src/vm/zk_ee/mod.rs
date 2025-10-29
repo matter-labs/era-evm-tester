@@ -12,6 +12,7 @@ use zk_ee::system::metadata::zk_metadata::BlockHashes;
 use zk_ee::system::tracer::NopTracer;
 use zk_ee::utils::Bytes32;
 use zksync_os_basic_bootloader::bootloader::config::BasicBootloaderCallSimulationConfig;
+use zksync_os_basic_bootloader::bootloader::config::BasicBootloaderProvingExecutionConfig;
 use zksync_os_basic_bootloader::bootloader::constants::MAX_BLOCK_GAS_LIMIT;
 use zksync_os_basic_system::system_implementation::flat_storage_model::address_into_special_storage_key;
 use zksync_os_basic_system::system_implementation::flat_storage_model::AccountProperties;
@@ -275,7 +276,7 @@ impl ZKsyncOS {
             _,
             _,
             _,
-            BasicBootloaderCallSimulationConfig,
+            BasicBootloaderProvingExecutionConfig,
         >(
             context,
             tree,
