@@ -231,7 +231,7 @@ impl ZKsyncOS {
                 .expect("Invalid coinbase"),
             block_hashes: BlockHashes::default(),
             mix_hash: ruint::aliases::U256::from(1),
-            blob_fee: ruint::aliases::U256::from(1),
+            ..Default::default()
         };
 
         let tree = self.tree.clone();
